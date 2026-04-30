@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Levante UD — Gestión Deportiva</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1B2E4B;--navy-light:#243B5E;--red:#E8333A;
+  --border:#E5E7EB;--border-strong:#D1D5DB;
+  --bg:#F0F2F5;--white:#fff;
+  --text:#111827;--text2:#374151;--text3:#6B7280;--text4:#9CA3AF;
+  --radius:8px;--shadow:0 1px 4px rgba(0,0,0,.08);
+  --col-w:72px;--time-w:44px;--px-min:1.15;
+  --day-h:42px;--fmt-h:18px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;background:var(--bg);height:100vh;overflow:hidden;color:var(--text);}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;}
+.sidebar{width:204px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;overflow:hidden;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;}
+.content{flex:1;overflow-y:auto;padding:14px 18px;}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+.sb-logo{padding:14px 12px 10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:9px;}
+.sb-icon{width:30px;height:30px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-icon svg{width:17px;height:17px;}
+.sb-name{color:#fff;font-size:13px;font-weight:600;line-height:1.2;}
+.sb-sub{color:rgba(255,255,255,.4);font-size:10px;}
+.sb-sync{padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sync-pill{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.5);}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#10B981;}
+.sync-dot.off{background:#6B7280;}
+.nav{padding:8px 6px;flex:1;}
+.nav-sec{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.08em;text-transform:uppercase;padding:8px 8px 3px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:1px;transition:all .15s;user-select:none;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.nav-item.active{background:rgba(232,51,58,.2);color:#fff;font-weight:500;}
+.nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);flex-shrink:0;}
+.nav-item.active .nav-dot{background:var(--red);}
+.nav-badge{margin-left:auto;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:9px;padding:1px 6px;border-radius:20px;}
+.sb-user{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:8px;}
+.user-av{width:26px;height:26px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0;}
+.user-name{font-size:11px;font-weight:500;color:#fff;}
+.user-role{font-size:10px;color:rgba(255,255,255,.4);}
+
+/* ═══════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════ */
+.page-title{font-size:15px;font-weight:600;color:var(--text);}
+.page-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.topbar-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+
+/* ═══════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;white-space:nowrap;transition:opacity .15s,background .15s;}
+.btn:hover{opacity:.88;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-blue{background:#2563EB;color:#fff;}
+.btn-green{background:#059669;color:#fff;}
+.btn-wa{background:#25D366;color:#fff;}
+.btn-outline{background:var(--white);border:1px solid var(--border-strong);color:var(--text2);}
+.btn-outline:hover{background:#F9FAFB;opacity:1;}
+.btn-sm{padding:4px 9px;font-size:10px;}
+.btn-xs{padding:3px 7px;font-size:9px;}
+
+/* ═══════════════════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════════════════ */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ═══════════════════════════════════════════════════
+   CARDS / TABLES
+═══════════════════════════════════════════════════ */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.card-hd{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text);}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;font-size:10px;font-weight:600;color:var(--text3);padding:7px 14px;background:#F9FAFB;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em;}
+.tbl td{padding:8px 14px;border-bottom:1px solid #F3F4F6;font-size:11px;color:var(--text2);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#FAFAFA;}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;}
+.pill-g{background:#D1FAE5;color:#065F46;}
+.pill-b{background:#DBEAFE;color:#1E40AF;}
+.pill-y{background:#FEF3C7;color:#92400E;}
+.pill-r{background:#FEE2E2;color:#991B1B;}
+.pill-p{background:#EDE9FE;color:#5B21B6;}
+.av-sm{width:24px;height:24px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+.stat-val{font-size:22px;font-weight:600;color:var(--text);}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* ═══════════════════════════════════════════════════
+   CALENDAR TOOLBAR
+═══════════════════════════════════════════════════ */
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;}
+.week-nav{display:flex;align-items:center;gap:6px;}
+.wbtn{width:26px;height:26px;border:1px solid var(--border-strong);background:var(--white);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:15px;line-height:1;}
+.wbtn:hover{background:#F9FAFB;}
+.wlabel{font-size:12px;font-weight:600;color:var(--text);min-width:155px;text-align:center;}
+.tab-row{display:flex;gap:4px;}
+.tab-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--white);font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;}
+.tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ═══════════════════════════════════════════════════
+   CALENDAR GRID — WEEKDAYS
+═══════════════════════════════════════════════════ */
+.cal-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--white);}
+.cal-outer{display:flex;width:max-content;}
+.time-axis{width:var(--time-w);flex-shrink:0;display:flex;flex-direction:column;}
+.tick{position:absolute;right:4px;font-size:9px;color:var(--text4);transform:translateY(-50%);white-space:nowrap;}
+.days-area{flex:1;display:flex;flex-direction:column;}
+.days-header{display:flex;}
+.day-hcell{text-align:center;font-size:11px;font-weight:600;color:var(--text2);padding:5px 2px;background:#F9FAFB;border-left:2px solid var(--border-strong);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:3px;}
+.day-hcell:first-child{border-left:none;}
+.day-pistas{display:flex;gap:2px;}
+.pt{font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;}
+.pt-t{background:#DBEAFE;color:#1D4ED8;}
+.pt-r{background:#FEE2E2;color:#B91C1C;}
+.pt-p{background:#EDE9FE;color:#6D28D9;}
+
+/* Format label */
+.fmt-row{display:flex;}
+.fmt-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-left:2px solid var(--border-strong);border-bottom:1px solid var(--border);display:flex;align-items:center;text-transform:uppercase;}
+.fmt-lbl:first-child{border-left:none;}
+.fmt-f11{background:#BFDBFE;color:#1E3A8A;}
+.fmt-f8{background:#FDE68A;color:#78350F;}
+
+/* Timeline */
+.timeline-body{display:flex;}
+.day-wrap{display:flex;border-left:2px solid var(--border-strong);}
+.day-wrap:first-child{border-left:none;}
+.pista-col{position:relative;border-right:1px solid var(--border);}
+.pista-col:last-child{border-right:none;}
+.pista-col.p-porteras{background:#FAFAF7;}
+.pista-col.p-tenis{background:#FAFEFF;}
+.pista-col.p-rio{background:#FFF9F9;}
+.hline{position:absolute;left:0;right:0;pointer-events:none;}
+.hline.solid{border-top:1px solid #F0F0F0;}
+.hline.hour{border-top:1px solid #E5E7EB;}
+.hline.half{border-top:1px dashed #F0F0F0;}
+.drop-zone{position:absolute;inset:0;z-index:1;}
+.drop-zone.over{background:rgba(37,99,235,.07);}
+
+/* ═══════════════════════════════════════════════════
+   FICHAS
+═══════════════════════════════════════════════════ */
+.ficha{position:absolute;left:2px;right:2px;border-radius:4px;padding:3px 5px;cursor:grab;overflow:hidden;display:flex;flex-direction:column;z-index:2;border-left:3px solid rgba(0,0,0,.18);}
+.ficha:active{cursor:grabbing;opacity:.7;}
+.ficha.merged{background:#fff !important;border:1.5px solid var(--border-strong);border-left:3px solid #6B7280;}
+.ficha.porteras-ficha{border-left-color:#7C3AED;}
+.f-sig{font-size:10px;font-weight:700;line-height:1.2;}
+.f-hr{font-size:8px;opacity:.8;}
+.f-tags{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px;}
+.f-tag{font-size:7px;padding:1px 4px;border-radius:3px;font-weight:500;}
+.f-tag-match{background:#FEF3C7;color:#92400E;}
+.f-tag-home{background:#D1FAE5;color:#065F46;}
+.f-tag-away{background:#FEE2E2;color:#991B1B;}
+.f-cmt{font-size:7.5px;font-style:italic;opacity:.75;margin-top:1px;line-height:1.3;}
+.f-acts{display:none;gap:2px;margin-top:2px;}
+.ficha:hover .f-acts{display:flex;}
+.fbt{background:rgba(255,255,255,.6);border:none;border-radius:3px;cursor:pointer;font-size:8px;padding:1px 4px;color:inherit;line-height:1.4;}
+.fbt:hover{background:rgba(255,255,255,.9);}
+
+/* ═══════════════════════════════════════════════════
+   WEEKEND CALENDAR
+═══════════════════════════════════════════════════ */
+.wk-grid{display:flex;gap:14px;}
+.wk-day{flex:1;min-width:280px;}
+.wk-day-hd{background:var(--navy);color:#fff;padding:8px 12px;border-radius:var(--radius) var(--radius) 0 0;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
+.wk-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;background:var(--white);}
+.wk-outer{display:flex;}
+.wk-axis{width:var(--time-w);flex-shrink:0;position:relative;}
+.wk-cols{flex:1;display:grid;grid-template-columns:1fr 1fr;}
+.wk-col-hd{font-size:10px;font-weight:600;text-align:center;padding:5px;background:#F9FAFB;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
+.wk-col-hd:last-child{border-right:none;}
+.wk-pista{position:relative;border-right:1px solid var(--border);}
+.wk-pista:last-child{border-right:none;}
+
+/* ═══════════════════════════════════════════════════
+   BANK
+═══════════════════════════════════════════════════ */
+.bank-box{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;}
+.bank-sec{flex:1;min-width:140px;}
+.bank-lbl{font-size:10px;font-weight:600;margin-bottom:5px;}
+.chips{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;}
+.chips.over{background:#EFF6FF;border-radius:4px;}
+.chip{border-radius:4px;padding:2px 8px;font-size:10px;font-weight:500;cursor:grab;user-select:none;}
+.chip:active{opacity:.6;}
+
+/* ═══════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:500;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--white);border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:360px;max-width:93vw;max-height:92vh;overflow-y:auto;}
+.modal-wide{width:480px;}
+.mh{padding:13px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;}
+.mt{font-size:13px;font-weight:600;color:var(--text);}
+.mx{background:none;border:none;cursor:pointer;color:var(--text4);font-size:18px;line-height:1;}
+.mb{padding:14px 16px;}
+.mr{margin-bottom:11px;}
+.ml{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.mi,.mta,.msel{width:100%;padding:7px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;color:var(--text);background:var(--white);}
+.mi:focus,.mta:focus,.msel:focus{outline:none;border-color:#2563EB;}
+.mta{resize:vertical;min-height:52px;}
+.mftr{padding:0 16px 14px;display:flex;gap:8px;}
+.mbtn-s{flex:1;padding:7px;background:var(--white);border:1px solid var(--border-strong);border-radius:6px;font-size:12px;color:var(--text2);cursor:pointer;}
+.mbtn-p{flex:1;padding:7px;background:var(--navy);border:none;border-radius:6px;font-size:12px;color:#fff;font-weight:500;cursor:pointer;}
+.mrow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px;}
+.toggle-row{display:flex;gap:8px;margin-bottom:11px;}
+.toggle-btn{flex:1;padding:7px;border:1px solid var(--border-strong);border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;text-align:center;color:var(--text3);background:var(--white);}
+.toggle-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* Email preview */
+.email-prev{background:#F9FAFB;border:1px solid var(--border);border-radius:6px;padding:12px;font-size:10px;color:var(--text2);line-height:1.7;max-height:200px;overflow-y:auto;white-space:pre-wrap;}
+.ent-row{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#F9FAFB;border-radius:6px;border:1px solid var(--border);margin-bottom:5px;}
+.ent-chk{width:14px;height:14px;accent-color:var(--navy);}
+
+/* Resumen partidos */
+.match-section{margin-bottom:14px;}
+.match-section h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.match-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#F9FAFB;border-radius:6px;margin-bottom:5px;border:1px solid var(--border);}
+.match-teams{font-size:11px;font-weight:500;color:var(--text);}
+.match-meta{font-size:10px;color:var(--text3);}
+
+/* Toast */
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:20px;font-size:11px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s;z-index:999;}
+.toast.show{opacity:1;}
+
+/* Historial */
+.hist-item{display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-bottom:1px solid #F3F4F6;}
+.hist-item:last-child{border-bottom:none;}
+.hist-ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.hist-body .ht{font-size:11px;font-weight:500;color:var(--text);}
+.hist-body .hs{font-size:10px;color:var(--text4);margin-top:1px;}
+
+/* Equipo color legend */
+.eq-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.eq-chip{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;}
+.eq-dot{width:8px;height:8px;border-radius:50%;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-icon">
+        <svg viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="6.5" stroke="white" stroke-width="1.3"/><path d="M8.5 2v13M2 8.5h13M5 5l7 7M12 5l-7 7" stroke="white" stroke-width="1" stroke-linecap="round"/></svg>
+      </div>
+      <div><div class="sb-name">Levante UD</div><div class="sb-sub">Escuela deportiva</div></div>
+    </div>
+    <div class="sb-sync">
+      <div class="sync-pill"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Sincronizando…</span></div>
+    </div>
+    <div class="nav">
+      <div class="nav-sec">Principal</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)"><div class="nav-dot"></div>Dashboard</div>
+      <div class="nav-item" onclick="nav('calendario',this)"><div class="nav-dot"></div>Calendario</div>
+      <div class="nav-sec">Gestión</div>
+      <div class="nav-item" onclick="nav('equipos',this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">8</span></div>
+      <div class="nav-item" onclick="nav('entrenadores',this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">17</span></div>
+      <div class="nav-sec">Comunicación</div>
+      <div class="nav-item" onclick="nav('mensajes',this)"><div class="nav-dot"></div>Mensajes</div>
+      <div class="nav-item" onclick="nav('historial',this)"><div class="nav-dot"></div>Historial</div>
+    </div>
+    <div class="sb-user">
+      <div class="user-av">CA</div>
+      <div><div class="user-name">Carlos A.</div><div class="user-role">Coordinador</div></div>
+    </div>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <div class="topbar">
+      <div><div class="page-title" id="ptitle">Dashboard</div><div class="page-sub" id="psub">Resumen general del club</div></div>
+      <div class="topbar-actions" id="tactions"></div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="v-dashboard">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Equipos activos</div></div>
+          <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Entrenadores</div></div>
+          <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-partidos">0</div><div class="stat-lbl">Partidos esta semana</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Actividad reciente</span></div>
+          <div id="hist-dash"></div>
+        </div>
+      </div>
+
+      <!-- CALENDARIO -->
+      <div class="view" id="v-calendario">
+        <div class="cal-toolbar">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="week-nav">
+              <button class="wbtn" onclick="cw(-1)">&#8249;</button>
+              <span class="wlabel" id="wlabel">–</span>
+              <button class="wbtn" onclick="cw(1)">&#8250;</button>
+            </div>
+            <div class="tab-row">
+              <button class="tab-btn active" id="tab-week" onclick="switchCalTab('week')">Semana</button>
+              <button class="tab-btn" id="tab-weekend" onclick="switchCalTab('weekend')">Fin de semana</button>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openResumen()">📋 Resumen de partidos</button>
+        </div>
+
+        <!-- Legend -->
+        <div class="eq-legend" id="eq-legend"></div>
+
+        <!-- Weekday calendar -->
+        <div id="cal-week">
+          <div class="cal-scroll"><div id="cal-outer" class="cal-outer"></div></div>
+          <div class="bank-box">
+            <div class="bank-sec"><div class="bank-lbl" style="color:#1E3A8A;">▪ F11 — Sin asignar</div><div class="chips" id="bank-f11" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'F11')"></div></div>
+            <div class="bank-sec"><div class="bank-lbl" style="color:#78350F;">▪ F8 — Sin asignar</div><div class="chips" id="bank-f8" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'F8')"></div></div>
+            <div class="bank-sec"><div class="bank-lbl" style="color:#6D28D9;">▪ Porteras — Sin asignar</div><div class="chips" id="bank-port" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'PORT')"></div></div>
+          </div>
+        </div>
+
+        <!-- Weekend calendar -->
+        <div id="cal-weekend" style="display:none;">
+          <div class="wk-grid" id="wk-grid"></div>
+          <div class="bank-box" style="margin-top:10px;">
+            <div class="bank-sec"><div class="bank-lbl">Sin asignar fin de semana</div><div class="chips" id="bank-wk" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBankWk(event)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EQUIPOS -->
+      <div class="view" id="v-equipos">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Equipos registrados</span><button class="btn btn-outline btn-sm">+ Nuevo equipo</button></div>
+          <table class="tbl">
+            <thead><tr><th>Equipo</th><th>Formato</th><th>Sigla</th><th>Entrenadores</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Femenino D</b></td><td><span class="pill pill-b">F11</span></td><td>FD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Infantil C</b></td><td><span class="pill pill-b">F11</span></td><td>IC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Infantil D</b></td><td><span class="pill pill-b">F11</span></td><td>ID</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Alevín C</b></td><td><span class="pill pill-b">F11</span></td><td>AC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Alevín D</b></td><td><span class="pill pill-b">F11</span></td><td>AD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Benjamín C</b></td><td><span class="pill pill-y">F8</span></td><td>BC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Benjamín D</b></td><td><span class="pill pill-y">F8</span></td><td>BD</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ENTRENADORES -->
+      <div class="view" id="v-entrenadores">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Entrenadores</span><button class="btn btn-outline btn-sm">+ Nuevo</button></div>
+          <table class="tbl">
+            <thead><tr><th>Nombre</th><th>Equipo</th><th>Email</th><th>Estado</th></tr></thead>
+            <tbody id="ent-tbl"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MENSAJES -->
+      <div class="view" id="v-mensajes">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Mensajes enviados</span></div>
+          <table class="tbl">
+            <thead><tr><th>Equipo</th><th>Tipo</th><th>Fecha</th><th>Canal</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>Femenino D</td><td>Horario semana</td><td>28 abr, 9:02</td><td>WhatsApp</td><td><span class="pill pill-g">Enviado</span></td></tr>
+              <tr><td>Infantil C</td><td>Horario semana</td><td>28 abr, 9:05</td><td>WhatsApp</td><td><span class="pill pill-g">Enviado</span></td></tr>
+              <tr><td>Alevín C</td><td>Aviso partido</td><td>29 abr, 16:30</td><td>WhatsApp</td><td><span class="pill pill-g">Enviado</span></td></tr>
+              <tr><td>Benjamín D</td><td>Horario semana</td><td>28 abr</td><td>Email</td><td><span class="pill pill-y">Pendiente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- HISTORIAL -->
+      <div class="view" id="v-historial">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Historial de acciones</span></div>
+          <div id="hist-full"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Edit ficha -->
+<div class="modal-bg" id="m-edit">
+  <div class="modal">
+    <div class="mh"><span class="mt" id="m-edit-title">Editar ficha</span><button class="mx" onclick="closeM('m-edit')">&#215;</button></div>
+    <div class="mb">
+      <div class="mrow2">
+        <div><div class="ml">Hora inicio</div><input class="mi" id="e-start" placeholder="17:30"></div>
+        <div><div class="ml">Hora fin</div><input class="mi" id="e-end" placeholder="19:00"></div>
+      </div>
+      <div class="mr"><div class="ml">Comentario</div><textarea class="mta" id="e-cmt" placeholder="Notas adicionales…"></textarea></div>
+      <div class="mr">
+        <div class="ml">Tipo de sesión</div>
+        <div class="toggle-row">
+          <div class="toggle-btn active" id="tt-train" onclick="setTipo('entrenamiento')">🏃 Entrenamiento</div>
+          <div class="toggle-btn" id="tt-match" onclick="setTipo('partido')">⚽ Partido</div>
+        </div>
+      </div>
+      <div id="match-extra" style="display:none;">
+        <div class="mr">
+          <div class="ml">Ubicación del partido</div>
+          <div class="toggle-row">
+            <div class="toggle-btn active" id="loc-home" onclick="setLoc('casa')">🏠 Casa</div>
+            <div class="toggle-btn" id="loc-away" onclick="setLoc('fuera')">✈️ Fuera</div>
+          </div>
+        </div>
+        <div class="mr"><div class="ml">Rival</div><input class="mi" id="e-rival" placeholder="ej. Torrent CF"></div>
+      </div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-edit')">Cancelar</button><button class="mbtn-p" onclick="saveEdit()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- Email modal -->
+<div class="modal-bg" id="m-email">
+  <div class="modal modal-wide">
+    <div class="mh"><span class="mt">📧 Enviar horario por email</span><button class="mx" onclick="closeM('m-email')">&#215;</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml" style="margin-bottom:8px;font-weight:600;">Destinatarios</div><div id="email-ents"></div></div>
+      <div class="mr"><div class="ml" style="margin-bottom:6px;font-weight:600;">Vista previa</div><div class="email-prev" id="email-prev"></div></div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-email')">Cancelar</button><button class="mbtn-p" style="background:#2563EB;" onclick="sendEmail()">📤 Enviar</button></div>
+  </div>
+</div>
+
+<!-- Resumen partidos -->
+<div class="modal-bg" id="m-resumen">
+  <div class="modal modal-wide">
+    <div class="mh"><span class="mt">📋 Resumen de partidos — <span id="res-week"></span></span><button class="mx" onclick="closeM('m-resumen')">&#215;</button></div>
+    <div class="mb" id="res-body"></div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-resumen')">Cerrar</button><button class="mbtn-p" onclick="copyResumen()">📋 Copiar</button></div>
+  </div>
+</div>
+
+<!-- Sent confirmation -->
+<div class="modal-bg" id="m-sent">
+  <div class="modal" style="width:300px;text-align:center;">
+    <div class="mh"><span class="mt">✅ Enviado</span><button class="mx" onclick="closeM('m-sent')">&#215;</button></div>
+    <div class="mb" style="padding:20px 16px;">
+      <div style="font-size:36px;margin-bottom:10px;">📬</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:6px;" id="sent-t"></div>
+      <div style="font-size:10px;color:var(--text3);" id="sent-s"></div>
+    </div>
+    <div class="mftr"><button class="mbtn-p" style="background:#059669;" onclick="closeM('m-sent')">Cerrar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
+<script>
+// ════════════════════════════════════════════
+// FIREBASE CONFIG
+// Replace with your own Firebase config
+// ════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey: "REPLACE_WITH_YOUR_FIREBASE_API_KEY",
+  authDomain: "REPLACE.firebaseapp.com",
+  databaseURL: "https://REPLACE-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "REPLACE",
+  storageBucket: "REPLACE.appspot.com",
+  messagingSenderId: "000000000",
+  appId: "REPLACE"
+};
+
+let db = null;
+let fbConnected = false;
+
+function initFirebase(){
+  try {
+    firebase.initializeApp(FB_CONFIG);
+    db = firebase.database();
+    db.ref('.info/connected').on('value', snap => {
+      fbConnected = snap.val();
+      document.getElementById('sync-dot').className = 'sync-dot' + (fbConnected?'':' off');
+      document.getElementById('sync-txt').textContent = fbConnected ? 'En tiempo real ✓' : 'Sin conexión (local)';
+    });
+    // Listen for schedule changes
+    db.ref('schedule').on('value', snap => {
+      const data = snap.val();
+      if(data) {
+        Object.assign(sched, data);
+        if(currentPage==='calendario') renderCalendar();
+      }
+    });
+    db.ref('scheduleWk').on('value', snap => {
+      const data = snap.val();
+      if(data) Object.assign(schedWk, data);
+    });
+    db.ref('historial').on('value', snap => {
+      const data = snap.val();
+      if(data) historial = Object.values(data).sort((a,b)=>b.ts-a.ts).slice(0,20);
+    });
+  } catch(e) {
+    console.warn('Firebase not configured — running in local mode');
+    document.getElementById('sync-dot').className = 'sync-dot off';
+    document.getElementById('sync-txt').textContent = 'Modo local (sin BD)';
+  }
+}
+
+function fbSaveSchedule(){
+  if(!db) return;
+  try { db.ref('schedule').set(sched); } catch(e){}
+}
+function fbSaveWk(){
+  if(!db) return;
+  try { db.ref('scheduleWk').set(schedWk); } catch(e){}
+}
+function fbPushHistorial(item){
+  if(!db) return;
+  try { db.ref('historial').push(item); } catch(e){}
+}
+
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
+const DIAS   = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
+const PISTAS = ["TENIS","RIO","PORTERAS"];
+const WEEKS  = ["21 abr — 27 abr","28 abr — 4 may","5 may — 11 may","12 may — 18 may","19 may — 25 may"];
+const WK_DAYS = ["Sábado","Domingo"];
+let wIdx = 1;
+let calTab = 'week'; // 'week' | 'weekend'
+
+// Unique color per team
+const EQ_COLORS = {
+  F11:{
+    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
+    FC:{ bg:"#F9A8C9", tx:"#5C0F2C", dot:"#C2185B" },
+    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
+    IC:{ bg:"#C4B5FD", tx:"#2E1065", dot:"#6D28D9" },
+    AD:{ bg:"#A7F3D0", tx:"#065F46", dot:"#059669" },
+    AC:{ bg:"#6EE7B7", tx:"#064E3B", dot:"#10B981" },
+  },
+  F8:{
+    AC:{ bg:"#FEF08A", tx:"#713F12", dot:"#EAB308" },
+    AD:{ bg:"#FDE047", tx:"#78350F", dot:"#CA8A04" },
+    BC:{ bg:"#FCA5A5", tx:"#7F1D1D", dot:"#EF4444" },
+    BD:{ bg:"#F87171", tx:"#6B0000", dot:"#DC2626" },
+  },
+  PORT:{
+    PORT:{ bg:"#E9D5FF", tx:"#5B21B6", dot:"#7C3AED" }
+  }
+};
+
+const ALL_EQ = {
+  F11:["FD","FC","ID","IC","AD","AC"],
+  F8: ["AC","AD","BC","BD"],
+  PORT:["PORT"]
+};
+
+const EQ_NAMES = {
+  FD:"Femenino D", FC:"Femenino C", ID:"Infantil D", IC:"Infantil C",
+  AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
+};
+
+function getEqColor(fmt, s){
+  return (EQ_COLORS[fmt]||{})[s] || {bg:"#E5E7EB",tx:"#374151",dot:"#9CA3AF"};
+}
+
+const ENTRENADORES = [
+  {n:"Miguel García",   eq:"Femenino D",  fmt:"F11", email:"mgarcia@levante.es"},
+  {n:"Javi Romero",     eq:"Femenino D",  fmt:"F11", email:"jromero@levante.es"},
+  {n:"Ángel López",     eq:"Femenino C",  fmt:"F11", email:"alopez@levante.es"},
+  {n:"Pablo Martínez",  eq:"Femenino C",  fmt:"F11", email:"pmartinez@levante.es"},
+  {n:"Sergio Ruiz",     eq:"Infantil D",  fmt:"F11", email:"sruiz@levante.es"},
+  {n:"Tomás Ferrer",    eq:"Infantil D",  fmt:"F11", email:"tferrer@levante.es"},
+  {n:"Carlos Peris",    eq:"Infantil C",  fmt:"F11", email:"cperis@levante.es"},
+  {n:"David Soler",     eq:"Infantil C",  fmt:"F11", email:"dsoler@levante.es"},
+  {n:"Raúl Navarro",    eq:"Alevín D",    fmt:"F11", email:"rnavarro@levante.es"},
+  {n:"Marcos Gil",      eq:"Alevín D",    fmt:"F11", email:"mgil@levante.es"},
+  {n:"Adrián Climent",  eq:"Alevín C",    fmt:"F11", email:"acliment@levante.es"},
+  {n:"Luis Pascual",    eq:"Benjamín C",  fmt:"F8",  email:"lpascual@levante.es"},
+  {n:"Néstor Bou",      eq:"Benjamín C",  fmt:"F8",  email:"nbou@levante.es"},
+  {n:"Oriol Vidal",     eq:"Benjamín D",  fmt:"F8",  email:"ovidal@levante.es"},
+  {n:"Pau Gómez",       eq:"Benjamín D",  fmt:"F8",  email:"pgomez@levante.es"},
+  {n:"Rubén Ibáñez",    eq:"Benjamín D",  fmt:"F8",  email:"ribanez@levante.es"},
+  {n:"Laura Sanz",      eq:"Porteras",    fmt:"PORT",email:"lsanz@levante.es"},
+];
+
+// sched[fmt][dia][pista] = [{id, s, i, f, c, tipo, loc, rival, mergedWith}]
+let sched = {
+  F11:{
+    Lunes:    {TENIS:[{id:uid(),s:"FD",i:"17:00",f:"18:20",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"ID",i:"18:20",f:"19:40",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"FD",i:"19:40",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[]},
+    Martes:   {TENIS:[],RIO:[],PORTERAS:[]},
+    Miércoles:{TENIS:[{id:uid(),s:"IC",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AC",i:"19:30",f:"21:00",c:"Partido vs Torrent CF",tipo:"partido",loc:"casa",rival:"Torrent CF"}],
+               RIO:  [{id:uid(),s:"ID",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AD",i:"19:30",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[{id:uid(),s:"PORT",i:"18:00",f:"19:30",c:"Específico porteras F11",tipo:"entrenamiento",loc:"",rival:""}]},
+    Jueves:   {TENIS:[{id:uid(),s:"FC",i:"16:00",f:"17:30",c:"FEM C+D",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"FD",i:"16:00",f:"17:30",c:"FEM C+D",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[]},
+    Viernes:  {TENIS:[{id:uid(),s:"FD",i:"16:00",f:"17:15",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"IC",i:"17:15",f:"18:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"ID",i:"18:30",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"FC",i:"16:00",f:"17:25",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"FC",i:"19:15",f:"20:30",c:"Comparten medio F11",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"FD",i:"19:30",f:"20:30",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[]},
+  },
+  F8:{
+    Lunes:    {TENIS:[{id:uid(),s:"AC",i:"17:45",f:"19:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"BC",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"BD",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AD",i:"19:30",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[]},
+    Martes:   {TENIS:[],RIO:[],PORTERAS:[]},
+    Miércoles:{TENIS:[{id:uid(),s:"BC",i:"17:45",f:"19:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"BD",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AD",i:"19:30",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               PORTERAS:[]},
+    Jueves:   {TENIS:[],RIO:[],PORTERAS:[]},
+    Viernes:  {TENIS:[{id:uid(),s:"AC",i:"17:30",f:"19:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"BC",i:"17:30",f:"19:00",c:"CD Buñol vs AD — por confirmar",tipo:"partido",loc:"fuera",rival:"CD Buñol"}],
+               PORTERAS:[]},
+  }
+};
+
+// Weekend schedule: schedWk[dayName][col] = [{...}]  col = 'casa'|'visitante'
+let schedWk = {
+  Sábado:  { casa:[], visitante:[] },
+  Domingo: { casa:[], visitante:[] }
+};
+
+const bank = {F11:[],F8:[],PORT:[]};
+let bankWk = [];
+let drag = null;
+let editTarget = null;
+let editTipo = 'entrenamiento';
+let editLoc  = 'casa';
+
+let historial = [
+  {icon:"💾",bg:"#D1FAE5",title:"Horario guardado",sub:"Semana 28 abr — 4 may · hace 10 min",ts:Date.now()-600000},
+  {icon:"📧",bg:"#DBEAFE",title:"Email enviado a 12 entrenadores",sub:"Horario semana · hace 2h",ts:Date.now()-7200000},
+  {icon:"💬",bg:"#DCFCE7",title:"WhatsApp generado — Alevín C",sub:"Partido vs Torrent CF · ayer",ts:Date.now()-86400000},
+];
+
+let currentPage = 'dashboard';
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function toMin(t){ const[h,m]=(t||"0:0").split(":").map(Number); return h*60+m; }
+function toStr(m){ const h=Math.floor(m/60),mn=m%60; return`${h}:${mn.toString().padStart(2,'0')}`; }
+function mkd(cls){ const e=document.createElement('div'); if(cls)e.className=cls; return e; }
+function showToast(msg,dur=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),dur); }
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+
+const FMTS_CFG = {
+  F11:{ label:"F11", startH:16, endH:22 },
+  F8: { label:"F8",  startH:17, endH:22 }
+};
+const PX = 1.15;
+const COL_W = 64;
+const TIME_W = 44;
+const DAY_H  = 42;
+const FMT_H  = 18;
+const WK_START = 9, WK_END = 21;
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+const PAGE_META = {
+  dashboard:   {t:"Dashboard",      s:"Resumen general del club"},
+  calendario:  {t:"Calendario",     s:"Gestiona los horarios de entrenamiento"},
+  equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
+  entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
+  mensajes:    {t:"Mensajes",       s:"Comunicaciones con familias"},
+  historial:   {t:"Historial",      s:"Registro de acciones"},
+};
+
+function nav(page, el){
+  currentPage = page;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('v-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  const m = PAGE_META[page]||{};
+  document.getElementById('ptitle').textContent = m.t||page;
+  document.getElementById('psub').textContent   = m.s||'';
+  renderTopActions(page);
+  if(page==='calendario')  { renderLegend(); renderCalendar(); }
+  if(page==='historial')   renderHistFull();
+  if(page==='entrenadores')renderEntrenadores();
+  if(page==='dashboard')   renderDash();
+}
+
+function renderTopActions(page){
+  const el = document.getElementById('tactions');
+  if(page==='calendario'){
+    el.innerHTML=`
+      <button class="btn btn-outline" onclick="openWaAll()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.65.15-.19.29-.75.95-.92 1.14-.17.2-.34.22-.63.07-.29-.15-1.23-.45-2.35-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.48.1-.2.05-.37-.02-.52-.07-.15-.65-1.57-.89-2.15-.23-.56-.47-.48-.65-.49h-.55c-.19 0-.5.07-.76.37-.27.29-1.01 1-1.01 2.42s1.04 2.8 1.18 3c.15.2 2.04 3.1 4.93 4.35.69.3 1.23.47 1.65.6.69.22 1.32.19 1.82.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34zM12.05 21.8h-.03a9.87 9.87 0 01-5.02-1.37l-.36-.21-3.73.98 1-3.65-.24-.38a9.86 9.86 0 01-1.51-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.9 6.99c0 5.46-4.44 9.89-9.9 9.89zM12.04 0C5.39 0 0 5.38 0 12a11.94 11.94 0 001.6 6l-1.6 5.9L6 22.4A12 12 0 0012.04 24C18.69 24 24 18.62 24 12S18.69 0 12.04 0z"/></svg>
+        WhatsApp
+      </button>
+      <button class="btn btn-blue" onclick="openEmailModal()">📧 Email entrenadores</button>
+      <button class="btn btn-navy" onclick="guardarHorario()">💾 Guardar</button>`;
+  } else { el.innerHTML=''; }
+}
+
+// ════════════════════════════════════════════
+// LEGEND
+// ════════════════════════════════════════════
+function renderLegend(){
+  const el = document.getElementById('eq-legend');
+  let html = '';
+  ['F11','F8','PORT'].forEach(fmt=>{
+    Object.entries(EQ_COLORS[fmt]||{}).forEach(([s,c])=>{
+      html+=`<div class="eq-chip" style="background:${c.bg};color:${c.tx};"><div class="eq-dot" style="background:${c.dot};"></div>${EQ_NAMES[s]||s}</div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+// ════════════════════════════════════════════
+// CALENDAR — WEEKDAY
+// ════════════════════════════════════════════
+function renderCalendar(){
+  updateWeekLabel();
+  if(calTab==='week') renderWeek();
+  else renderWeekend();
+}
+
+function updateWeekLabel(){
+  document.getElementById('wlabel').textContent = WEEKS[wIdx]||'';
+}
+
+function switchCalTab(tab){
+  calTab=tab;
+  document.getElementById('tab-week').className='tab-btn'+(tab==='week'?' active':'');
+  document.getElementById('tab-weekend').className='tab-btn'+(tab==='weekend'?' active':'');
+  document.getElementById('cal-week').style.display = tab==='week'?'':'none';
+  document.getElementById('cal-weekend').style.display = tab==='weekend'?'':'none';
+  renderCalendar();
+}
+
+function renderWeek(){
+  const outer = document.getElementById('cal-outer');
+  outer.innerHTML = '';
+
+  // Time axis
+  const axis = mkd('time-axis');
+  axis.style.cssText=`width:${TIME_W}px;flex-shrink:0;`;
+  const axH = mkd(''); axH.style.height=DAY_H+'px'; axis.appendChild(axH);
+
+  ['F11','F8'].forEach(fmt=>{
+    const F=FMTS_CFG[fmt], h=fmtBlockH(fmt);
+    const lbl=mkd(''); lbl.style.height=FMT_H+'px'; axis.appendChild(lbl);
+    const body=mkd(''); body.style.cssText=`position:relative;height:${h}px;`;
+    for(let hh=F.startH;hh<=F.endH;hh++){
+      const tk=mkd('tick'); tk.style.top=(hh-F.startH)*60*PX+'px'; tk.textContent=hh+':00'; body.appendChild(tk);
+    }
+    axis.appendChild(body);
+  });
+  outer.appendChild(axis);
+
+  // Days area
+  const da = mkd('days-area');
+
+  // Day headers — each day has 3 columns: TENIS, RIO, PORTERAS
+  const hrow = mkd('days-header');
+  DIAS.forEach((d,di)=>{
+    const c=mkd('day-hcell');
+    c.style.cssText=`width:${COL_W*3}px;min-width:${COL_W*3}px;height:${DAY_H}px;`;
+    c.innerHTML=`<span>${d}</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div>`;
+    hrow.appendChild(c);
+  });
+  da.appendChild(hrow);
+
+  // Format blocks
+  ['F11','F8'].forEach(fmt=>{
+    const F=FMTS_CFG[fmt], h=fmtBlockH(fmt);
+
+    // fmt label row
+    const frow=mkd('fmt-row');
+    DIAS.forEach((d,di)=>{
+      const c=mkd(`fmt-lbl fmt-${fmt.toLowerCase()}`);
+      c.style.cssText=`width:${COL_W*3}px;min-width:${COL_W*3}px;height:${FMT_H}px;`;
+      if(di===0) c.textContent=fmt;
+      frow.appendChild(c);
+    });
+    da.appendChild(frow);
+
+    // timeline
+    const tbody=mkd('timeline-body');
+    DIAS.forEach((dia,di)=>{
+      const dw=mkd('day-wrap');
+
+      PISTAS.forEach((pista,pi)=>{
+        const bgMap={TENIS:'p-tenis',RIO:'p-rio',PORTERAS:'p-porteras'};
+        const col=mkd('pista-col '+bgMap[pista]);
+        col.style.cssText=`width:${COL_W}px;min-width:${COL_W}px;height:${h}px;`;
+
+        // grid lines
+        for(let hh=F.startH;hh<=F.endH;hh++){
+          const y=(hh-F.startH)*60*PX;
+          const l=mkd('hline hour'); l.style.top=y+'px'; col.appendChild(l);
+          if(hh<F.endH){
+            const lh=mkd('hline half'); lh.style.top=(y+30*PX)+'px'; col.appendChild(lh);
+          }
+        }
+
+        // drop zone
+        const dz=mkd('drop-zone');
+        dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+        dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+        dz.addEventListener('drop',e=>dropOnCol(e,fmt,dia,pista,F));
+        col.appendChild(dz);
+
+        // fichas — check for merges
+        const fichas = (sched[fmt][dia][pista])||[];
+        const merged = detectMerges(fichas);
+        merged.forEach(group=>{
+          if(group.length===1){
+            const f=group[0];
+            const c=getEqColor(fmt,f.s);
+            col.appendChild(makeFicha(fmt,f,c,dia,pista,F,false));
+          } else {
+            col.appendChild(makeMergedFicha(fmt,group,dia,pista,F));
+          }
+        });
+
+        dw.appendChild(col);
+      });
+      tbody.appendChild(dw);
+    });
+    da.appendChild(tbody);
+  });
+
+  outer.appendChild(da);
+  buildBanks();
+  updateDashPartidos();
+}
+
+function fmtBlockH(fmt){
+  const F=FMTS_CFG[fmt];
+  return Math.round((F.endH-F.startH)*60*PX);
+}
+
+// Detect overlapping fichas (merge if same time slot)
+function detectMerges(fichas){
+  const groups=[];
+  const used=new Set();
+  fichas.forEach((f,i)=>{
+    if(used.has(i))return;
+    const grp=[f]; used.add(i);
+    fichas.forEach((g,j)=>{
+      if(i===j||used.has(j))return;
+      // overlap if start times match within 30 min
+      if(Math.abs(toMin(f.i)-toMin(g.i))<30 && Math.abs(toMin(f.f)-toMin(g.f))<30){
+        grp.push(g); used.add(j);
+      }
+    });
+    groups.push(grp);
+  });
+  return groups;
+}
+
+function makeFicha(fmt,f,clr,dia,pista,F,isPort){
+  const top=(toMin(f.i)-F.startH*60)*PX;
+  const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
+  const d=mkd('ficha'+(isPort?' porteras-ficha':''));
+  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;`;
+  let tags='';
+  if(f.tipo==='partido') tags+=`<span class="f-tag f-tag-match">⚽ Partido</span>`;
+  if(f.loc==='casa')     tags+=`<span class="f-tag f-tag-home">🏠 Casa</span>`;
+  if(f.loc==='fuera')    tags+=`<span class="f-tag f-tag-away">✈️ Fuera</span>`;
+  d.innerHTML=`
+    <div class="f-sig">${EQ_NAMES[f.s]||f.s}</div>
+    <div class="f-hr">${f.i}–${f.f}</div>
+    ${tags?`<div class="f-tags">${tags}</div>`:''}
+    ${f.c?`<div class="f-cmt">${f.c}</div>`:''}
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit('${fmt}','${dia}','${pista}','${f.id}')">✏</button>
+      <button class="fbt" onclick="rmFicha('${fmt}','${dia}','${pista}','${f.id}')">✕</button>
+    </div>`;
+  d.draggable=true;
+  d.addEventListener('dragstart',()=>{drag={fmt,id:f.id,dia,pista,fromBank:false};setTimeout(()=>d.style.opacity='.3',0);});
+  d.addEventListener('dragend',()=>d.style.opacity='1');
+  return d;
+}
+
+function makeMergedFicha(fmt,group,dia,pista,F){
+  const f=group[0];
+  const top=(toMin(f.i)-F.startH*60)*PX;
+  const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
+  const d=mkd('ficha merged');
+  d.style.cssText=`top:${top}px;height:${height}px;`;
+  const labels=group.map(g=>g.s).join('+');
+  d.innerHTML=`
+    <div class="f-sig" style="color:#374151;">${labels}</div>
+    <div class="f-hr" style="color:#6B7280;">${f.i}–${f.f}</div>
+    <div class="f-cmt" style="color:#6B7280;">Entrenamiento conjunto</div>`;
+  return d;
+}
+
+// ════════════════════════════════════════════
+// CALENDAR — WEEKEND
+// ════════════════════════════════════════════
+function renderWeekend(){
+  const grid = document.getElementById('wk-grid');
+  grid.innerHTML='';
+  const h = (WK_END-WK_START)*60*PX;
+
+  WK_DAYS.forEach(dayName=>{
+    const wrap=mkd('wk-day');
+
+    const hd=mkd('wk-day-hd');
+    hd.innerHTML=`<span>${dayName}</span><button class="btn btn-outline btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3);" onclick="addWkFicha('${dayName}')">+ Añadir</button>`;
+    wrap.appendChild(hd);
+
+    const body=mkd('wk-body');
+    const outer2=mkd('wk-outer');
+
+    // axis
+    const ax=mkd('wk-axis');
+    ax.style.cssText=`width:${TIME_W}px;flex-shrink:0;position:relative;height:${h}px;margin-top:28px;`; // 28 = header row
+    for(let hh=WK_START;hh<=WK_END;hh++){
+      const tk=mkd('tick'); tk.style.top=(hh-WK_START)*60*PX+'px'; tk.textContent=hh+':00'; ax.appendChild(tk);
+    }
+    outer2.appendChild(ax);
+
+    const cols=mkd('wk-cols');
+    cols.style.flex='1';
+
+    // col headers row
+    const chrow=mkd('');
+    chrow.style.cssText='display:grid;grid-template-columns:1fr 1fr;';
+    ['Casa 🏠','Visitante ✈️'].forEach(lbl=>{
+      const ch=mkd('wk-col-hd'); ch.textContent=lbl; chrow.appendChild(ch);
+    });
+    cols.appendChild(chrow);
+
+    const colsBody=mkd('');
+    colsBody.style.cssText=`display:grid;grid-template-columns:1fr 1fr;position:relative;height:${h}px;`;
+
+    ['casa','visitante'].forEach(col=>{
+      const pc=mkd('wk-pista');
+      pc.style.cssText=`position:relative;height:${h}px;`;
+      for(let hh=WK_START;hh<=WK_END;hh++){
+        const y=(hh-WK_START)*60*PX;
+        const l=mkd('hline hour'); l.style.top=y+'px'; pc.appendChild(l);
+        if(hh<WK_END){const lh=mkd('hline half');lh.style.top=(y+30*PX)+'px';pc.appendChild(lh);}
+      }
+      const dz=mkd('drop-zone');
+      dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+      dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+      dz.addEventListener('drop',e=>dropWkCol(e,dayName,col));
+      pc.appendChild(dz);
+
+      (schedWk[dayName][col]||[]).forEach(f=>{
+        const allEq=Object.keys(EQ_NAMES);
+        const fmt=ALL_EQ.F11.includes(f.s)?'F11':ALL_EQ.F8.includes(f.s)?'F8':'PORT';
+        const clr=getEqColor(fmt,f.s);
+        const top=(toMin(f.i)-WK_START*60)*PX;
+        const height2=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
+        const fd=mkd('ficha');
+        fd.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height2}px;`;
+        let tags2='';
+        if(f.tipo==='partido') tags2+=`<span class="f-tag f-tag-match">⚽</span>`;
+        if(col==='casa')       tags2+=`<span class="f-tag f-tag-home">🏠</span>`;
+        else                   tags2+=`<span class="f-tag f-tag-away">✈️</span>`;
+        fd.innerHTML=`<div class="f-sig">${EQ_NAMES[f.s]||f.s}</div><div class="f-hr">${f.i}–${f.f}</div><div class="f-tags">${tags2}</div>${f.rival?`<div class="f-cmt">vs ${f.rival}</div>`:''}<div class="f-acts"><button class="fbt" onclick="rmWkFicha('${dayName}','${col}','${f.id}')">✕</button></div>`;
+        fd.draggable=true;
+        fd.addEventListener('dragstart',()=>{drag={wk:true,id:f.id,dayName,col};setTimeout(()=>fd.style.opacity='.3',0);});
+        fd.addEventListener('dragend',()=>fd.style.opacity='1');
+        pc.appendChild(fd);
+      });
+      colsBody.appendChild(pc);
+    });
+
+    cols.appendChild(colsBody);
+    outer2.appendChild(cols);
+    body.appendChild(outer2);
+    wrap.appendChild(body);
+    grid.appendChild(wrap);
+  });
+
+  buildBankWk();
+}
+
+function addWkFicha(dayName){
+  // Quick add: prompt for team
+  const s=prompt('Sigla del equipo (FD, FC, IC, ID, AC, AD, BC, BD):');
+  if(!s) return;
+  const name=EQ_NAMES[s.toUpperCase()];
+  if(!name){alert('Equipo no reconocido');return;}
+  const S=s.toUpperCase();
+  const fmt=ALL_EQ.F11.includes(S)?'F11':ALL_EQ.F8.includes(S)?'F8':'PORT';
+  const rival=prompt('Rival (dejar vacío si es entrenamiento):')||'';
+  const col=rival?prompt('Casa o fuera?')?.toLowerCase()||'casa':'casa';
+  const i=prompt('Hora inicio (ej 10:00):')||'10:00';
+  const f=prompt('Hora fin (ej 12:00):')||'12:00';
+  if(!schedWk[dayName][col]) schedWk[dayName][col]=[];
+  schedWk[dayName][col].push({id:uid(),s:S,i,f,c:'',tipo:rival?'partido':'entrenamiento',loc:col,rival,fmt});
+  fbSaveWk();
+  renderWeekend();
+}
+
+function rmWkFicha(dayName,col,id){
+  schedWk[dayName][col]=(schedWk[dayName][col]||[]).filter(f=>f.id!==id);
+  fbSaveWk();
+  renderWeekend();
+}
+
+function dropWkCol(e,dayName,col){
+  e.preventDefault();
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
+  if(!drag||!drag.wk) return;
+  if(drag.dayName!==dayName||drag.col!==col){
+    const f=(schedWk[drag.dayName][drag.col]||[]).find(x=>x.id===drag.id);
+    if(f){
+      schedWk[drag.dayName][drag.col]=(schedWk[drag.dayName][drag.col]||[]).filter(x=>x.id!==drag.id);
+      if(!schedWk[dayName][col])schedWk[dayName][col]=[];
+      schedWk[dayName][col].push({...f,loc:col});
+    }
+  }
+  drag=null;
+  fbSaveWk();
+  renderWeekend();
+}
+
+function buildBankWk(){
+  const el=document.getElementById('bank-wk');
+  el.innerHTML=`<span style="font-size:10px;color:var(--text4);">Usa el botón + en cada día para añadir partidos</span>`;
+}
+
+// ════════════════════════════════════════════
+// DRAG & DROP — WEEKDAYS
+// ════════════════════════════════════════════
+function dropOnCol(e,fmt,dia,pista,F){
+  e.preventDefault();
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
+  if(!drag||drag.fmt!==fmt) return;
+  const rect=e.currentTarget.parentElement.getBoundingClientRect();
+  const minOff=Math.round((e.clientY-rect.top)/PX/15)*15;
+  const iStr=toStr(Math.max(F.startH*60,Math.min(F.endH*60-30,F.startH*60+minOff)));
+
+  let f;
+  if(!drag.fromBank){
+    const arr=sched[fmt][drag.dia][drag.pista]||[];
+    const idx=arr.findIndex(x=>x.id===drag.id);
+    if(idx>-1){ f={...arr[idx]}; arr.splice(idx,1); }
+  } else {
+    // from bank: find in bank
+    const bi=bank[fmt].indexOf(drag.s);
+    if(bi>-1){ bank[fmt].splice(bi,1); f={id:uid(),s:drag.s,i:iStr,f:toStr(toMin(iStr)+80),c:'',tipo:'entrenamiento',loc:'',rival:''}; }
+    else if(fmt==='PORT'){
+      const pi=bank.PORT.indexOf(drag.s);
+      if(pi>-1){ bank.PORT.splice(pi,1); f={id:uid(),s:drag.s,i:iStr,f:toStr(toMin(iStr)+80),c:'Porteras',tipo:'entrenamiento',loc:'',rival:''}; }
+    }
+  }
+  if(!f){drag=null;return;}
+  f.i=iStr; f.f=toStr(toMin(iStr)+(toMin(f.f)-toMin(f.i)||80));
+  if(!sched[fmt][dia][pista])sched[fmt][dia][pista]=[];
+  sched[fmt][dia][pista].push(f);
+  drag=null;
+  fbSaveSchedule();
+  renderWeek();
+}
+
+function dropBank(e,fmt){
+  e.preventDefault();
+  document.getElementById('bank-'+fmt.toLowerCase()).classList.remove('over');
+  if(!drag||drag.fromBank||drag.fmt!==fmt) return;
+  const arr=sched[fmt][drag.dia][drag.pista]||[];
+  const idx=arr.findIndex(x=>x.id===drag.id);
+  if(idx>-1){
+    const f=arr.splice(idx,1)[0];
+    bank[fmt].push(f.s);
+  }
+  drag=null;
+  fbSaveSchedule();
+  renderWeek();
+}
+
+function rmFicha(fmt,dia,pista,id){
+  const arr=sched[fmt][dia][pista]||[];
+  const idx=arr.findIndex(f=>f.id===id);
+  if(idx>-1){ const f=arr.splice(idx,1)[0]; bank[f.s==='PORT'?'PORT':fmt].push(f.s); }
+  fbSaveSchedule();
+  renderWeek();
+}
+
+function buildBanks(){
+  ['F11','F8','PORT'].forEach(fmt=>{
+    const elId = fmt==='PORT'?'bank-port':'bank-'+fmt.toLowerCase();
+    const el=document.getElementById(elId); if(!el)return;
+    el.innerHTML='';
+    if(!bank[fmt].length){ el.innerHTML=`<span style="font-size:10px;color:var(--text4);">Todos asignados ✓</span>`; return; }
+    bank[fmt].forEach(s=>{
+      const realFmt = s==='PORT'?'PORT':fmt;
+      const c=getEqColor(realFmt,s);
+      const chip=mkd('chip');
+      chip.style.cssText=`background:${c.bg};color:${c.tx};`;
+      chip.textContent=EQ_NAMES[s]||s; chip.draggable=true;
+      chip.addEventListener('dragstart',()=>{drag={fmt,s,fromBank:true};setTimeout(()=>chip.style.opacity='.4',0);});
+      chip.addEventListener('dragend',()=>chip.style.opacity='1');
+      el.appendChild(chip);
+    });
+  });
+}
+
+// ════════════════════════════════════════════
+// EDIT MODAL
+// ════════════════════════════════════════════
+function openEdit(fmt,dia,pista,id){
+  const f=(sched[fmt][dia][pista]||[]).find(x=>x.id===id); if(!f)return;
+  editTarget={fmt,dia,pista,id};
+  editTipo = f.tipo||'entrenamiento';
+  editLoc  = f.loc||'casa';
+  const c=getEqColor(fmt,f.s);
+  document.getElementById('m-edit-title').textContent=`${EQ_NAMES[f.s]||f.s} — ${pista}`;
+  document.getElementById('e-start').value=f.i;
+  document.getElementById('e-end').value=f.f;
+  document.getElementById('e-cmt').value=f.c||'';
+  document.getElementById('e-rival').value=f.rival||'';
+  setTipo(editTipo,false);
+  setLoc(editLoc,false);
+  openM('m-edit');
+}
+
+function setTipo(tipo,save=true){
+  editTipo=tipo;
+  document.getElementById('tt-train').className='toggle-btn'+(tipo==='entrenamiento'?' active':'');
+  document.getElementById('tt-match').className='toggle-btn'+(tipo==='partido'?' active':'');
+  document.getElementById('match-extra').style.display=tipo==='partido'?'':'none';
+}
+function setLoc(loc,save=true){
+  editLoc=loc;
+  document.getElementById('loc-home').className='toggle-btn'+(loc==='casa'?' active':'');
+  document.getElementById('loc-away').className='toggle-btn'+(loc==='fuera'?' active':'');
+}
+
+function saveEdit(){
+  if(!editTarget) return;
+  const{fmt,dia,pista,id}=editTarget;
+  const f=(sched[fmt][dia][pista]||[]).find(x=>x.id===id);
+  if(f){
+    const oldI=f.i, oldF=f.f;
+    f.i=document.getElementById('e-start').value.trim()||f.i;
+    f.f=document.getElementById('e-end').value.trim()||f.f;
+    f.c=document.getElementById('e-cmt').value.trim();
+    f.tipo=editTipo; f.loc=editLoc;
+    f.rival=document.getElementById('e-rival').value.trim();
+    if(oldI!==f.i||oldF!==f.f){
+      addHistorial({icon:"✏️",bg:"#FEF3C7",title:`Cambio horario — ${EQ_NAMES[f.s]||f.s}`,sub:`${dia} ${pista}: ${oldI}–${oldF} → ${f.i}–${f.f}`});
+    }
+  }
+  closeM('m-edit');
+  fbSaveSchedule();
+  renderWeek();
+}
+
+// ════════════════════════════════════════════
+// SAVE & EMAIL & WHATSAPP
+// ════════════════════════════════════════════
+function guardarHorario(){
+  fbSaveSchedule();
+  addHistorial({icon:"💾",bg:"#D1FAE5",title:"Horario guardado",sub:`Semana ${WEEKS[wIdx]}`});
+  showToast('✅ Horario guardado');
+}
+
+function openEmailModal(){
+  const el=document.getElementById('email-ents');
+  el.innerHTML=ENTRENADORES.map((e,i)=>`
+    <div class="ent-row">
+      <input type="checkbox" class="ent-chk" id="ec${i}" checked>
+      <div style="flex:1;">
+        <label for="ec${i}" style="cursor:pointer;font-weight:500;font-size:11px;">${e.n}</label>
+        <div style="font-size:10px;color:var(--text4);">${e.eq} · ${e.email}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('email-prev').textContent=genEmailPreview();
+  openM('m-email');
+}
+
+function genEmailPreview(){
+  let lines=[];
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    (sched[fmt][dia][pista]||[]).forEach(f=>{
+      lines.push(`  • ${EQ_NAMES[f.s]||f.s} (${fmt}) — ${dia} ${pista}: ${f.i}–${f.f}${f.rival?' vs '+f.rival:''}${f.c?' | '+f.c:''}`);
+    });
+  })));
+  return `Asunto: Horarios semana ${WEEKS[wIdx]}\n\nHola equipo,\n\nos enviamos el horario de esta semana:\n\n${lines.join('\n')}\n\nCualquier cambio os llegará por este canal.\n\nUn saludo,\nCoordinación Levante UD`;
+}
+
+function sendEmail(){
+  const sel=ENTRENADORES.filter((_,i)=>document.getElementById('ec'+i)?.checked);
+  closeM('m-email');
+  addHistorial({icon:"📧",bg:"#DBEAFE",title:`Email enviado a ${sel.length} entrenadores`,sub:`Horario semana ${WEEKS[wIdx]}`});
+  document.getElementById('sent-t').textContent=`Enviado a ${sel.length} entrenadores`;
+  document.getElementById('sent-s').textContent=sel.map(e=>e.email).join(' · ');
+  openM('m-sent');
+}
+
+function openWaAll(){
+  const asgn={};
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    (sched[fmt][dia][pista]||[]).forEach(f=>{
+      const k=f.s;
+      if(!asgn[k]) asgn[k]={fmt,s:f.s,ses:[]};
+      asgn[k].ses.push({dia,pista,i:f.i,ff:f.f,c:f.c,rival:f.rival});
+    });
+  })));
+  const first=Object.values(asgn)[0]; if(!first){alert('Sin datos');return;}
+  const e=first; const lines=e.ses.map(x=>`  • ${x.dia} ${x.pista}: ${x.i}–${x.ff}${x.rival?' vs '+x.rival:''}`).join('\n');
+  const msg=`⚽ *Horario ${EQ_NAMES[e.s]||e.s} — semana ${WEEKS[wIdx]}*\n\n${lines}\n\n¡Arriba Levante! 🔴⚪`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  addHistorial({icon:"💬",bg:"#DCFCE7",title:`WhatsApp — ${EQ_NAMES[e.s]||e.s}`,sub:`Semana ${WEEKS[wIdx]}`});
+}
+
+// ════════════════════════════════════════════
+// RESUMEN PARTIDOS
+// ════════════════════════════════════════════
+function openResumen(){
+  const casa=[], fuera=[];
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    (sched[fmt][dia][pista]||[]).filter(f=>f.tipo==='partido').forEach(f=>{
+      const item={equipo:EQ_NAMES[f.s]||f.s,dia,hora:f.i,rival:f.rival||'–',loc:f.loc};
+      if(f.loc==='fuera') fuera.push(item); else casa.push(item);
+    });
+  })));
+  // weekend
+  WK_DAYS.forEach(dayName=>['casa','visitante'].forEach(col=>{
+    (schedWk[dayName][col]||[]).filter(f=>f.tipo==='partido').forEach(f=>{
+      const item={equipo:EQ_NAMES[f.s]||f.s,dia:dayName,hora:f.i,rival:f.rival||'–',loc:col==='visitante'?'fuera':'casa'};
+      if(col==='visitante') fuera.push(item); else casa.push(item);
+    });
+  }));
+
+  function matchHTML(items,label,emoji){
+    if(!items.length) return `<div class="match-section"><h3>${emoji} ${label}</h3><p style="font-size:11px;color:var(--text4);padding:8px 0;">Sin partidos</p></div>`;
+    return `<div class="match-section"><h3>${emoji} ${label}</h3>${items.map(m=>`
+      <div class="match-item">
+        <div><div class="match-teams">${m.equipo}</div><div class="match-meta">vs ${m.rival}</div></div>
+        <div class="match-meta" style="text-align:right;">${m.dia} · ${m.hora}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  document.getElementById('res-week').textContent=WEEKS[wIdx];
+  document.getElementById('res-body').innerHTML=matchHTML(casa,'Partidos en Casa','🏠')+matchHTML(fuera,'Partidos Fuera','✈️');
+  openM('m-resumen');
+}
+
+function copyResumen(){
+  const txt=document.getElementById('res-body').innerText;
+  navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado'));
+}
+
+// ════════════════════════════════════════════
+// HISTORIAL
+// ════════════════════════════════════════════
+function addHistorial(item){
+  item.ts=Date.now();
+  item.sub=(item.sub||'')+' · ahora mismo';
+  historial.unshift(item);
+  fbPushHistorial(item);
+  renderDash();
+}
+
+function histHTML(items){
+  return items.map(h=>`
+    <div class="hist-item">
+      <div class="hist-ic" style="background:${h.bg||'#F3F4F6'}">${h.icon||'•'}</div>
+      <div class="hist-body"><div class="ht">${h.title}</div><div class="hs">${h.sub}</div></div>
+    </div>`).join('');
+}
+
+function renderHistFull(){
+  document.getElementById('hist-full').innerHTML=histHTML(historial);
+}
+
+function renderDash(){
+  const el=document.getElementById('hist-dash');
+  if(el) el.innerHTML=histHTML(historial.slice(0,4));
+  updateDashPartidos();
+}
+
+function updateDashPartidos(){
+  let count=0;
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    count+=(sched[fmt][dia][pista]||[]).filter(f=>f.tipo==='partido').length;
+  })));
+  WK_DAYS.forEach(d=>['casa','visitante'].forEach(c=>{ count+=(schedWk[d][c]||[]).filter(f=>f.tipo==='partido').length; }));
+  const el=document.getElementById('dash-partidos');
+  if(el) el.textContent=count;
+}
+
+// ════════════════════════════════════════════
+// ENTRENADORES TABLE
+// ════════════════════════════════════════════
+function renderEntrenadores(){
+  const tbl=document.getElementById('ent-tbl');
+  tbl.innerHTML=ENTRENADORES.map(e=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:7px;"><div class="av-sm">${e.n.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>${e.n}</div></td>
+      <td>${e.eq}</td><td style="color:var(--text3);">${e.email}</td><td><span class="pill pill-g">Activo</span></td>
+    </tr>`).join('');
+}
+
+// ════════════════════════════════════════════
+// WEEK NAV
+// ════════════════════════════════════════════
+function cw(d){ wIdx=Math.max(0,Math.min(WEEKS.length-1,wIdx+d)); renderCalendar(); }
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+initFirebase();
+renderDash();
+renderTopActions('dashboard');
+</script>
+</body>
+</html>
