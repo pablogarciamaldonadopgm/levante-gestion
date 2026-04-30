@@ -1078,27 +1078,51 @@ function dropOnCol(e,fmt,dia,pista,F){
   e.preventDefault();
   document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
   if(!drag||drag.fmt!==fmt) return;
+
   const rect=e.currentTarget.parentElement.getBoundingClientRect();
   const minOff=Math.round((e.clientY-rect.top)/PX/15)*15;
-  const iStr=toStr(Math.max(F.startH*60,Math.min(F.endH*60-30,F.startH*60+minOff)));
+  const startMin=Math.max(
+    F.startH*60,
+    Math.min(F.endH*60-30, F.startH*60+minOff)
+  );
+  const iStr=toStr(startMin);
 
   let f;
+  let dur=80;
+
   if(!drag.fromBank){
     const arr=getFichas(fmt,drag.dia,drag.pista);
     const idx=arr.findIndex(x=>x.id===drag.id);
-    if(idx>-1){ f={...arr[idx]}; arr.splice(idx,1); }
+
+    if(idx>-1){
+      f={...arr[idx]};
+      dur=Math.max(toMin(f.f)-toMin(f.i),30);
+      arr.splice(idx,1);
+    }
   } else {
-    // from bank: find in bank
     const bi=bank[fmt].indexOf(drag.s);
-    if(bi>-1){ bank[fmt].splice(bi,1); f={id:uid(),s:drag.s,i:iStr,f:toStr(toMin(iStr)+80),c:'',tipo:'entrenamiento',loc:'',rival:''}; }
-    else if(fmt==='PORT'){
+
+    if(bi>-1){
+      bank[fmt].splice(bi,1);
+      f={id:uid(),s:drag.s,i:iStr,f:toStr(startMin+80),c:'',tipo:'entrenamiento',loc:'',rival:''};
+      dur=80;
+    } else if(fmt==='PORT'){
       const pi=bank.PORT.indexOf(drag.s);
-      if(pi>-1){ bank.PORT.splice(pi,1); f={id:uid(),s:drag.s,i:iStr,f:toStr(toMin(iStr)+80),c:'Porteras',tipo:'entrenamiento',loc:'',rival:''}; }
+      if(pi>-1){
+        bank.PORT.splice(pi,1);
+        f={id:uid(),s:drag.s,i:iStr,f:toStr(startMin+80),c:'Porteras',tipo:'entrenamiento',loc:'',rival:''};
+        dur=80;
+      }
     }
   }
+
   if(!f){drag=null;return;}
-  f.i=iStr; f.f=toStr(toMin(iStr)+(toMin(f.f)-toMin(f.i)||80));
+
+  f.i=iStr;
+  f.f=toStr(Math.min(startMin+dur, F.endH*60));
+
   ensureFichas(fmt,dia,pista).push(f);
+
   drag=null;
   fbSaveSchedule();
   renderWeek();
