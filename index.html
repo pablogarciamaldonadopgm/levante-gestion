@@ -306,7 +306,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Equipos activos</div></div>
           <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Entrenadores</div></div>
           <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
-          <div class="stat-card"><div class="stat-val" id="dash-partidos">0</div><div class="stat-lbl">Partidos esta semana/div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-partidos">0</div><div class="stat-lbl">Partidos esta semana</div></div>
         </div>
         <div class="card">
           <div class="card-hd"><span class="card-title">Actividad reciente</span></div>
@@ -1072,7 +1072,7 @@ function dropOnCol(e,fmt,dia,pista,F){
 
   let f;
   if(!drag.fromBank){
-    const arr=sched[fmt][drag.dia][drag.pista]||[];
+    const arr=getFichas(fmt,drag.dia,drag.pista);
     const idx=arr.findIndex(x=>x.id===drag.id);
     if(idx>-1){ f={...arr[idx]}; arr.splice(idx,1); }
   } else {
@@ -1086,8 +1086,7 @@ function dropOnCol(e,fmt,dia,pista,F){
   }
   if(!f){drag=null;return;}
   f.i=iStr; f.f=toStr(toMin(iStr)+(toMin(f.f)-toMin(f.i)||80));
-  if(!sched[fmt][dia][pista])sched[fmt][dia][pista]=[];
-  sched[fmt][dia][pista].push(f);
+  ensureFichas(fmt,dia,pista).push(f);
   drag=null;
   fbSaveSchedule();
   renderWeek();
@@ -1097,7 +1096,7 @@ function dropBank(e,fmt){
   e.preventDefault();
   document.getElementById('bank-'+fmt.toLowerCase()).classList.remove('over');
   if(!drag||drag.fromBank||drag.fmt!==fmt) return;
-  const arr=sched[fmt][drag.dia][drag.pista]||[];
+  const arr=getFichas(fmt,drag.dia,drag.pista);
   const idx=arr.findIndex(x=>x.id===drag.id);
   if(idx>-1){
     const f=arr.splice(idx,1)[0];
@@ -1109,7 +1108,7 @@ function dropBank(e,fmt){
 }
 
 function rmFicha(fmt,dia,pista,id){
-  const arr=sched[fmt][dia][pista]||[];
+  const arr=getFichas(fmt,dia,pista);
   const idx=arr.findIndex(f=>f.id===id);
   if(idx>-1){ const f=arr.splice(idx,1)[0]; bank[f.s==='PORT'?'PORT':fmt].push(f.s); }
   fbSaveSchedule();
@@ -1139,7 +1138,7 @@ function buildBanks(){
 // EDIT MODAL
 // ════════════════════════════════════════════
 function openEdit(fmt,dia,pista,id){
-  const f=(sched[fmt][dia][pista]||[]).find(x=>x.id===id); if(!f)return;
+  const f=getFichas(fmt,dia,pista).find(x=>x.id===id); if(!f)return;
   editTarget={fmt,dia,pista,id};
   editTipo = f.tipo||'entrenamiento';
   editLoc  = f.loc||'casa';
@@ -1311,12 +1310,29 @@ function renderDash(){
   updateDashPartidos();
 }
 
+function getFichas(fmt,dia,pista){
+  return (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
+}
+
 function updateDashPartidos(){
   let count=0;
-  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
-    count+=(sched[fmt][dia][pista]||[]).filter(f=>f.tipo==='partido').length;
-  })));
-  WK_DAYS.forEach(d=>['casa','visitante'].forEach(c=>{ count+=(schedWk[d][c]||[]).filter(f=>f.tipo==='partido').length; }));
+
+  ['F11','F8'].forEach(fmt=>{
+    DIAS.forEach(dia=>{
+      PISTAS.forEach(pista=>{
+        count += getFichas(fmt,dia,pista)
+          .filter(f=>f.tipo==='partido').length;
+      });
+    });
+  });
+
+  WK_DAYS.forEach(d=>{
+    ['casa','visitante'].forEach(c=>{
+      count += (((schedWk || {})[d] || {})[c] || [])
+        .filter(f=>f.tipo==='partido').length;
+    });
+  });
+
   const el=document.getElementById('dash-partidos');
   if(el) el.textContent=count;
 }
