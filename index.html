@@ -842,7 +842,7 @@ function renderWeek(){
         col.appendChild(dz);
 
         // fichas — check for merges
-        const fichas = (sched[fmt][dia][pista])||[];
+        const fichas = (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
         const merged = detectMerges(fichas);
         merged.forEach(group=>{
           if(group.length===1){
