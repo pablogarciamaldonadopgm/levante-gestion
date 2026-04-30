@@ -133,8 +133,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .days-header{display:flex;}
 .day-hcell{text-align:center;font-size:11px;font-weight:600;color:var(--text2);padding:5px 2px;background:#F9FAFB;border-left:2px solid var(--border-strong);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:3px;}
 .day-hcell:first-child{border-left:none;}
-.day-pistas{display:flex;gap:2px;}
-.pt{font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;}
+.day-pistas{
+  display:grid;
+  grid-template-columns:repeat(3, 64px);
+  width:192px;
+  gap:0;
+}
+
+.pt{
+  font-size:8px;
+  font-weight:600;
+  padding:1px 0;
+  border-radius:3px;
+  text-align:center;
+}
 .pt-t{background:#DBEAFE;color:#1D4ED8;}
 .pt-r{background:#FEE2E2;color:#B91C1C;}
 .pt-p{background:#EDE9FE;color:#6D28D9;}
