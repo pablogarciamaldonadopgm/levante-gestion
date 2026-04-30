@@ -887,18 +887,32 @@ function fmtBlockH(fmt){
 function detectMerges(fichas){
   const groups=[];
   const used=new Set();
+
   fichas.forEach((f,i)=>{
-    if(used.has(i))return;
-    const grp=[f]; used.add(i);
+    if(used.has(i)) return;
+
+    const grp=[f];
+    used.add(i);
+
     fichas.forEach((g,j)=>{
-      if(i===j||used.has(j))return;
-      // overlap if start times match within 30 min
-      if(Math.abs(toMin(f.i)-toMin(g.i))<30 && Math.abs(toMin(f.f)-toMin(g.f))<30){
-        grp.push(g); used.add(j);
+      if(i===j || used.has(j)) return;
+
+      const fStart = toMin(f.i);
+      const fEnd   = toMin(f.f);
+      const gStart = toMin(g.i);
+      const gEnd   = toMin(g.f);
+
+      const overlaps = fStart < gEnd && gStart < fEnd;
+
+      if(overlaps){
+        grp.push(g);
+        used.add(j);
       }
     });
+
     groups.push(grp);
   });
+
   return groups;
 }
 
