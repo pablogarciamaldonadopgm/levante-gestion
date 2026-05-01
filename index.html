@@ -591,6 +591,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <table class="tbl">
             <thead><tr><th>Equipo</th><th>Formato</th><th>Sigla</th><th>Entrenadores</th><th>Estado</th></tr></thead>
             <tbody>
+              <tr><td><b>Femenino B</b></td><td><span class="pill pill-b">F11</span></td><td>FB</td><td>0</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Femenino D</b></td><td><span class="pill pill-b">F11</span></td><td>FD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Infantil C</b></td><td><span class="pill pill-b">F11</span></td><td>IC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
@@ -749,7 +750,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <select class="msel" id="wk-sel-eq">
           <option value="">-- Selecciona equipo --</option>
           <optgroup label="F11">
-            <option value="FD">Femenino D</option><option value="FC">Femenino C</option>
+            <option value="FB">Femenino B</option><option value="FD">Femenino D</option><option value="FC">Femenino C</option>
             <option value="ID">Infantil D</option><option value="IC">Infantil C</option>
             <option value="AD">Alevín D</option><option value="AC">Alevín C</option>
           </optgroup>
@@ -863,6 +864,7 @@ let calTab = 'week'; // 'week' | 'weekend'
 // Unique color per team
 const EQ_COLORS = {
   F11:{
+    FB:{ bg:"#FEE2E2", tx:"#7F1D1D", dot:"#E11D48" },
     FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
     FC:{ bg:"#F9A8C9", tx:"#5C0F2C", dot:"#C2185B" },
     ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
@@ -882,13 +884,13 @@ const EQ_COLORS = {
 };
 
 const ALL_EQ = {
-  F11:["FD","FC","ID","IC","AD","AC"],
+  F11:["FB","FD","FC","ID","IC","AD","AC"],
   F8: ["AC","AD","BC","BD"],
   PORT:["PORT"]
 };
 
 const EQ_NAMES = {
-  FD:"Femenino D", FC:"Femenino C", ID:"Infantil D", IC:"Infantil C",
+  FB:"Femenino B", FD:"Femenino D", FC:"Femenino C", ID:"Infantil D", IC:"Infantil C",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
 };
 
@@ -987,7 +989,7 @@ const FMTS_CFG = {
 const PX = 1.15;
 const COL_W = 64;
 const TIME_W = 44;
-const DAY_H  = 42;
+const DAY_H  = 58;
 const FMT_H  = 18;
 const WK_START = 9, WK_END = 21;
 
@@ -1378,6 +1380,7 @@ function addWkFicha(dayName){
   document.getElementById('wk-end').value='12:00';
   document.getElementById('wk-tipo').value='partido';
   window._wkTargetDay = dayName;
+  window._weekTargetDay = null;
   openM('m-wk-add');
 }
 
@@ -2000,6 +2003,7 @@ function cw(d){ wIdx=Math.max(0,Math.min(WEEKS.length-1,wIdx+d)); renderCalendar
 // INIT
 // ════════════════════════════════════════════
 initFirebase();
+renderLegend();
 renderDash();
 renderTopActions('dashboard');
 </script>
