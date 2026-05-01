@@ -1038,11 +1038,19 @@ function renderTopActions(page){
 function renderLegend(){
   const el = document.getElementById('eq-legend');
   let html = '';
+  const pintados = new Set();
+
   ['F11','F8','PORT'].forEach(fmt=>{
     Object.entries(EQ_COLORS[fmt]||{}).forEach(([s,c])=>{
-      html+=`<div class="eq-chip" style="background:${c.bg};color:${c.tx};"><div class="eq-dot" style="background:${c.dot};"></div>${EQ_NAMES[s]||s}</div>`;
+      const nombre = EQ_NAMES[s] || s;
+
+      if(pintados.has(nombre)) return;
+      pintados.add(nombre);
+
+      html+=`<div class="eq-chip" style="background:${c.bg};color:${c.tx};"><div class="eq-dot" style="background:${c.dot};"></div>${nombre}</div>`;
     });
   });
+
   el.innerHTML = html;
 }
 
