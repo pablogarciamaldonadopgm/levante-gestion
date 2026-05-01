@@ -203,7 +203,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .wk-body{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;background:var(--white);}
 .wk-outer{display:flex;}
 .wk-axis{width:var(--time-w);flex-shrink:0;position:relative;}
-.wk-cols{flex:1;display:grid;grid-template-columns:1fr 1fr;}
+.wk-cols{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.wk-cols > div{
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+}
 .wk-col-hd{font-size:10px;font-weight:600;text-align:center;padding:5px;background:#F9FAFB;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
 .wk-col-hd:last-child{border-right:none;}
 .wk-pista{position:relative;border-right:1px solid var(--border);}
