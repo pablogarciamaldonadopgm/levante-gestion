@@ -759,6 +759,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         </select>
       </div>
       <div class="mr">
+  <div class="ml">Campo</div>
+  <select class="msel" id="wk-pista-mode">
+    <option value="TENIS">Tenis</option>
+    <option value="RIO">Río</option>
+    <option value="AMBOS">Tenis + Río</option>
+    <option value="PORTERAS">Porteras</option>
+  </select>
+</div>
+      <div class="mr">
         <div class="ml">Tipo</div>
         <select class="msel" id="wk-tipo">
           <option value="partido">⚽ Partido</option>
@@ -863,10 +872,11 @@ let calTab = 'week'; // 'week' | 'weekend'
 // Unique color per team
 const EQ_COLORS = {
   F11:{
-    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
+    FB:{ bg:"#FBCFE8", tx:"#831843", dot:"#DB2777" },
     FC:{ bg:"#F9A8C9", tx:"#5C0F2C", dot:"#C2185B" },
-    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
+    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
     IC:{ bg:"#C4B5FD", tx:"#2E1065", dot:"#6D28D9" },
+    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
     AD:{ bg:"#A7F3D0", tx:"#065F46", dot:"#059669" },
     AC:{ bg:"#6EE7B7", tx:"#064E3B", dot:"#10B981" },
   },
@@ -882,13 +892,13 @@ const EQ_COLORS = {
 };
 
 const ALL_EQ = {
-  F11:["FD","FC","ID","IC","AD","AC"],
+  F11:["FB","FC","FD","IC","ID"],
   F8: ["AC","AD","BC","BD"],
   PORT:["PORT"]
 };
 
 const EQ_NAMES = {
-  FD:"Femenino D", FC:"Femenino C", ID:"Infantil D", IC:"Infantil C",
+  FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
 };
 
@@ -1157,7 +1167,11 @@ function renderWeek(){
         col.appendChild(dz);
 
         // fichas — check for merges
-        const fichas = (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
+        let fichas = (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
+
+if(pista === 'RIO'){
+  fichas = fichas.filter(f => !isDualFieldFicha(f));
+}
         const merged = detectMerges(fichas);
         merged.forEach(group=>{
           if(group.length===1){
@@ -1223,7 +1237,8 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
   const top=(toMin(f.i)-F.startH*60)*PX;
   const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
   const d=mkd('ficha'+(isPort?' porteras-ficha':''));
-  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;`;
+  const widthExtra = isDualFieldFicha(f) ? `width:${COL_W*2-4}px;right:auto;` : '';
+d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;${widthExtra}`;
   let tags='';
   if(f.tipo==='partido') tags+=`<span class="f-tag f-tag-match">⚽ Partido</span>`;
   if(f.loc==='casa')     tags+=`<span class="f-tag f-tag-home">🏠 Casa</span>`;
@@ -1408,7 +1423,11 @@ function saveWkFicha(){
   if(window._weekTargetDay){
   const dia = window._weekTargetDay;
   const fmt = ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
-  const pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
+  let pistaMode = document.getElementById('wk-pista-mode')?.value || 'TENIS';
+
+if(fmt === 'PORT') pistaMode = 'PORTERAS';
+
+const pista = pistaMode === 'AMBOS' ? 'TENIS' : pistaMode;
 
   ensureFichas(fmt,dia,pista).push({
     id:uid(),
@@ -1419,6 +1438,7 @@ function saveWkFicha(){
     tipo,
     loc:col,
     rival
+    pistaMode
   });
 
   window._weekTargetDay = null;
@@ -1954,6 +1974,10 @@ function ensureFichas(fmt,dia,pista){
   if(!sched[fmt][dia]) sched[fmt][dia]={};
   if(!sched[fmt][dia][pista]) sched[fmt][dia][pista]=[];
   return sched[fmt][dia][pista];
+}
+
+function isDualFieldFicha(f){
+  return f && f.pistaMode === 'AMBOS';
 }
 
 function updateDashPartidos(){
