@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0052)file:///C:/Users/valen/Downloads/levante-app-v2.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Levante UD — Gestión Deportiva</title>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="./Levante UD — Gestión Deportiva_files/firebase-app-compat.js.descarga"></script>
+<script src="./Levante UD — Gestión Deportiva_files/firebase-database-compat.js.descarga"></script>
 
 <style>
 /* ═══════════════════════════════════════════════════
@@ -280,23 +280,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="sidebar">
     <div class="sb-logo">
       <div class="sb-icon">
-        <svg viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="6.5" stroke="white" stroke-width="1.3"/><path d="M8.5 2v13M2 8.5h13M5 5l7 7M12 5l-7 7" stroke="white" stroke-width="1" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="6.5" stroke="white" stroke-width="1.3"></circle><path d="M8.5 2v13M2 8.5h13M5 5l7 7M12 5l-7 7" stroke="white" stroke-width="1" stroke-linecap="round"></path></svg>
       </div>
       <div><div class="sb-name">Levante UD</div><div class="sb-sub">Escuela deportiva</div></div>
     </div>
     <div class="sb-sync">
-      <div class="sync-pill"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Sincronizando…</span></div>
+      <div class="sync-pill"><div class="sync-dot off" id="sync-dot"></div><span id="sync-txt">Sin conexión (local)</span></div>
     </div>
     <div class="nav">
       <div class="nav-sec">Principal</div>
-      <div class="nav-item active" onclick="nav('dashboard',this)"><div class="nav-dot"></div>Dashboard</div>
-      <div class="nav-item" onclick="nav('calendario',this)"><div class="nav-dot"></div>Calendario</div>
+      <div class="nav-item" onclick="nav(&#39;dashboard&#39;,this)"><div class="nav-dot"></div>Dashboard</div>
+      <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
-      <div class="nav-item" onclick="nav('equipos',this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">8</span></div>
-      <div class="nav-item" onclick="nav('entrenadores',this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">17</span></div>
+      <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">8</span></div>
+      <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">17</span></div>
       <div class="nav-sec">Comunicación</div>
-      <div class="nav-item" onclick="nav('mensajes',this)"><div class="nav-dot"></div>Mensajes</div>
-      <div class="nav-item" onclick="nav('historial',this)"><div class="nav-dot"></div>Historial</div>
+      <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
+      <div class="nav-item" onclick="nav(&#39;historial&#39;,this)"><div class="nav-dot"></div>Historial</div>
     </div>
     <div class="sb-user">
       <div class="user-av">CA</div>
@@ -307,60 +307,270 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <!-- ── MAIN ── -->
   <div class="main">
     <div class="topbar">
-      <div><div class="page-title" id="ptitle">Dashboard</div><div class="page-sub" id="psub">Resumen general del club</div></div>
-      <div class="topbar-actions" id="tactions"></div>
+      <div><div class="page-title" id="ptitle">Calendario</div><div class="page-sub" id="psub">Gestiona los horarios de entrenamiento</div></div>
+      <div class="topbar-actions" id="tactions">
+      <button class="btn btn-outline" onclick="openWaAll()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.65.15-.19.29-.75.95-.92 1.14-.17.2-.34.22-.63.07-.29-.15-1.23-.45-2.35-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.48.1-.2.05-.37-.02-.52-.07-.15-.65-1.57-.89-2.15-.23-.56-.47-.48-.65-.49h-.55c-.19 0-.5.07-.76.37-.27.29-1.01 1-1.01 2.42s1.04 2.8 1.18 3c.15.2 2.04 3.1 4.93 4.35.69.3 1.23.47 1.65.6.69.22 1.32.19 1.82.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34zM12.05 21.8h-.03a9.87 9.87 0 01-5.02-1.37l-.36-.21-3.73.98 1-3.65-.24-.38a9.86 9.86 0 01-1.51-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.9 6.99c0 5.46-4.44 9.89-9.9 9.89zM12.04 0C5.39 0 0 5.38 0 12a11.94 11.94 0 001.6 6l-1.6 5.9L6 22.4A12 12 0 0012.04 24C18.69 24 24 18.62 24 12S18.69 0 12.04 0z"></path></svg>
+        WhatsApp
+      </button>
+      <button class="btn btn-blue" onclick="openEmailModal()">📧 Email entrenadores</button>
+      <button class="btn btn-navy" onclick="guardarHorario()">💾 Guardar</button></div>
     </div>
     <div class="content">
 
       <!-- DASHBOARD -->
-      <div class="view active" id="v-dashboard">
+      <div class="view" id="v-dashboard">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Equipos activos</div></div>
           <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Entrenadores</div></div>
           <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
-          <div class="stat-card"><div class="stat-val" id="dash-partidos">0</div><div class="stat-lbl">Partidos esta semana</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-partidos">3</div><div class="stat-lbl">Partidos esta semana</div></div>
         </div>
         <div class="card">
           <div class="card-hd"><span class="card-title">Actividad reciente</span></div>
-          <div id="hist-dash"></div>
+          <div id="hist-dash">
+    <div class="hist-item">
+      <div class="hist-ic" style="background:#D1FAE5">💾</div>
+      <div class="hist-body"><div class="ht">Horario guardado</div><div class="hs">Semana 28 abr — 4 may · hace 10 min</div></div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-ic" style="background:#DBEAFE">📧</div>
+      <div class="hist-body"><div class="ht">Email enviado a 12 entrenadores</div><div class="hs">Horario semana · hace 2h</div></div>
+    </div>
+    <div class="hist-item">
+      <div class="hist-ic" style="background:#DCFCE7">💬</div>
+      <div class="hist-body"><div class="ht">WhatsApp generado — Alevín C</div><div class="hs">Partido vs Torrent CF · ayer</div></div>
+    </div></div>
         </div>
       </div>
 
       <!-- CALENDARIO -->
-      <div class="view" id="v-calendario">
+      <div class="view active" id="v-calendario">
         <div class="cal-toolbar">
           <div style="display:flex;align-items:center;gap:10px;">
             <div class="week-nav">
-              <button class="wbtn" onclick="cw(-1)">&#8249;</button>
-              <span class="wlabel" id="wlabel">–</span>
-              <button class="wbtn" onclick="cw(1)">&#8250;</button>
+              <button class="wbtn" onclick="cw(-1)">‹</button>
+              <span class="wlabel" id="wlabel">28 abr — 4 may</span>
+              <button class="wbtn" onclick="cw(1)">›</button>
             </div>
             <div class="tab-row">
-              <button class="tab-btn active" id="tab-week" onclick="switchCalTab('week')">Semana</button>
-              <button class="tab-btn" id="tab-weekend" onclick="switchCalTab('weekend')">Fin de semana</button>
+              <button class="tab-btn active" id="tab-week" onclick="switchCalTab(&#39;week&#39;)">Semana</button>
+              <button class="tab-btn" id="tab-weekend" onclick="switchCalTab(&#39;weekend&#39;)">Fin de semana</button>
             </div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="openResumen()">📋 Resumen de partidos</button>
         </div>
 
         <!-- Legend -->
-        <div class="eq-legend" id="eq-legend"></div>
+        <div class="eq-legend" id="eq-legend"><div class="eq-chip" style="background:#FBD0E0;color:#6B1A33;"><div class="eq-dot" style="background:#E91E8C;"></div>Femenino D</div><div class="eq-chip" style="background:#F9A8C9;color:#5C0F2C;"><div class="eq-dot" style="background:#C2185B;"></div>Femenino C</div><div class="eq-chip" style="background:#DDD6FE;color:#3730A3;"><div class="eq-dot" style="background:#7C3AED;"></div>Infantil D</div><div class="eq-chip" style="background:#C4B5FD;color:#2E1065;"><div class="eq-dot" style="background:#6D28D9;"></div>Infantil C</div><div class="eq-chip" style="background:#A7F3D0;color:#065F46;"><div class="eq-dot" style="background:#059669;"></div>Alevín D</div><div class="eq-chip" style="background:#6EE7B7;color:#064E3B;"><div class="eq-dot" style="background:#10B981;"></div>Alevín C</div><div class="eq-chip" style="background:#FEF08A;color:#713F12;"><div class="eq-dot" style="background:#EAB308;"></div>Alevín C</div><div class="eq-chip" style="background:#FDE047;color:#78350F;"><div class="eq-dot" style="background:#CA8A04;"></div>Alevín D</div><div class="eq-chip" style="background:#FCA5A5;color:#7F1D1D;"><div class="eq-dot" style="background:#EF4444;"></div>Benjamín C</div><div class="eq-chip" style="background:#F87171;color:#6B0000;"><div class="eq-dot" style="background:#DC2626;"></div>Benjamín D</div><div class="eq-chip" style="background:#E9D5FF;color:#5B21B6;"><div class="eq-dot" style="background:#7C3AED;"></div>Porteras</div></div>
 
         <!-- Weekday calendar -->
-        <div id="cal-week">
-          <div class="cal-scroll"><div id="cal-outer" class="cal-outer"></div></div>
+        <div id="cal-week" style="">
+          <div class="cal-scroll"><div id="cal-outer" class="cal-outer"><div class="time-axis" style="width: 44px; flex-shrink: 0;"><div style="height: 42px;"></div><div style="height: 18px;"></div><div style="position: relative; height: 414px;"><div class="tick" style="top: 0px;">16:00</div><div class="tick" style="top: 69px;">17:00</div><div class="tick" style="top: 138px;">18:00</div><div class="tick" style="top: 207px;">19:00</div><div class="tick" style="top: 276px;">20:00</div><div class="tick" style="top: 345px;">21:00</div><div class="tick" style="top: 414px;">22:00</div></div><div style="height: 18px;"></div><div style="position: relative; height: 345px;"><div class="tick" style="top: 0px;">17:00</div><div class="tick" style="top: 69px;">18:00</div><div class="tick" style="top: 138px;">19:00</div><div class="tick" style="top: 207px;">20:00</div><div class="tick" style="top: 276px;">21:00</div><div class="tick" style="top: 345px;">22:00</div></div></div><div class="days-area"><div class="days-header"><div class="day-hcell" style="width: 192px; min-width: 192px; height: 42px;"><span>Lunes</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div></div><div class="day-hcell" style="width: 192px; min-width: 192px; height: 42px;"><span>Martes</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div></div><div class="day-hcell" style="width: 192px; min-width: 192px; height: 42px;"><span>Miércoles</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div></div><div class="day-hcell" style="width: 192px; min-width: 192px; height: 42px;"><span>Jueves</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div></div><div class="day-hcell" style="width: 192px; min-width: 192px; height: 42px;"><span>Viernes</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div></div></div><div class="fmt-row"><div class="fmt-lbl fmt-f11" style="width: 192px; min-width: 192px; height: 18px;">F11</div><div class="fmt-lbl fmt-f11" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f11" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f11" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f11" style="width: 192px; min-width: 192px; height: 18px;"></div></div><div class="timeline-body"><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(221, 214, 254); color: rgb(55, 48, 163); top: 161px; height: 92px;">
+    <div class="f-sig">Infantil D</div>
+    <div class="f-hr">18:20–19:40</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;vx9x7h7&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;vx9x7h7&#39;)">✕</button>
+    </div></div><div class="ficha" draggable="true" style="background: rgb(251, 208, 224); color: rgb(107, 26, 51); top: 253px; height: 92px;">
+    <div class="f-sig">Femenino D</div>
+    <div class="f-hr">19:40–21:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;iqy1rss&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;iqy1rss&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(251, 208, 224); color: rgb(107, 26, 51); top: 207px; height: 92px;">
+    <div class="f-sig">Femenino D</div>
+    <div class="f-hr">19:00–20:20</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Martes&#39;,&#39;TENIS&#39;,&#39;q1jb2in&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Martes&#39;,&#39;TENIS&#39;,&#39;q1jb2in&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(196, 181, 253); color: rgb(46, 16, 101); top: 172.5px; height: 103.5px;">
+    <div class="f-sig">Infantil C</div>
+    <div class="f-hr">18:30–20:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Martes&#39;,&#39;PORTERAS&#39;,&#39;dvh4y65&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Martes&#39;,&#39;PORTERAS&#39;,&#39;dvh4y65&#39;)">✕</button>
+    </div></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(110, 231, 183); color: rgb(6, 78, 59); top: 241.5px; height: 103.5px;">
+    <div class="f-sig">Alevín C</div>
+    <div class="f-hr">19:30–21:00</div>
+    <div class="f-tags"><span class="f-tag f-tag-match">⚽ Partido</span><span class="f-tag f-tag-home">🏠 Casa</span></div>
+    <div class="f-cmt">Partido vs Torrent CF</div>
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;TENIS&#39;,&#39;d9j0iic&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;TENIS&#39;,&#39;d9j0iic&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(221, 214, 254); color: rgb(55, 48, 163); top: 138px; height: 103.5px;">
+    <div class="f-sig">Infantil D</div>
+    <div class="f-hr">18:00–19:30</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;431yz6a&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;431yz6a&#39;)">✕</button>
+    </div></div><div class="ficha" draggable="true" style="background: rgb(167, 243, 208); color: rgb(6, 95, 70); top: 241.5px; height: 103.5px;">
+    <div class="f-sig">Alevín D</div>
+    <div class="f-hr">19:30–21:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;tffy0af&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;tffy0af&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(229, 231, 235); color: rgb(55, 65, 81); top: 138px; height: 103.5px;">
+    <div class="f-sig">Porteras</div>
+    <div class="f-hr">18:00–19:30</div>
+    
+    <div class="f-cmt">Específico porteras F11</div>
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;PORTERAS&#39;,&#39;ebeobpm&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Miércoles&#39;,&#39;PORTERAS&#39;,&#39;ebeobpm&#39;)">✕</button>
+    </div></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(249, 168, 201); color: rgb(92, 15, 44); top: 0px; height: 103.5px;">
+    <div class="f-sig">Femenino C</div>
+    <div class="f-hr">16:00–17:30</div>
+    
+    <div class="f-cmt">FEM C+D</div>
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Jueves&#39;,&#39;TENIS&#39;,&#39;97t9j5k&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Jueves&#39;,&#39;TENIS&#39;,&#39;97t9j5k&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(251, 208, 224); color: rgb(107, 26, 51); top: 0px; height: 103.5px;">
+    <div class="f-sig">Femenino D</div>
+    <div class="f-hr">16:00–17:30</div>
+    
+    <div class="f-cmt">FEM C+D</div>
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Jueves&#39;,&#39;RIO&#39;,&#39;r81v6yc&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Jueves&#39;,&#39;RIO&#39;,&#39;r81v6yc&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(251, 208, 224); color: rgb(107, 26, 51); top: 0px; height: 86.25px;">
+    <div class="f-sig">Femenino D</div>
+    <div class="f-hr">16:00–17:15</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;qb7yu54&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;qb7yu54&#39;)">✕</button>
+    </div></div><div class="ficha" draggable="true" style="background: rgb(196, 181, 253); color: rgb(46, 16, 101); top: 86.25px; height: 86.25px;">
+    <div class="f-sig">Infantil C</div>
+    <div class="f-hr">17:15–18:30</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;wjseydd&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;wjseydd&#39;)">✕</button>
+    </div></div><div class="ficha" draggable="true" style="background: rgb(221, 214, 254); color: rgb(55, 48, 163); top: 172.5px; height: 69px;">
+    <div class="f-sig">Infantil D</div>
+    <div class="f-hr">18:30–19:30</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;havdxj0&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;havdxj0&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(249, 168, 201); color: rgb(92, 15, 44); top: 0px; height: 97.75px;">
+    <div class="f-sig">Femenino C</div>
+    <div class="f-hr">16:00–17:25</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;dp3w15z&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;dp3w15z&#39;)">✕</button>
+    </div></div><div class="ficha merged" style="top: 224.25px; height: 86.25px; padding: 2px 3px; flex-direction: row; gap: 2px; align-items: stretch;"><div draggable="true" style="flex: 1 1 0%; background: rgb(249, 168, 201); color: rgb(92, 15, 44); border-radius: 3px; padding: 2px 4px; cursor: grab; display: flex; flex-direction: column; min-width: 0px; border-left: 2px solid rgb(194, 24, 91);">
+      <div style="font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;">FC</div>
+      <div style="font-size:7px;opacity:.8;">19:15–20:30</div>
+      <div style="display:none;gap:2px;margin-top:2px;" class="mini-acts">
+        <button class="fbt" style="font-size:7px;" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;f6dh5ax&#39;)">✏</button>
+        <button class="fbt" style="font-size:7px;" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;f6dh5ax&#39;)">✕</button>
+      </div></div><div draggable="true" style="flex: 1 1 0%; background: rgb(251, 208, 224); color: rgb(107, 26, 51); border-radius: 3px; padding: 2px 4px; cursor: grab; display: flex; flex-direction: column; min-width: 0px; border-left: 2px solid rgb(233, 30, 140);">
+      <div style="font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;">FD</div>
+      <div style="font-size:7px;opacity:.8;">19:30–20:30</div>
+      <div style="display:none;gap:2px;margin-top:2px;" class="mini-acts">
+        <button class="fbt" style="font-size:7px;" onclick="openEdit(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;gd26qlj&#39;)">✏</button>
+        <button class="fbt" style="font-size:7px;" onclick="rmFicha(&#39;F11&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;gd26qlj&#39;)">✕</button>
+      </div></div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 414px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="drop-zone"></div></div></div></div><div class="fmt-row"><div class="fmt-lbl fmt-f8" style="width: 192px; min-width: 192px; height: 18px;">F8</div><div class="fmt-lbl fmt-f8" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f8" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f8" style="width: 192px; min-width: 192px; height: 18px;"></div><div class="fmt-lbl fmt-f8" style="width: 192px; min-width: 192px; height: 18px;"></div></div><div class="timeline-body"><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(254, 240, 138); color: rgb(113, 63, 18); top: 51.75px; height: 86.25px;">
+    <div class="f-sig">Alevín C</div>
+    <div class="f-hr">17:45–19:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Lunes&#39;,&#39;TENIS&#39;,&#39;jmp63tm&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Lunes&#39;,&#39;TENIS&#39;,&#39;jmp63tm&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha merged" style="top: 69px; height: 103.5px; padding: 2px 3px; flex-direction: row; gap: 2px; align-items: stretch;"><div draggable="true" style="flex: 1 1 0%; background: rgb(252, 165, 165); color: rgb(127, 29, 29); border-radius: 3px; padding: 2px 4px; cursor: grab; display: flex; flex-direction: column; min-width: 0px; border-left: 2px solid rgb(239, 68, 68);">
+      <div style="font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;">BC</div>
+      <div style="font-size:7px;opacity:.8;">18:00–19:30</div>
+      <div style="display:none;gap:2px;margin-top:2px;" class="mini-acts">
+        <button class="fbt" style="font-size:7px;" onclick="openEdit(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;rnq5pts&#39;)">✏</button>
+        <button class="fbt" style="font-size:7px;" onclick="rmFicha(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;rnq5pts&#39;)">✕</button>
+      </div></div><div draggable="true" style="flex: 1 1 0%; background: rgb(248, 113, 113); color: rgb(107, 0, 0); border-radius: 3px; padding: 2px 4px; cursor: grab; display: flex; flex-direction: column; min-width: 0px; border-left: 2px solid rgb(220, 38, 38);">
+      <div style="font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;">BD</div>
+      <div style="font-size:7px;opacity:.8;">18:00–19:30</div>
+      <div style="display:none;gap:2px;margin-top:2px;" class="mini-acts">
+        <button class="fbt" style="font-size:7px;" onclick="openEdit(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;zvng647&#39;)">✏</button>
+        <button class="fbt" style="font-size:7px;" onclick="rmFicha(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;zvng647&#39;)">✕</button>
+      </div></div></div><div class="ficha" draggable="true" style="background: rgb(253, 224, 71); color: rgb(120, 53, 15); top: 172.5px; height: 103.5px;">
+    <div class="f-sig">Alevín D</div>
+    <div class="f-hr">19:30–21:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;w73zd1k&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Lunes&#39;,&#39;RIO&#39;,&#39;w73zd1k&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(252, 165, 165); color: rgb(127, 29, 29); top: 51.75px; height: 86.25px;">
+    <div class="f-sig">Benjamín C</div>
+    <div class="f-hr">17:45–19:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;TENIS&#39;,&#39;rcjqkaa&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;TENIS&#39;,&#39;rcjqkaa&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(248, 113, 113); color: rgb(107, 0, 0); top: 69px; height: 103.5px;">
+    <div class="f-sig">Benjamín D</div>
+    <div class="f-hr">18:00–19:30</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;qx18530&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;qx18530&#39;)">✕</button>
+    </div></div><div class="ficha" draggable="true" style="background: rgb(253, 224, 71); color: rgb(120, 53, 15); top: 172.5px; height: 103.5px;">
+    <div class="f-sig">Alevín D</div>
+    <div class="f-hr">19:30–21:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;i4gvq93&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Miércoles&#39;,&#39;RIO&#39;,&#39;i4gvq93&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div></div><div class="day-wrap"><div class="pista-col p-tenis" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(254, 240, 138); color: rgb(113, 63, 18); top: 34.5px; height: 103.5px;">
+    <div class="f-sig">Alevín C</div>
+    <div class="f-hr">17:30–19:00</div>
+    
+    
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;prtm87f&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Viernes&#39;,&#39;TENIS&#39;,&#39;prtm87f&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-rio" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(252, 165, 165); color: rgb(127, 29, 29); top: 34.5px; height: 103.5px;">
+    <div class="f-sig">Benjamín C</div>
+    <div class="f-hr">17:30–19:00</div>
+    <div class="f-tags"><span class="f-tag f-tag-match">⚽ Partido</span><span class="f-tag f-tag-away">✈️ Fuera</span></div>
+    <div class="f-cmt">CD Buñol vs AD — por confirmar</div>
+    <div class="f-acts">
+      <button class="fbt" onclick="openEdit(&#39;F8&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;ncv5j1p&#39;)">✏</button>
+      <button class="fbt" onclick="rmFicha(&#39;F8&#39;,&#39;Viernes&#39;,&#39;RIO&#39;,&#39;ncv5j1p&#39;)">✕</button>
+    </div></div></div><div class="pista-col p-porteras" style="width: 64px; min-width: 64px; height: 345px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="drop-zone"></div></div></div></div></div></div></div>
           <div class="bank-box">
-            <div class="bank-sec"><div class="bank-lbl" style="color:#1E3A8A;">▪ F11 — Sin asignar</div><div class="chips" id="bank-f11" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'F11')"></div></div>
-            <div class="bank-sec"><div class="bank-lbl" style="color:#78350F;">▪ F8 — Sin asignar</div><div class="chips" id="bank-f8" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'F8')"></div></div>
-            <div class="bank-sec"><div class="bank-lbl" style="color:#6D28D9;">▪ Porteras — Sin asignar</div><div class="chips" id="bank-port" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBank(event,'PORT')"></div></div>
+            <div class="bank-sec"><div class="bank-lbl" style="color:#1E3A8A;">▪ F11 — Sin asignar</div><div class="chips" id="bank-f11" ondragover="event.preventDefault();this.classList.add(&#39;over&#39;)" ondragleave="this.classList.remove(&#39;over&#39;)" ondrop="dropBank(event,&#39;F11&#39;)"><span style="font-size:10px;color:var(--text4);">Todos asignados ✓</span></div></div>
+            <div class="bank-sec"><div class="bank-lbl" style="color:#78350F;">▪ F8 — Sin asignar</div><div class="chips" id="bank-f8" ondragover="event.preventDefault();this.classList.add(&#39;over&#39;)" ondragleave="this.classList.remove(&#39;over&#39;)" ondrop="dropBank(event,&#39;F8&#39;)"><span style="font-size:10px;color:var(--text4);">Todos asignados ✓</span></div></div>
+            <div class="bank-sec"><div class="bank-lbl" style="color:#6D28D9;">▪ Porteras — Sin asignar</div><div class="chips" id="bank-port" ondragover="event.preventDefault();this.classList.add(&#39;over&#39;)" ondragleave="this.classList.remove(&#39;over&#39;)" ondrop="dropBank(event,&#39;PORT&#39;)"><span style="font-size:10px;color:var(--text4);">Todos asignados ✓</span></div></div>
           </div>
         </div>
 
         <!-- Weekend calendar -->
-        <div id="cal-weekend" style="display:none;">
-          <div class="wk-grid" id="wk-grid"></div>
+        <div id="cal-weekend" style="display: none;">
+          <div class="wk-grid" id="wk-grid"><div class="wk-day"><div class="wk-day-hd"><span>Sábado</span><button class="btn btn-outline btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3);" onclick="addWkFicha(&#39;Sábado&#39;)">+ Añadir</button></div><div class="wk-body"><div class="wk-outer"><div class="wk-axis" style="width: 44px; flex-shrink: 0; position: relative; height: 828px; margin-top: 28px;"><div class="tick" style="top: 0px;">9:00</div><div class="tick" style="top: 69px;">10:00</div><div class="tick" style="top: 138px;">11:00</div><div class="tick" style="top: 207px;">12:00</div><div class="tick" style="top: 276px;">13:00</div><div class="tick" style="top: 345px;">14:00</div><div class="tick" style="top: 414px;">15:00</div><div class="tick" style="top: 483px;">16:00</div><div class="tick" style="top: 552px;">17:00</div><div class="tick" style="top: 621px;">18:00</div><div class="tick" style="top: 690px;">19:00</div><div class="tick" style="top: 759px;">20:00</div><div class="tick" style="top: 828px;">21:00</div></div><div class="wk-cols" style="flex: 1 1 0%;"><div style="display: grid; grid-template-columns: 1fr 1fr;"><div class="wk-col-hd">Casa 🏠</div><div class="wk-col-hd">Visitante ✈️</div></div><div style="display: grid; grid-template-columns: 1fr 1fr; position: relative; height: 828px;"><div class="wk-pista" style="position: relative; height: 828px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="hline half" style="top: 448.5px;"></div><div class="hline hour" style="top: 483px;"></div><div class="hline half" style="top: 517.5px;"></div><div class="hline hour" style="top: 552px;"></div><div class="hline half" style="top: 586.5px;"></div><div class="hline hour" style="top: 621px;"></div><div class="hline half" style="top: 655.5px;"></div><div class="hline hour" style="top: 690px;"></div><div class="hline half" style="top: 724.5px;"></div><div class="hline hour" style="top: 759px;"></div><div class="hline half" style="top: 793.5px;"></div><div class="hline hour" style="top: 828px;"></div><div class="drop-zone"></div><div class="ficha" draggable="true" style="background: rgb(252, 165, 165); color: rgb(127, 29, 29); top: 103.5px; height: 138px;"><div class="f-sig">Benjamín C</div><div class="f-hr">10:30–12:30</div><div class="f-tags"><span class="f-tag f-tag-match">⚽</span><span class="f-tag f-tag-home">🏠</span></div><div class="f-cmt">vs loriguilla</div><div class="f-acts"><button class="fbt" onclick="rmWkFicha(&#39;Sábado&#39;,&#39;casa&#39;,&#39;ll781w8&#39;)">✕</button></div></div></div><div class="wk-pista" style="position: relative; height: 828px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="hline half" style="top: 448.5px;"></div><div class="hline hour" style="top: 483px;"></div><div class="hline half" style="top: 517.5px;"></div><div class="hline hour" style="top: 552px;"></div><div class="hline half" style="top: 586.5px;"></div><div class="hline hour" style="top: 621px;"></div><div class="hline half" style="top: 655.5px;"></div><div class="hline hour" style="top: 690px;"></div><div class="hline half" style="top: 724.5px;"></div><div class="hline hour" style="top: 759px;"></div><div class="hline half" style="top: 793.5px;"></div><div class="hline hour" style="top: 828px;"></div><div class="drop-zone"></div></div></div></div></div></div></div><div class="wk-day"><div class="wk-day-hd"><span>Domingo</span><button class="btn btn-outline btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3);" onclick="addWkFicha(&#39;Domingo&#39;)">+ Añadir</button></div><div class="wk-body"><div class="wk-outer"><div class="wk-axis" style="width: 44px; flex-shrink: 0; position: relative; height: 828px; margin-top: 28px;"><div class="tick" style="top: 0px;">9:00</div><div class="tick" style="top: 69px;">10:00</div><div class="tick" style="top: 138px;">11:00</div><div class="tick" style="top: 207px;">12:00</div><div class="tick" style="top: 276px;">13:00</div><div class="tick" style="top: 345px;">14:00</div><div class="tick" style="top: 414px;">15:00</div><div class="tick" style="top: 483px;">16:00</div><div class="tick" style="top: 552px;">17:00</div><div class="tick" style="top: 621px;">18:00</div><div class="tick" style="top: 690px;">19:00</div><div class="tick" style="top: 759px;">20:00</div><div class="tick" style="top: 828px;">21:00</div></div><div class="wk-cols" style="flex: 1 1 0%;"><div style="display: grid; grid-template-columns: 1fr 1fr;"><div class="wk-col-hd">Casa 🏠</div><div class="wk-col-hd">Visitante ✈️</div></div><div style="display: grid; grid-template-columns: 1fr 1fr; position: relative; height: 828px;"><div class="wk-pista" style="position: relative; height: 828px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="hline half" style="top: 448.5px;"></div><div class="hline hour" style="top: 483px;"></div><div class="hline half" style="top: 517.5px;"></div><div class="hline hour" style="top: 552px;"></div><div class="hline half" style="top: 586.5px;"></div><div class="hline hour" style="top: 621px;"></div><div class="hline half" style="top: 655.5px;"></div><div class="hline hour" style="top: 690px;"></div><div class="hline half" style="top: 724.5px;"></div><div class="hline hour" style="top: 759px;"></div><div class="hline half" style="top: 793.5px;"></div><div class="hline hour" style="top: 828px;"></div><div class="drop-zone"></div></div><div class="wk-pista" style="position: relative; height: 828px;"><div class="hline hour" style="top: 0px;"></div><div class="hline half" style="top: 34.5px;"></div><div class="hline hour" style="top: 69px;"></div><div class="hline half" style="top: 103.5px;"></div><div class="hline hour" style="top: 138px;"></div><div class="hline half" style="top: 172.5px;"></div><div class="hline hour" style="top: 207px;"></div><div class="hline half" style="top: 241.5px;"></div><div class="hline hour" style="top: 276px;"></div><div class="hline half" style="top: 310.5px;"></div><div class="hline hour" style="top: 345px;"></div><div class="hline half" style="top: 379.5px;"></div><div class="hline hour" style="top: 414px;"></div><div class="hline half" style="top: 448.5px;"></div><div class="hline hour" style="top: 483px;"></div><div class="hline half" style="top: 517.5px;"></div><div class="hline hour" style="top: 552px;"></div><div class="hline half" style="top: 586.5px;"></div><div class="hline hour" style="top: 621px;"></div><div class="hline half" style="top: 655.5px;"></div><div class="hline hour" style="top: 690px;"></div><div class="hline half" style="top: 724.5px;"></div><div class="hline hour" style="top: 759px;"></div><div class="hline half" style="top: 793.5px;"></div><div class="hline hour" style="top: 828px;"></div><div class="drop-zone"></div></div></div></div></div></div></div></div>
           <div class="bank-box" style="margin-top:10px;">
-            <div class="bank-sec"><div class="bank-lbl">Sin asignar fin de semana</div><div class="chips" id="bank-wk" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="dropBankWk(event)"></div></div>
+            <div class="bank-sec"><div class="bank-lbl">Sin asignar fin de semana</div><div class="chips" id="bank-wk" ondragover="event.preventDefault();this.classList.add(&#39;over&#39;)" ondragleave="this.classList.remove(&#39;over&#39;)" ondrop="dropBankWk(event)"><span style="font-size:10px;color:var(--text4);">Usa el botón + en cada día para añadir partidos</span></div></div>
           </div>
         </div>
       </div>
@@ -431,7 +641,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 <!-- Edit ficha -->
 <div class="modal-bg" id="m-edit">
   <div class="modal">
-    <div class="mh"><span class="mt" id="m-edit-title">Editar ficha</span><button class="mx" onclick="closeM('m-edit')">&#215;</button></div>
+    <div class="mh"><span class="mt" id="m-edit-title">Editar ficha</span><button class="mx" onclick="closeM(&#39;m-edit&#39;)">×</button></div>
     <div class="mb">
       <div class="mrow2">
         <div><div class="ml">Hora inicio</div><input class="mi" id="e-start" placeholder="17:30"></div>
@@ -441,56 +651,121 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="mr">
         <div class="ml">Tipo de sesión</div>
         <div class="toggle-row">
-          <div class="toggle-btn active" id="tt-train" onclick="setTipo('entrenamiento')">🏃 Entrenamiento</div>
-          <div class="toggle-btn" id="tt-match" onclick="setTipo('partido')">⚽ Partido</div>
+          <div class="toggle-btn active" id="tt-train" onclick="setTipo(&#39;entrenamiento&#39;)">🏃 Entrenamiento</div>
+          <div class="toggle-btn" id="tt-match" onclick="setTipo(&#39;partido&#39;)">⚽ Partido</div>
         </div>
       </div>
       <div id="match-extra" style="display:none;">
         <div class="mr">
           <div class="ml">Ubicación del partido</div>
           <div class="toggle-row">
-            <div class="toggle-btn active" id="loc-home" onclick="setLoc('casa')">🏠 Casa</div>
-            <div class="toggle-btn" id="loc-away" onclick="setLoc('fuera')">✈️ Fuera</div>
+            <div class="toggle-btn active" id="loc-home" onclick="setLoc(&#39;casa&#39;)">🏠 Casa</div>
+            <div class="toggle-btn" id="loc-away" onclick="setLoc(&#39;fuera&#39;)">✈️ Fuera</div>
           </div>
         </div>
         <div class="mr"><div class="ml">Rival</div><input class="mi" id="e-rival" placeholder="ej. Torrent CF"></div>
       </div>
     </div>
-    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-edit')">Cancelar</button><button class="mbtn-p" onclick="saveEdit()">Guardar</button></div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM(&#39;m-edit&#39;)">Cancelar</button><button class="mbtn-p" onclick="saveEdit()">Guardar</button></div>
   </div>
 </div>
 
 <!-- Email modal -->
 <div class="modal-bg" id="m-email">
   <div class="modal modal-wide">
-    <div class="mh"><span class="mt">📧 Enviar horario por email</span><button class="mx" onclick="closeM('m-email')">&#215;</button></div>
+    <div class="mh"><span class="mt">📧 Enviar horario por email</span><button class="mx" onclick="closeM(&#39;m-email&#39;)">×</button></div>
     <div class="mb">
       <div class="mr"><div class="ml" style="margin-bottom:8px;font-weight:600;">Destinatarios</div><div id="email-ents"></div></div>
       <div class="mr"><div class="ml" style="margin-bottom:6px;font-weight:600;">Vista previa</div><div class="email-prev" id="email-prev"></div></div>
     </div>
-    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-email')">Cancelar</button><button class="mbtn-p" style="background:#2563EB;" onclick="sendEmail()">📤 Enviar</button></div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM(&#39;m-email&#39;)">Cancelar</button><button class="mbtn-p" style="background:#2563EB;" onclick="sendEmail()">📤 Enviar</button></div>
   </div>
 </div>
 
 <!-- Resumen partidos -->
 <div class="modal-bg" id="m-resumen">
   <div class="modal modal-wide">
-    <div class="mh"><span class="mt">📋 Resumen de partidos — <span id="res-week"></span></span><button class="mx" onclick="closeM('m-resumen')">&#215;</button></div>
+    <div class="mh"><span class="mt">📋 Resumen de partidos — <span id="res-week"></span></span><button class="mx" onclick="closeM(&#39;m-resumen&#39;)">×</button></div>
     <div class="mb" id="res-body"></div>
-    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-resumen')">Cerrar</button><button class="mbtn-p" onclick="copyResumen()">📋 Copiar</button></div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM(&#39;m-resumen&#39;)">Cerrar</button><button class="mbtn-p" onclick="copyResumen()">📋 Copiar</button></div>
   </div>
 </div>
 
 <!-- Sent confirmation -->
 <div class="modal-bg" id="m-sent">
   <div class="modal" style="width:300px;text-align:center;">
-    <div class="mh"><span class="mt">✅ Enviado</span><button class="mx" onclick="closeM('m-sent')">&#215;</button></div>
+    <div class="mh"><span class="mt">✅ Enviado</span><button class="mx" onclick="closeM(&#39;m-sent&#39;)">×</button></div>
     <div class="mb" style="padding:20px 16px;">
       <div style="font-size:36px;margin-bottom:10px;">📬</div>
       <div style="font-size:13px;font-weight:500;margin-bottom:6px;" id="sent-t"></div>
       <div style="font-size:10px;color:var(--text3);" id="sent-s"></div>
     </div>
-    <div class="mftr"><button class="mbtn-p" style="background:#059669;" onclick="closeM('m-sent')">Cerrar</button></div>
+    <div class="mftr"><button class="mbtn-p" style="background:#059669;" onclick="closeM(&#39;m-sent&#39;)">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- WhatsApp team picker modal -->
+<div class="modal-bg" id="m-wa">
+  <div class="modal modal-wide">
+    <div class="mh"><span class="mt">💬 Enviar horario por WhatsApp</span><button class="mx" onclick="closeM(&#39;m-wa&#39;)">×</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml" style="font-weight:600;margin-bottom:8px;">Selecciona el equipo</div>
+        <div id="wa-eq-picker" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+      </div>
+      <div class="mr"><div class="ml" style="font-weight:600;margin-bottom:6px;">Vista previa del mensaje</div>
+        <div class="email-prev" id="wa-preview" style="min-height:120px;"></div>
+      </div>
+    </div>
+    <div class="mftr">
+      <button class="mbtn-s" onclick="copyWaMsg()">📋 Copiar texto</button>
+      <button class="mbtn-p" style="background:#25D366;" onclick="sendWa()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="white" style="margin-right:4px;"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.65.15-.19.29-.75.95-.92 1.14-.17.2-.34.22-.63.07-.29-.15-1.23-.45-2.35-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.48.1-.2.05-.37-.02-.52-.07-.15-.65-1.57-.89-2.15-.23-.56-.47-.48-.65-.49h-.55c-.19 0-.5.07-.76.37-.27.29-1.01 1-1.01 2.42s1.04 2.8 1.18 3c.15.2 2.04 3.1 4.93 4.35.69.3 1.23.47 1.65.6.69.22 1.32.19 1.82.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34zM12.05 21.8h-.03a9.87 9.87 0 01-5.02-1.37l-.36-.21-3.73.98 1-3.65-.24-.38a9.86 9.86 0 01-1.51-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.9 6.99c0 5.46-4.44 9.89-9.9 9.89zM12.04 0C5.39 0 0 5.38 0 12a11.94 11.94 0 001.6 6l-1.6 5.9L6 22.4A12 12 0 0012.04 24C18.69 24 24 18.62 24 12S18.69 0 12.04 0z"></path></svg>
+        Abrir WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Weekend add modal -->
+<div class="modal-bg" id="m-wk-add">
+  <div class="modal">
+    <div class="mh"><span class="mt">➕ Añadir a <span id="wk-modal-day">Sábado</span></span><button class="mx" onclick="closeM(&#39;m-wk-add&#39;)">×</button></div>
+    <div class="mb">
+      <div class="mr">
+        <div class="ml">Equipo</div>
+        <select class="msel" id="wk-sel-eq">
+          <option value="">-- Selecciona equipo --</option>
+          <optgroup label="F11">
+            <option value="FD">Femenino D</option><option value="FC">Femenino C</option>
+            <option value="ID">Infantil D</option><option value="IC">Infantil C</option>
+            <option value="AD">Alevín D</option><option value="AC">Alevín C</option>
+          </optgroup>
+          <optgroup label="F8">
+            <option value="BC">Benjamín C</option><option value="BD">Benjamín D</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="mr">
+        <div class="ml">Tipo</div>
+        <select class="msel" id="wk-tipo">
+          <option value="partido">⚽ Partido</option>
+          <option value="entrenamiento">🏃 Entrenamiento</option>
+        </select>
+      </div>
+      <div class="mr">
+        <div class="ml">Columna</div>
+        <select class="msel" id="wk-sel-col">
+          <option value="casa">🏠 Casa</option>
+          <option value="visitante">✈️ Fuera</option>
+        </select>
+      </div>
+      <div class="mr"><div class="ml">Rival (opcional)</div><input class="mi" id="wk-rival" placeholder="ej. Valencia CF"></div>
+      <div class="mrow2">
+        <div><div class="ml">Hora inicio</div><input class="mi" id="wk-start" placeholder="10:00"></div>
+        <div><div class="ml">Hora fin</div><input class="mi" id="wk-end" placeholder="12:00"></div>
+      </div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM(&#39;m-wk-add&#39;)">Cancelar</button><button class="mbtn-p" onclick="saveWkFicha()">Añadir</button></div>
   </div>
 </div>
 
@@ -850,7 +1125,7 @@ function renderWeek(){
         const dz=mkd('drop-zone');
         dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
         dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-        dz.addEventListener('drop',e=>dropOnCol(e,fmt,dia,pista,F));
+        dz.addEventListener('drop',e=>dropOnCol(e,fmt,dia,pista,F,col));
         col.appendChild(dz);
 
         // fichas — check for merges
@@ -941,16 +1216,39 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
 }
 
 function makeMergedFicha(fmt,group,dia,pista,F){
-  const f=group[0];
-  const top=(toMin(f.i)-F.startH*60)*PX;
-  const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
-  const d=mkd('ficha merged');
-  d.style.cssText=`top:${top}px;height:${height}px;`;
-  const labels=group.map(g=>g.s).join('+');
-  d.innerHTML=`
-    <div class="f-sig" style="color:#374151;">${labels}</div>
-    <div class="f-hr" style="color:#6B7280;">${f.i}–${f.f}</div>
-    <div class="f-cmt" style="color:#6B7280;">Entrenamiento conjunto</div>`;
+  // Use the earliest start and latest end for the container
+  const startMin = Math.min(...group.map(g=>toMin(g.i)));
+  const endMin   = Math.max(...group.map(g=>toMin(g.f)));
+  const top    = (startMin - F.startH*60)*PX;
+  const height = Math.max((endMin-startMin)*PX, 20);
+
+  const d = mkd('ficha merged');
+  d.style.cssText=`top:${top}px;height:${height}px;padding:2px 3px;flex-direction:row;gap:2px;align-items:stretch;`;
+
+  // Each team gets its own mini-card inside the merged ficha
+  group.forEach(f=>{
+    const clr = getEqColor(fmt,f.s);
+    const mini = mkd('');
+    mini.style.cssText=`flex:1;background:${clr.bg};color:${clr.tx};border-radius:3px;padding:2px 4px;cursor:grab;display:flex;flex-direction:column;min-width:0;border-left:2px solid ${clr.dot||'rgba(0,0,0,.2)'};`;
+    mini.draggable=true;
+    mini.innerHTML=`
+      <div style="font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;">${f.s}</div>
+      <div style="font-size:7px;opacity:.8;">${f.i}–${f.f}</div>
+      <div style="display:none;gap:2px;margin-top:2px;" class="mini-acts">
+        <button class="fbt" style="font-size:7px;" onclick="openEdit('${fmt}','${dia}','${pista}','${f.id}')">✏</button>
+        <button class="fbt" style="font-size:7px;" onclick="rmFicha('${fmt}','${dia}','${pista}','${f.id}')">✕</button>
+      </div>`;
+    mini.addEventListener('mouseenter',()=>mini.querySelector('.mini-acts').style.display='flex');
+    mini.addEventListener('mouseleave',()=>mini.querySelector('.mini-acts').style.display='none');
+    mini.addEventListener('dragstart',e=>{
+      e.stopPropagation();
+      drag={fmt,id:f.id,dia,pista,fromBank:false};
+      setTimeout(()=>mini.style.opacity='.3',0);
+    });
+    mini.addEventListener('dragend',()=>mini.style.opacity='1');
+    d.appendChild(mini);
+  });
+
   return d;
 }
 
@@ -1005,7 +1303,10 @@ function renderWeekend(){
       const dz=mkd('drop-zone');
       dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
       dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-      dz.addEventListener('drop',e=>dropWkCol(e,dayName,col));
+      // closure captures col correctly for each pista
+      ;(function(capturedCol, capturedDay, capturedPc){
+        dz.addEventListener('drop',e=>dropWkCol(e,capturedDay,capturedCol,capturedPc));
+      })(col, dayName, pc);
       pc.appendChild(dz);
 
       (schedWk[dayName][col]||[]).forEach(f=>{
@@ -1040,19 +1341,30 @@ function renderWeekend(){
 }
 
 function addWkFicha(dayName){
-  // Quick add: prompt for team
-  const s=prompt('Sigla del equipo (FD, FC, IC, ID, AC, AD, BC, BD):');
-  if(!s) return;
-  const name=EQ_NAMES[s.toUpperCase()];
-  if(!name){alert('Equipo no reconocido');return;}
-  const S=s.toUpperCase();
-  const fmt=ALL_EQ.F11.includes(S)?'F11':ALL_EQ.F8.includes(S)?'F8':'PORT';
-  const rival=prompt('Rival (dejar vacío si es entrenamiento):')||'';
-  const col=rival?prompt('Casa o fuera?')?.toLowerCase()||'casa':'casa';
-  const i=prompt('Hora inicio (ej 10:00):')||'10:00';
-  const f=prompt('Hora fin (ej 12:00):')||'12:00';
+  // Open the weekend-add modal
+  document.getElementById('wk-modal-day').textContent = dayName;
+  document.getElementById('wk-sel-eq').value='';
+  document.getElementById('wk-sel-col').value='casa';
+  document.getElementById('wk-rival').value='';
+  document.getElementById('wk-start').value='10:00';
+  document.getElementById('wk-end').value='12:00';
+  document.getElementById('wk-tipo').value='partido';
+  window._wkTargetDay = dayName;
+  openM('m-wk-add');
+}
+
+function saveWkFicha(){
+  const dayName = window._wkTargetDay;
+  const S = document.getElementById('wk-sel-eq').value.toUpperCase();
+  if(!EQ_NAMES[S]){showToast('❌ Equipo no reconocido');return;}
+  const col   = document.getElementById('wk-sel-col').value;
+  const rival = document.getElementById('wk-rival').value.trim();
+  const i     = document.getElementById('wk-start').value||'10:00';
+  const f     = document.getElementById('wk-end').value||'12:00';
+  const tipo  = document.getElementById('wk-tipo').value;
   if(!schedWk[dayName][col]) schedWk[dayName][col]=[];
-  schedWk[dayName][col].push({id:uid(),s:S,i,f,c:'',tipo:rival?'partido':'entrenamiento',loc:col,rival,fmt});
+  schedWk[dayName][col].push({id:uid(),s:S,i,f,c:'',tipo,loc:col,rival});
+  closeM('m-wk-add');
   fbSaveWk();
   renderWeekend();
 }
@@ -1063,21 +1375,30 @@ function rmWkFicha(dayName,col,id){
   renderWeekend();
 }
 
-function dropWkCol(e,dayName,col){
+function dropWkCol(e,dayName,col,pcEl){
   e.preventDefault();
   document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
-  if(!drag||!drag.wk) return;
-  if(drag.dayName!==dayName||drag.col!==col){
+
+  // Position by Y if dragging within weekend
+  if(drag&&drag.wk){
+    const rect=(pcEl||e.currentTarget.parentElement).getBoundingClientRect();
+    const minOff=Math.round((e.clientY-rect.top)/PX/15)*15;
+    const startMin=Math.max(WK_START*60,Math.min(WK_END*60-30,WK_START*60+minOff));
+    const iStr=toStr(startMin);
+
     const f=(schedWk[drag.dayName][drag.col]||[]).find(x=>x.id===drag.id);
     if(f){
       schedWk[drag.dayName][drag.col]=(schedWk[drag.dayName][drag.col]||[]).filter(x=>x.id!==drag.id);
       if(!schedWk[dayName][col])schedWk[dayName][col]=[];
-      schedWk[dayName][col].push({...f,loc:col});
+      const dur=Math.max(toMin(f.f)-toMin(f.i),30);
+      schedWk[dayName][col].push({...f,loc:col,i:iStr,f:toStr(Math.min(startMin+dur,WK_END*60))});
     }
+    drag=null;
+    fbSaveWk();
+    renderWeekend();
+    return;
   }
   drag=null;
-  fbSaveWk();
-  renderWeekend();
 }
 
 function buildBankWk(){
@@ -1088,12 +1409,12 @@ function buildBankWk(){
 // ════════════════════════════════════════════
 // DRAG & DROP — WEEKDAYS
 // ════════════════════════════════════════════
-function dropOnCol(e,fmt,dia,pista,F){
+function dropOnCol(e,fmt,dia,pista,F,colEl){
   e.preventDefault();
   document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
   if(!drag||drag.fmt!==fmt) return;
 
-  const rect=e.currentTarget.parentElement.getBoundingClientRect();
+  const rect=(colEl||e.currentTarget.parentElement).getBoundingClientRect();
   const minOff=Math.round((e.clientY-rect.top)/PX/15)*15;
   const startMin=Math.max(
     F.startH*60,
@@ -1278,19 +1599,64 @@ function sendEmail(){
 }
 
 function openWaAll(){
+  // Collect all assigned teams
   const asgn={};
   ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
-    (sched[fmt][dia][pista]||[]).forEach(f=>{
-      const k=f.s;
+    (getFichas(fmt,dia,pista)||[]).forEach(f=>{
+      const k=fmt+'|'+f.s;
       if(!asgn[k]) asgn[k]={fmt,s:f.s,ses:[]};
       asgn[k].ses.push({dia,pista,i:f.i,ff:f.f,c:f.c,rival:f.rival});
     });
   })));
-  const first=Object.values(asgn)[0]; if(!first){alert('Sin datos');return;}
-  const e=first; const lines=e.ses.map(x=>`  • ${x.dia} ${x.pista}: ${x.i}–${x.ff}${x.rival?' vs '+x.rival:''}`).join('\n');
-  const msg=`⚽ *Horario ${EQ_NAMES[e.s]||e.s} — semana ${WEEKS[wIdx]}*\n\n${lines}\n\n¡Arriba Levante! 🔴⚪`;
+  // Also weekend
+  WK_DAYS.forEach(dayName=>['casa','visitante'].forEach(col=>{
+    (schedWk[dayName][col]||[]).forEach(f=>{
+      const fmt=ALL_EQ.F11.includes(f.s)?'F11':ALL_EQ.F8.includes(f.s)?'F8':'PORT';
+      const k=fmt+'|'+f.s;
+      if(!asgn[k]) asgn[k]={fmt,s:f.s,ses:[]};
+      asgn[k].ses.push({dia:dayName,pista:col==='casa'?'Casa':'Fuera',i:f.i,ff:f.f,c:f.c,rival:f.rival});
+    });
+  }));
+
+  const keys=Object.keys(asgn);
+  if(!keys.length){showToast('Sin equipos en el calendario');return;}
+
+  // Build team picker buttons
+  const picker = document.getElementById('wa-eq-picker');
+  picker.innerHTML='';
+  keys.forEach((k,idx)=>{
+    const {fmt,s,ses}=asgn[k];
+    const clr=getEqColor(fmt,s);
+    const b=document.createElement('button');
+    b.style.cssText=`background:${clr.bg};color:${clr.tx};border:2px solid transparent;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;`;
+    b.textContent=`${EQ_NAMES[s]||s}`;
+    b.onclick=()=>{
+      picker.querySelectorAll('button').forEach(x=>x.style.borderColor='transparent');
+      b.style.borderColor=clr.dot||clr.tx;
+      // Preview
+      const lines=ses.map(x=>`  • ${x.dia} ${x.pista}: ${x.i}–${x.ff}${x.rival?' vs '+x.rival:''}${x.c?' | '+x.c:''}`).join('\n');
+      const msg=`⚽ *Horario ${EQ_NAMES[s]||s} — semana ${WEEKS[wIdx]}*\n\nBuenas familias,\n\nos compartimos el horario de esta semana:\n\n${lines}\n\nRecordad botas y agua. Cualquier duda escribidnos.\n\n¡Arriba Levante! 🔴⚪`;
+      document.getElementById('wa-preview').textContent=msg;
+      window._waCurrent={s,msg};
+    };
+    picker.appendChild(b);
+    if(idx===0) b.click();
+  });
+
+  openM('m-wa');
+}
+
+function sendWa(){
+  if(!window._waCurrent){showToast('Selecciona un equipo');return;}
+  const {s,msg}=window._waCurrent;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-  addHistorial({icon:"💬",bg:"#DCFCE7",title:`WhatsApp — ${EQ_NAMES[e.s]||e.s}`,sub:`Semana ${WEEKS[wIdx]}`});
+  addHistorial({icon:"💬",bg:"#DCFCE7",title:`WhatsApp — ${EQ_NAMES[s]||s}`,sub:`Semana ${WEEKS[wIdx]}`});
+  closeM('m-wa');
+}
+
+function copyWaMsg(){
+  if(!window._waCurrent){showToast('Selecciona un equipo');return;}
+  navigator.clipboard.writeText(window._waCurrent.msg).then(()=>showToast('✅ Copiado'));
 }
 
 // ════════════════════════════════════════════
@@ -1364,6 +1730,13 @@ function getFichas(fmt,dia,pista){
   return (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
 }
 
+function ensureFichas(fmt,dia,pista){
+  if(!sched[fmt]) sched[fmt]={};
+  if(!sched[fmt][dia]) sched[fmt][dia]={};
+  if(!sched[fmt][dia][pista]) sched[fmt][dia][pista]=[];
+  return sched[fmt][dia][pista];
+}
+
 function updateDashPartidos(){
   let count=0;
 
@@ -1411,5 +1784,5 @@ initFirebase();
 renderDash();
 renderTopActions('dashboard');
 </script>
-</body>
-</html>
+
+</body></html>
