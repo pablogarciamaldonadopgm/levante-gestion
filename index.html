@@ -38,8 +38,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
    SIDEBAR
 ═══════════════════════════════════════════════════ */
 .sb-logo{padding:14px 12px 10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:9px;}
-.sb-icon{width:30px;height:30px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sb-icon svg{width:17px;height:17px;}
+.sb-icon{width:34px;height:34px;background:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:2px;}
+.sb-icon img{width:100%;height:100%;object-fit:contain;display:block;}
 .sb-name{color:#fff;font-size:13px;font-weight:600;line-height:1.2;}
 .sb-sub{color:rgba(255,255,255,.4);font-size:10px;}
 .sb-sync{padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.08);}
@@ -264,6 +264,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .match-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#F9FAFB;border-radius:6px;margin-bottom:5px;border:1px solid var(--border);}
 .match-teams{font-size:11px;font-weight:500;color:var(--text);}
 .match-meta{font-size:10px;color:var(--text3);}
+#m-edit button[onclick="copyResumen()"],
+#m-edit button[onclick="generarImagenPartidos()"]{display:none;}
 
 /* Toast */
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:20px;font-size:11px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s;z-index:999;}
@@ -289,7 +291,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="sidebar">
     <div class="sb-logo">
       <div class="sb-icon">
-        <svg viewBox="0 0 17 17" fill="none"><circle cx="8.5" cy="8.5" r="6.5" stroke="white" stroke-width="1.3"></circle><path d="M8.5 2v13M2 8.5h13M5 5l7 7M12 5l-7 7" stroke="white" stroke-width="1" stroke-linecap="round"></path></svg>
+        <img src="https://upload.wikimedia.org/wikipedia/en/5/5f/Levante_UD_logo.svg" alt="Levante UD">
       </div>
       <div><div class="sb-name">Levante UD</div><div class="sb-sub">Escuela deportiva</div></div>
     </div>
@@ -301,7 +303,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item" onclick="nav(&#39;dashboard&#39;,this)"><div class="nav-dot"></div>Dashboard</div>
       <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
-      <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">8</span></div>
+      <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">17</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
@@ -322,6 +324,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.65.15-.19.29-.75.95-.92 1.14-.17.2-.34.22-.63.07-.29-.15-1.23-.45-2.35-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.48.1-.2.05-.37-.02-.52-.07-.15-.65-1.57-.89-2.15-.23-.56-.47-.48-.65-.49h-.55c-.19 0-.5.07-.76.37-.27.29-1.01 1-1.01 2.42s1.04 2.8 1.18 3c.15.2 2.04 3.1 4.93 4.35.69.3 1.23.47 1.65.6.69.22 1.32.19 1.82.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34zM12.05 21.8h-.03a9.87 9.87 0 01-5.02-1.37l-.36-.21-3.73.98 1-3.65-.24-.38a9.86 9.86 0 01-1.51-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.9 6.99c0 5.46-4.44 9.89-9.9 9.89zM12.04 0C5.39 0 0 5.38 0 12a11.94 11.94 0 001.6 6l-1.6 5.9L6 22.4A12 12 0 0012.04 24C18.69 24 24 18.62 24 12S18.69 0 12.04 0z"></path></svg>
         WhatsApp
       </button>
+      <button class="btn btn-outline" onclick="copiarSemanaAnterior()">Copiar semana anterior</button>
+      <button class="btn btn-green" onclick="generarImagenSemana()">Generar imagen</button>
       <button class="btn btn-blue" onclick="openEmailModal()">📧 Email entrenadores</button>
       <button class="btn btn-navy" onclick="guardarHorario()">💾 Guardar</button></div>
     </div>
@@ -330,7 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <!-- DASHBOARD -->
       <div class="view" id="v-dashboard">
         <div class="stats-row">
-          <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Equipos activos</div></div>
+          <div class="stat-card"><div class="stat-val">9</div><div class="stat-lbl">Equipos activos</div></div>
           <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Entrenadores</div></div>
           <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
           <div class="stat-card"><div class="stat-val" id="dash-partidos">3</div><div class="stat-lbl">Partidos esta semana</div></div>
@@ -675,9 +679,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         </div>
         <div class="mr"><div class="ml">Rival</div><input class="mi" id="e-rival" placeholder="ej. Torrent CF"></div>
       </div>
+      <div class="mr" id="span-tr-row">
+        <label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;cursor:pointer;">
+          <input type="checkbox" id="e-span-tr" style="width:14px;height:14px;">
+          Ocupa Tenis + RÃ­o
+        </label>
+      </div>
     </div>
     <div class="mftr">
-  <button class="mbtn-s" onclick="closeM('m-resumen')">Cerrar</button>
+  <button class="mbtn-s" onclick="closeM('m-edit')">Cancelar</button>
+  <button class="mbtn-p" onclick="saveEdit()">Guardar cambios</button>
   <button class="mbtn-s" onclick="copyResumen()">📋 Copiar</button>
   <button class="mbtn-p" onclick="generarImagenPartidos()">🖼️ Generar imagen</button>
 </div>
@@ -750,8 +761,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <select class="msel" id="wk-sel-eq">
           <option value="">-- Selecciona equipo --</option>
           <optgroup label="F11">
-            <option value="FB">Femenino B</option><option value="FD">Femenino D</option><option value="FC">Femenino C</option>
-            <option value="ID">Infantil D</option><option value="IC">Infantil C</option>
+            <option value="FB">Femenino B</option><option value="FC">Femenino C</option><option value="FD">Femenino D</option>
+            <option value="IC">Infantil C</option><option value="ID">Infantil D</option>
             <option value="AD">Alevín D</option><option value="AC">Alevín C</option>
           </optgroup>
           <optgroup label="F8">
@@ -860,17 +871,19 @@ const WEEKS  = ["21 abr — 27 abr","28 abr — 4 may","5 may — 11 may","12 ma
 const WK_DAYS = ["Sábado","Domingo"];
 let wIdx = 1;
 let calTab = 'week'; // 'week' | 'weekend'
+const TEAM_ORDER = ["FB","FC","FD","IC","ID","AC","AD","BC","BD","PORT"];
+let weeklyCache = {};
 
 // Unique color per team
 const EQ_COLORS = {
   F11:{
     FB:{ bg:"#FEE2E2", tx:"#7F1D1D", dot:"#E11D48" },
-    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
     FC:{ bg:"#F9A8C9", tx:"#5C0F2C", dot:"#C2185B" },
-    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
+    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
     IC:{ bg:"#C4B5FD", tx:"#2E1065", dot:"#6D28D9" },
-    AD:{ bg:"#A7F3D0", tx:"#065F46", dot:"#059669" },
+    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
     AC:{ bg:"#6EE7B7", tx:"#064E3B", dot:"#10B981" },
+    AD:{ bg:"#A7F3D0", tx:"#065F46", dot:"#059669" },
   },
   F8:{
     AC:{ bg:"#FEF08A", tx:"#713F12", dot:"#EAB308" },
@@ -884,13 +897,13 @@ const EQ_COLORS = {
 };
 
 const ALL_EQ = {
-  F11:["FB","FD","FC","ID","IC","AD","AC"],
+  F11:["FB","FC","FD","IC","ID","AC","AD"],
   F8: ["AC","AD","BC","BD"],
   PORT:["PORT"]
 };
 
 const EQ_NAMES = {
-  FB:"Femenino B", FD:"Femenino D", FC:"Femenino C", ID:"Infantil D", IC:"Infantil C",
+  FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
 };
 
@@ -969,7 +982,7 @@ let historial = [
   {icon:"💬",bg:"#DCFCE7",title:"WhatsApp generado — Alevín C",sub:"Partido vs Torrent CF · ayer",ts:Date.now()-86400000},
 ];
 
-let currentPage = 'dashboard';
+let currentPage = 'calendario';
 
 // ════════════════════════════════════════════
 // HELPERS
@@ -1029,6 +1042,8 @@ function renderTopActions(page){
         <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.99-.95-.27-.1-.46-.15-.65.15-.19.29-.75.95-.92 1.14-.17.2-.34.22-.63.07-.29-.15-1.23-.45-2.35-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.48.1-.2.05-.37-.02-.52-.07-.15-.65-1.57-.89-2.15-.23-.56-.47-.48-.65-.49h-.55c-.19 0-.5.07-.76.37-.27.29-1.01 1-1.01 2.42s1.04 2.8 1.18 3c.15.2 2.04 3.1 4.93 4.35.69.3 1.23.47 1.65.6.69.22 1.32.19 1.82.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.27-.19-.56-.34zM12.05 21.8h-.03a9.87 9.87 0 01-5.02-1.37l-.36-.21-3.73.98 1-3.65-.24-.38a9.86 9.86 0 01-1.51-5.27c0-5.45 4.44-9.88 9.9-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.9 6.99c0 5.46-4.44 9.89-9.9 9.89zM12.04 0C5.39 0 0 5.38 0 12a11.94 11.94 0 001.6 6l-1.6 5.9L6 22.4A12 12 0 0012.04 24C18.69 24 24 18.62 24 12S18.69 0 12.04 0z"/></svg>
         WhatsApp
       </button>
+      <button class="btn btn-outline" onclick="copiarSemanaAnterior()">Copiar semana anterior</button>
+      <button class="btn btn-green" onclick="generarImagenSemana()">Generar imagen</button>
       <button class="btn btn-blue" onclick="openEmailModal()">📧 Email entrenadores</button>
       <button class="btn btn-navy" onclick="guardarHorario()">💾 Guardar</button>`;
   } else { el.innerHTML=''; }
@@ -1042,18 +1057,29 @@ function renderLegend(){
   let html = '';
   const pintados = new Set();
 
-  ['F11','F8','PORT'].forEach(fmt=>{
-    Object.entries(EQ_COLORS[fmt]||{}).forEach(([s,c])=>{
-      const nombre = EQ_NAMES[s] || s;
+  TEAM_ORDER.forEach(s=>{
+    const fmt = ALL_EQ.F11.includes(s) ? 'F11' : ALL_EQ.F8.includes(s) ? 'F8' : 'PORT';
+    const c = getEqColor(fmt, s);
+    const nombre = EQ_NAMES[s] || s;
 
-      if(pintados.has(nombre)) return;
-      pintados.add(nombre);
+    if(pintados.has(nombre)) return;
+    pintados.add(nombre);
 
-      html+=`<div class="eq-chip" style="background:${c.bg};color:${c.tx};"><div class="eq-dot" style="background:${c.dot};"></div>${nombre}</div>`;
-    });
+    html+=`<div class="eq-chip" style="background:${c.bg};color:${c.tx};"><div class="eq-dot" style="background:${c.dot};"></div>${nombre}</div>`;
   });
 
   el.innerHTML = html;
+}
+
+function renderTeamSelects(){
+  const sel=document.getElementById('wk-sel-eq');
+  if(!sel) return;
+  const f11=TEAM_ORDER.filter(s=>ALL_EQ.F11.includes(s));
+  const f8=TEAM_ORDER.filter(s=>ALL_EQ.F8.includes(s));
+  sel.innerHTML=`
+    <option value="">-- Selecciona equipo --</option>
+    <optgroup label="F11">${f11.map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')}</optgroup>
+    <optgroup label="F8">${f8.map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')}</optgroup>`;
 }
 
 // ════════════════════════════════════════════
@@ -1164,6 +1190,7 @@ function renderWeek(){
         merged.forEach(group=>{
           if(group.length===1){
             const f=group[0];
+            if(pista==='RIO' && f.spanTR) return;
             const c=getEqColor(fmt,f.s);
             col.appendChild(makeFicha(fmt,f,c,dia,pista,F,false));
           } else {
@@ -1225,8 +1252,9 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
   const top=(toMin(f.i)-F.startH*60)*PX;
   const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
   const d=mkd('ficha'+(isPort?' porteras-ficha':''));
-  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;`;
-  let tags='';
+  const spanStyle = f.spanTR && pista==='TENIS' ? `right:auto;width:${COL_W*2-4}px;` : '';
+  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;${spanStyle}`;
+  let tags=f.spanTR?`<span class="f-tag">Tenis + RÃ­o</span>`:'';
   if(f.tipo==='partido') tags+=`<span class="f-tag f-tag-match">⚽ Partido</span>`;
   if(f.loc==='casa')     tags+=`<span class="f-tag f-tag-home">🏠 Casa</span>`;
   if(f.loc==='fuera')    tags+=`<span class="f-tag f-tag-away">✈️ Fuera</span>`;
@@ -1523,8 +1551,10 @@ function dropOnCol(e,fmt,dia,pista,F,colEl){
 
   f.i=iStr;
   f.f=toStr(Math.min(startMin+dur, F.endH*60));
+  const targetPista = f.spanTR && pista==='RIO' ? 'TENIS' : pista;
+  if(targetPista==='PORTERAS') f.spanTR=false;
 
-  ensureFichas(fmt,dia,pista).push(f);
+  ensureFichas(fmt,dia,targetPista).push(f);
 
   drag=null;
   fbSaveSchedule();
@@ -1587,6 +1617,8 @@ function openEdit(fmt,dia,pista,id){
   document.getElementById('e-end').value=f.f;
   document.getElementById('e-cmt').value=f.c||'';
   document.getElementById('e-rival').value=f.rival||'';
+  document.getElementById('e-span-tr').checked=!!f.spanTR;
+  document.getElementById('span-tr-row').style.display=(pista==='PORTERAS'||f.s==='PORT')?'none':'';
   setTipo(editTipo,false);
   setLoc(editLoc,false);
   openM('m-edit');
@@ -1607,7 +1639,8 @@ function setLoc(loc,save=true){
 function saveEdit(){
   if(!editTarget) return;
   const{fmt,dia,pista,id}=editTarget;
-  const f=(sched[fmt][dia][pista]||[]).find(x=>x.id===id);
+  const arr=(sched[fmt][dia][pista]||[]);
+  const f=arr.find(x=>x.id===id);
   if(f){
     const oldI=f.i, oldF=f.f;
     f.i=document.getElementById('e-start').value.trim()||f.i;
@@ -1615,6 +1648,11 @@ function saveEdit(){
     f.c=document.getElementById('e-cmt').value.trim();
     f.tipo=editTipo; f.loc=editLoc;
     f.rival=document.getElementById('e-rival').value.trim();
+    f.spanTR=!!document.getElementById('e-span-tr').checked && pista!=='PORTERAS' && f.s!=='PORT';
+    if(f.spanTR && pista==='RIO'){
+      arr.splice(arr.findIndex(x=>x.id===id),1);
+      ensureFichas(fmt,dia,'TENIS').push(f);
+    }
     if(oldI!==f.i||oldF!==f.f){
       addHistorial({icon:"✏️",bg:"#FEF3C7",title:`Cambio horario — ${EQ_NAMES[f.s]||f.s}`,sub:`${dia} ${pista}: ${oldI}–${oldF} → ${f.i}–${f.f}`});
     }
@@ -1628,9 +1666,73 @@ function saveEdit(){
 // SAVE & EMAIL & WHATSAPP
 // ════════════════════════════════════════════
 function guardarHorario(){
+  cacheCurrentWeek();
   fbSaveSchedule();
   addHistorial({icon:"💾",bg:"#D1FAE5",title:"Horario guardado",sub:`Semana ${WEEKS[wIdx]}`});
   showToast('✅ Horario guardado');
+}
+
+function generarImagenSemana(){
+  const canvas=document.createElement('canvas');
+  canvas.width=1400;
+  canvas.height=1800;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#F8FAFC';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#1B2E4B';
+  ctx.fillRect(0,0,canvas.width,150);
+  ctx.fillStyle='#fff';
+  ctx.textAlign='center';
+  ctx.font='bold 42px Arial';
+  ctx.fillText('Calendario semanal',700,62);
+  ctx.font='24px Arial';
+  ctx.fillText(WEEKS[wIdx]||'',700,105);
+
+  const left=60, top=200, dayW=250, rowH=44;
+  DIAS.forEach((dia,idx)=>{
+    const x=left+idx*(dayW+18);
+    ctx.fillStyle='#E8333A';
+    ctx.fillRect(x,top,dayW,46);
+    ctx.fillStyle='#fff';
+    ctx.font='bold 22px Arial';
+    ctx.textAlign='center';
+    ctx.fillText(dia,x+dayW/2,top+30);
+
+    let items=[];
+    ['F11','F8'].forEach(fmt=>PISTAS.forEach(pista=>{
+      getFichas(fmt,dia,pista).forEach(f=>{
+        if(pista==='RIO' && f.spanTR) return;
+        items.push({...f,fmt,pista:pista==='TENIS'&&f.spanTR?'TENIS + RIO':pista});
+      });
+    }));
+    items.sort((a,b)=>toMin(a.i)-toMin(b.i));
+
+    let y=top+62;
+    if(!items.length){
+      ctx.fillStyle='#6B7280';
+      ctx.font='18px Arial';
+      ctx.fillText('Sin sesiones',x+dayW/2,y+24);
+      return;
+    }
+
+    items.forEach(f=>{
+      const clr=getEqColor(f.fmt,f.s);
+      ctx.fillStyle=clr.bg;
+      ctx.fillRect(x,y,dayW,rowH);
+      ctx.fillStyle=clr.tx;
+      ctx.textAlign='left';
+      ctx.font='bold 16px Arial';
+      ctx.fillText(EQ_NAMES[f.s]||f.s,x+10,y+18);
+      ctx.font='13px Arial';
+      ctx.fillText(`${f.i}-${f.f} · ${f.pista}`,x+10,y+36);
+      y+=rowH+8;
+    });
+  });
+
+  const link=document.createElement('a');
+  link.download=`calendario-semana-${(WEEKS[wIdx]||'').replace(/[^a-z0-9]+/gi,'-')}.png`;
+  link.href=canvas.toDataURL('image/png');
+  link.click();
 }
 
 function openEmailModal(){
@@ -1670,7 +1772,7 @@ function openWaAll(){
   // Collect all assigned teams
   const asgn={};
   ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
-    (getFichas(fmt,dia,pista)||[]).forEach(f=>{
+    (getFichas(fmt,dia,pista)||[]).filter(f=>f.tipo!=='partido').forEach(f=>{
       const k=fmt+'|'+f.s;
       if(!asgn[k]) asgn[k]={fmt,s:f.s,ses:[]};
       asgn[k].ses.push({dia,pista,i:f.i,ff:f.f,c:f.c,rival:f.rival});
@@ -1678,7 +1780,7 @@ function openWaAll(){
   })));
   // Also weekend
   WK_DAYS.forEach(dayName=>['casa','visitante'].forEach(col=>{
-    (schedWk[dayName][col]||[]).forEach(f=>{
+    (schedWk[dayName][col]||[]).filter(f=>f.tipo!=='partido').forEach(f=>{
       const fmt=ALL_EQ.F11.includes(f.s)?'F11':ALL_EQ.F8.includes(f.s)?'F8':'PORT';
       const k=fmt+'|'+f.s;
       if(!asgn[k]) asgn[k]={fmt,s:f.s,ses:[]};
@@ -1686,7 +1788,7 @@ function openWaAll(){
     });
   }));
 
-  const keys=Object.keys(asgn);
+  const keys=Object.keys(asgn).sort((a,b)=>TEAM_ORDER.indexOf(a.split('|')[1])-TEAM_ORDER.indexOf(b.split('|')[1]));
   if(!keys.length){showToast('Sin equipos en el calendario');return;}
 
   // Build team picker buttons
@@ -1703,7 +1805,7 @@ function openWaAll(){
       b.style.borderColor=clr.dot||clr.tx;
       // Preview
       const lines=ses.map(x=>`  • ${x.dia} ${x.pista}: ${x.i}–${x.ff}${x.rival?' vs '+x.rival:''}${x.c?' | '+x.c:''}`).join('\n');
-      const msg=`⚽ *Horario ${EQ_NAMES[s]||s} — semana ${WEEKS[wIdx]}*\n\nBuenas familias,\n\nos compartimos el horario de esta semana:\n\n${lines}\n\nRecordad botas y agua. Cualquier duda escribidnos.\n\n¡Arriba Levante! 🔴⚪`;
+      const msg=`Horario ${EQ_NAMES[s]||s} - semana ${WEEKS[wIdx]}\n\nBuenas familias,\n\nos compartimos los entrenamientos de esta semana:\n\n${lines}\n\nRecordad botas y agua. Cualquier duda escribidnos.\n\nArriba Levante.`;
       document.getElementById('wa-preview').textContent=msg;
       window._waCurrent={s,msg};
     };
@@ -1997,16 +2099,44 @@ function renderEntrenadores(){
 // ════════════════════════════════════════════
 // WEEK NAV
 // ════════════════════════════════════════════
-function cw(d){ wIdx=Math.max(0,Math.min(WEEKS.length-1,wIdx+d)); renderCalendar(); }
+function cloneData(o){ return JSON.parse(JSON.stringify(o)); }
+function cacheCurrentWeek(){ weeklyCache[wIdx]={sched:cloneData(sched),schedWk:cloneData(schedWk)}; }
+function loadCachedWeek(i){
+  if(!weeklyCache[i]) return;
+  sched=cloneData(weeklyCache[i].sched);
+  schedWk=cloneData(weeklyCache[i].schedWk);
+}
+function cw(d){
+  cacheCurrentWeek();
+  wIdx=Math.max(0,Math.min(WEEKS.length-1,wIdx+d));
+  loadCachedWeek(wIdx);
+  renderCalendar();
+}
+
+function copiarSemanaAnterior(){
+  if(wIdx<=0){showToast('No hay semana anterior');return;}
+  cacheCurrentWeek();
+  const prev=weeklyCache[wIdx-1];
+  if(!prev){showToast('No hay datos guardados de la semana anterior');return;}
+  sched=cloneData(prev.sched);
+  schedWk=cloneData(prev.schedWk);
+  cacheCurrentWeek();
+  fbSaveSchedule();
+  fbSaveWk();
+  renderCalendar();
+  showToast('Semana anterior copiada');
+}
 
 // ════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════
 initFirebase();
+renderTeamSelects();
 renderLegend();
 renderCalendar();
+cacheCurrentWeek();
 renderDash();
-renderTopActions('dashboard');
+renderTopActions('calendario');
 </script>
 
 </body></html>
