@@ -177,7 +177,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 /* ═══════════════════════════════════════════════════
    FICHAS
 ═══════════════════════════════════════════════════ */
-.ficha{position:absolute;left:2px;right:2px;border-radius:4px;padding:3px 5px;cursor:grab;overflow:hidden;display:flex;flex-direction:column;z-index:2;border-left:3px solid rgba(0,0,0,.18);}
+.ficha{position:absolute;left:2px;right:2px;border-radius:4px;padding:3px 5px;cursor:grab;overflow:hidden;display:flex;flex-direction:column;z-index:2;border-left:3px solid rgba(0,0,0,.18);min-height:42px;}
 .ficha:active{cursor:grabbing;opacity:.7;}
 .ficha.merged{background:#fff !important;border:1.5px solid var(--border-strong);border-left:3px solid #6B7280;}
 .ficha.porteras-ficha{border-left-color:#7C3AED;}
@@ -189,8 +189,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .f-tag-home{background:#D1FAE5;color:#065F46;}
 .f-tag-away{background:#FEE2E2;color:#991B1B;}
 .f-cmt{font-size:7.5px;font-style:italic;opacity:.75;margin-top:1px;line-height:1.3;}
-.f-acts{display:none;gap:2px;margin-top:2px;}
-.ficha:hover .f-acts{display:flex;}
+.f-acts{display:flex;gap:2px;margin-top:2px;}
 .fbt{background:rgba(255,255,255,.6);border:none;border-radius:3px;cursor:pointer;font-size:8px;padding:1px 4px;color:inherit;line-height:1.4;}
 .fbt:hover{background:rgba(255,255,255,.9);}
 
@@ -772,19 +771,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       </div>
       <div class="mr">
         <div class="ml">Tipo</div>
-        <select class="msel" id="wk-tipo">
+        <select class="msel" id="wk-tipo" onchange="updateAddModalFields()">
           <option value="partido">⚽ Partido</option>
           <option value="entrenamiento">🏃 Entrenamiento</option>
         </select>
       </div>
       <div class="mr">
-        <div class="ml">Columna</div>
+        <div class="ml" id="wk-col-label">Columna</div>
         <select class="msel" id="wk-sel-col">
           <option value="casa">🏠 Casa</option>
           <option value="visitante">✈️ Fuera</option>
         </select>
       </div>
-      <div class="mr"><div class="ml">Rival (opcional)</div><input class="mi" id="wk-rival" placeholder="ej. Valencia CF"></div>
+      <div class="mr" id="wk-rival-row"><div class="ml">Rival (opcional)</div><input class="mi" id="wk-rival" placeholder="ej. Valencia CF"></div>
       <div class="mrow2">
         <div><div class="ml">Hora inicio</div><input class="mi" id="wk-start" placeholder="10:00"></div>
         <div><div class="ml">Hora fin</div><input class="mi" id="wk-end" placeholder="12:00"></div>
@@ -1250,7 +1249,7 @@ function detectMerges(fichas){
 
 function makeFicha(fmt,f,clr,dia,pista,F,isPort){
   const top=(toMin(f.i)-F.startH*60)*PX;
-  const height=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
+  const height=Math.max((toMin(f.f)-toMin(f.i))*PX,46);
   const d=mkd('ficha'+(isPort?' porteras-ficha':''));
   const spanStyle = f.spanTR && pista==='TENIS' ? `right:auto;width:${COL_W*2-4}px;` : '';
   d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;${spanStyle}`;
@@ -1372,7 +1371,7 @@ function renderWeekend(){
         const fmt=ALL_EQ.F11.includes(f.s)?'F11':ALL_EQ.F8.includes(f.s)?'F8':'PORT';
         const clr=getEqColor(fmt,f.s);
         const top=(toMin(f.i)-WK_START*60)*PX;
-        const height2=Math.max((toMin(f.f)-toMin(f.i))*PX,16);
+  const height2=Math.max((toMin(f.f)-toMin(f.i))*PX,46);
         const fd=mkd('ficha');
         fd.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height2}px;`;
         let tags2='';
@@ -1409,13 +1408,13 @@ function addWkFicha(dayName){
   document.getElementById('wk-tipo').value='partido';
   window._wkTargetDay = dayName;
   window._weekTargetDay = null;
+  updateAddModalFields();
   openM('m-wk-add');
 }
 
 function addWeekFicha(dia){
   document.getElementById('wk-modal-day').textContent = dia;
   document.getElementById('wk-sel-eq').value='';
-  document.getElementById('wk-sel-col').value='casa';
   document.getElementById('wk-rival').value='';
   document.getElementById('wk-start').value='17:00';
   document.getElementById('wk-end').value='18:30';
@@ -1423,8 +1422,33 @@ function addWeekFicha(dia){
 
   window._weekTargetDay = dia;
   window._wkTargetDay = null;
+  updateAddModalFields();
 
   openM('m-wk-add');
+}
+
+function updateAddModalFields(){
+  const tipo=document.getElementById('wk-tipo').value;
+  const isWeek=!!window._weekTargetDay;
+  const sel=document.getElementById('wk-sel-col');
+  const label=document.getElementById('wk-col-label');
+  const rivalRow=document.getElementById('wk-rival-row');
+
+  if(isWeek && tipo==='entrenamiento'){
+    label.textContent='Pista';
+    sel.innerHTML=`
+      <option value="TENIS">Tenis</option>
+      <option value="RIO">RÃ­o</option>
+      <option value="TENIS_RIO">Tenis + RÃ­o</option>
+      <option value="PORTERAS">Porteras</option>`;
+    rivalRow.style.display='none';
+  } else {
+    label.textContent='Columna';
+    sel.innerHTML=`
+      <option value="casa">Casa</option>
+      <option value="visitante">Fuera</option>`;
+    rivalRow.style.display=tipo==='partido'?'':'none';
+  }
 }
 
 function saveWkFicha(){
@@ -1439,17 +1463,30 @@ function saveWkFicha(){
   if(window._weekTargetDay){
   const dia = window._weekTargetDay;
   const fmt = ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
-  const pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
+  let pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
+  let spanTR = false;
+  let loc = '';
+  let comment = '';
+
+  if(tipo==='entrenamiento'){
+    pista = col==='TENIS_RIO' ? 'TENIS' : col;
+    spanTR = col==='TENIS_RIO';
+    if(fmt==='PORT') pista='PORTERAS';
+  } else {
+    loc = col;
+    comment = rival ? `Partido vs ${rival}` : '';
+  }
 
   ensureFichas(fmt,dia,pista).push({
     id:uid(),
     s:S,
     i,
     f,
-    c:rival ? `Partido vs ${rival}` : '',
+    c:comment,
     tipo,
-    loc:col,
-    rival
+    loc,
+    rival:tipo==='partido'?rival:'',
+    spanTR
   });
 
   window._weekTargetDay = null;
@@ -1672,67 +1709,36 @@ function guardarHorario(){
   showToast('✅ Horario guardado');
 }
 
-function generarImagenSemana(){
-  const canvas=document.createElement('canvas');
-  canvas.width=1400;
-  canvas.height=1800;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#F8FAFC';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#1B2E4B';
-  ctx.fillRect(0,0,canvas.width,150);
-  ctx.fillStyle='#fff';
-  ctx.textAlign='center';
-  ctx.font='bold 42px Arial';
-  ctx.fillText('Calendario semanal',700,62);
-  ctx.font='24px Arial';
-  ctx.fillText(WEEKS[wIdx]||'',700,105);
-
-  const left=60, top=200, dayW=250, rowH=44;
-  DIAS.forEach((dia,idx)=>{
-    const x=left+idx*(dayW+18);
-    ctx.fillStyle='#E8333A';
-    ctx.fillRect(x,top,dayW,46);
-    ctx.fillStyle='#fff';
-    ctx.font='bold 22px Arial';
-    ctx.textAlign='center';
-    ctx.fillText(dia,x+dayW/2,top+30);
-
-    let items=[];
-    ['F11','F8'].forEach(fmt=>PISTAS.forEach(pista=>{
-      getFichas(fmt,dia,pista).forEach(f=>{
-        if(pista==='RIO' && f.spanTR) return;
-        items.push({...f,fmt,pista:pista==='TENIS'&&f.spanTR?'TENIS + RIO':pista});
-      });
-    }));
-    items.sort((a,b)=>toMin(a.i)-toMin(b.i));
-
-    let y=top+62;
-    if(!items.length){
-      ctx.fillStyle='#6B7280';
-      ctx.font='18px Arial';
-      ctx.fillText('Sin sesiones',x+dayW/2,y+24);
-      return;
-    }
-
-    items.forEach(f=>{
-      const clr=getEqColor(f.fmt,f.s);
-      ctx.fillStyle=clr.bg;
-      ctx.fillRect(x,y,dayW,rowH);
-      ctx.fillStyle=clr.tx;
-      ctx.textAlign='left';
-      ctx.font='bold 16px Arial';
-      ctx.fillText(EQ_NAMES[f.s]||f.s,x+10,y+18);
-      ctx.font='13px Arial';
-      ctx.fillText(`${f.i}-${f.f} · ${f.pista}`,x+10,y+36);
-      y+=rowH+8;
-    });
+function loadHtml2Canvas(){
+  if(window.html2canvas) return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    s.onload=resolve;
+    s.onerror=reject;
+    document.head.appendChild(s);
   });
+}
 
-  const link=document.createElement('a');
-  link.download=`calendario-semana-${(WEEKS[wIdx]||'').replace(/[^a-z0-9]+/gi,'-')}.png`;
-  link.href=canvas.toDataURL('image/png');
-  link.click();
+function generarImagenSemana(){
+  const target=document.getElementById('cal-week');
+  if(!target){showToast('No se encuentra el calendario');return;}
+  loadHtml2Canvas().then(()=>{
+    return html2canvas(target,{
+      backgroundColor:'#F0F2F5',
+      scale:2,
+      useCORS:true,
+      width:target.scrollWidth,
+      height:target.scrollHeight,
+      windowWidth:target.scrollWidth,
+      windowHeight:target.scrollHeight
+    });
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    link.download=`calendario-semana-${(WEEKS[wIdx]||'').replace(/[^a-z0-9]+/gi,'-')}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }).catch(()=>showToast('No se pudo generar la captura'));
 }
 
 function openEmailModal(){
