@@ -305,7 +305,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
-      <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">17</span></div>
+      <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
       <div class="nav-item" onclick="nav(&#39;historial&#39;,this)"><div class="nav-dot"></div>Historial</div>
@@ -336,7 +336,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="view" id="v-dashboard">
         <div class="stats-row">
           <div class="stat-card"><div class="stat-val">9</div><div class="stat-lbl">Equipos activos</div></div>
-          <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Entrenadores</div></div>
+          <div class="stat-card"><div class="stat-val">20</div><div class="stat-lbl">Entrenadores</div></div>
           <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
           <div class="stat-card"><div class="stat-val" id="dash-partidos">3</div><div class="stat-lbl">Partidos esta semana</div></div>
         </div>
@@ -596,15 +596,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <table class="tbl">
             <thead><tr><th>Equipo</th><th>Formato</th><th>Sigla</th><th>Entrenadores</th><th>Estado</th></tr></thead>
             <tbody>
-              <tr><td><b>Femenino B</b></td><td><span class="pill pill-b">F11</span></td><td>FB</td><td>0</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Femenino B</b></td><td><span class="pill pill-b">F11</span></td><td>FB</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Femenino D</b></td><td><span class="pill pill-b">F11</span></td><td>FD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Infantil C</b></td><td><span class="pill pill-b">F11</span></td><td>IC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Infantil D</b></td><td><span class="pill pill-b">F11</span></td><td>ID</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Alevín C</b></td><td><span class="pill pill-b">F11</span></td><td>AC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Alevín D</b></td><td><span class="pill pill-b">F11</span></td><td>AD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Alevín C</b></td><td><span class="pill pill-y">F8</span></td><td>AC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Alevín D</b></td><td><span class="pill pill-y">F8</span></td><td>AD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Benjamín C</b></td><td><span class="pill pill-y">F8</span></td><td>BC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Benjamín D</b></td><td><span class="pill pill-y">F8</span></td><td>BD</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr><td><b>Benjamín D</b></td><td><span class="pill pill-y">F8</span></td><td>BD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -922,23 +922,26 @@ function getEqColor(fmt, s){
 }
 
 const ENTRENADORES = [
-  {n:"Miguel García",   eq:"Femenino D",  fmt:"F11", email:"mgarcia@levante.es"},
-  {n:"Javi Romero",     eq:"Femenino D",  fmt:"F11", email:"jromero@levante.es"},
-  {n:"Ángel López",     eq:"Femenino C",  fmt:"F11", email:"alopez@levante.es"},
-  {n:"Pablo Martínez",  eq:"Femenino C",  fmt:"F11", email:"pmartinez@levante.es"},
-  {n:"Sergio Ruiz",     eq:"Infantil D",  fmt:"F11", email:"sruiz@levante.es"},
-  {n:"Tomás Ferrer",    eq:"Infantil D",  fmt:"F11", email:"tferrer@levante.es"},
-  {n:"Carlos Peris",    eq:"Infantil C",  fmt:"F11", email:"cperis@levante.es"},
-  {n:"David Soler",     eq:"Infantil C",  fmt:"F11", email:"dsoler@levante.es"},
-  {n:"Raúl Navarro",    eq:"Alevín D",    fmt:"F11", email:"rnavarro@levante.es"},
-  {n:"Marcos Gil",      eq:"Alevín D",    fmt:"F11", email:"mgil@levante.es"},
-  {n:"Adrián Climent",  eq:"Alevín C",    fmt:"F11", email:"acliment@levante.es"},
-  {n:"Luis Pascual",    eq:"Benjamín C",  fmt:"F8",  email:"lpascual@levante.es"},
-  {n:"Néstor Bou",      eq:"Benjamín C",  fmt:"F8",  email:"nbou@levante.es"},
-  {n:"Oriol Vidal",     eq:"Benjamín D",  fmt:"F8",  email:"ovidal@levante.es"},
-  {n:"Pau Gómez",       eq:"Benjamín D",  fmt:"F8",  email:"pgomez@levante.es"},
-  {n:"Rubén Ibáñez",    eq:"Benjamín D",  fmt:"F8",  email:"ribanez@levante.es"},
-  {n:"Laura Sanz",      eq:"Porteras",    fmt:"PORT",email:"lsanz@levante.es"},
+  {n:"Adrián Marquez Navarro", eq:"Femenino B", fmt:"F11", email:""},
+  {n:"ALBA SANCHIS CABRERA", eq:"Femenino B", fmt:"F11", email:""},
+  {n:"ALFONSO HERRANDO NAVARRETE", eq:"Femenino B", fmt:"F11", email:""},
+  {n:"CRISTIAN GONZALEZ GARCIA", eq:"Femenino C", fmt:"F11", email:""},
+  {n:"ALEJANDRO ESCRIBANO LUIS", eq:"Femenino C", fmt:"F11", email:""},
+  {n:"NOELIA LOPEZ MONTEAGUDO", eq:"Femenino C", fmt:"F11", email:""},
+  {n:"ALBERTO ANGEL ASPAS PERIS", eq:"Femenino D", fmt:"F11", email:""},
+  {n:"FRANCISCO MUÑOZ SAEZ", eq:"Femenino D", fmt:"F11", email:""},
+  {n:"FRANCISCO JAVIER MEDRANO MARTINEZ", eq:"Infantil C", fmt:"F11", email:""},
+  {n:"JOAN CARLES IBAÑEZ ROS", eq:"Infantil C", fmt:"F11", email:""},
+  {n:"JONATAN RASO DELGADO", eq:"Infantil D", fmt:"F11", email:""},
+  {n:"PABLO GISBERT PUCHALT", eq:"Infantil D", fmt:"F11", email:""},
+  {n:"ALVARO PATON SANZ", eq:"Alevín C", fmt:"F8", email:""},
+  {n:"PABLO RODRIGUEZ CACERES", eq:"Alevín C", fmt:"F8", email:""},
+  {n:"PAULA SANCHEZ JIMENEZ", eq:"Alevín D", fmt:"F8", email:""},
+  {n:"FRANCISCO JAVIER BLANES SALOM", eq:"Alevín D", fmt:"F8", email:""},
+  {n:"PABLO GARCIA MALDONADO", eq:"Benjamín C", fmt:"F8", email:""},
+  {n:"ELISA PASTOR VAÑO", eq:"Benjamín C", fmt:"F8", email:""},
+  {n:"MIGUEL MUÑOZ PARDO", eq:"Benjamín D", fmt:"F8", email:""},
+  {n:"MARÍA BORRAS BELTRAN", eq:"Benjamín D", fmt:"F8", email:""},
 ];
 
 // sched[fmt][dia][pista] = [{id, s, i, f, c, tipo, loc, rival, mergedWith}]
