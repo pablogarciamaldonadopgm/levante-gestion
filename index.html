@@ -828,16 +828,26 @@ function initFirebase(){
       document.getElementById('sync-txt').textContent = fbConnected ? 'En tiempo real ✓' : 'Sin conexión (local)';
     });
     // Listen for schedule changes
-    db.ref('schedule').on('value', snap => {
+    db.ref('schedule_DISABLED').on('value', snap => {
       const data = snap.val();
       if(data) {
         Object.assign(sched, data);
         if(currentPage==='calendario') renderCalendar();
       }
     });
-    db.ref('scheduleWk').on('value', snap => {
+    db.ref('scheduleWk_DISABLED').on('value', snap => {
       const data = snap.val();
       if(data) Object.assign(schedWk, data);
+    });
+    db.ref('weeks').on('value', snap => {
+      const data = snap.val();
+      if(data){
+        Object.keys(data).forEach(k=>{
+          weeklyCache[Number(k)]={sched:data[k].schedule||emptyWeekSched(),schedWk:data[k].scheduleWk||emptyWeekSchedWk()};
+        });
+        loadCachedWeek(wIdx);
+        if(currentPage==='calendario') renderCalendar();
+      }
     });
     db.ref('historial').on('value', snap => {
       const data = snap.val();
@@ -852,11 +862,11 @@ function initFirebase(){
 
 function fbSaveSchedule(){
   if(!db) return;
-  try { db.ref('schedule').set(sched); } catch(e){}
+  try { db.ref('weeks/'+wIdx+'/schedule').set(sched); } catch(e){}
 }
 function fbSaveWk(){
   if(!db) return;
-  try { db.ref('scheduleWk').set(schedWk); } catch(e){}
+  try { db.ref('weeks/'+wIdx+'/scheduleWk').set(schedWk); } catch(e){}
 }
 function fbPushHistorial(item){
   if(!db) return;
@@ -969,6 +979,8 @@ let schedWk = {
   Domingo: { casa:[], visitante:[] }
 };
 
+const initialSched = JSON.parse(JSON.stringify(sched));
+const initialSchedWk = JSON.parse(JSON.stringify(schedWk));
 const bank = {F11:[],F8:[],PORT:[]};
 let bankWk = [];
 let drag = null;
@@ -1490,7 +1502,7 @@ function saveWkFicha(){
   const tipo  = document.getElementById('wk-tipo').value;
   if(window._weekTargetDay){
   const dia = window._weekTargetDay;
-  const fmt = S==='PORT' ? 'PORT' : ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
+  const fmt = S==='PORT' ? 'F11' : ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'F11';
   let pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
   let spanTR = false;
   let loc = '';
@@ -2135,8 +2147,22 @@ function renderEntrenadores(){
 // ════════════════════════════════════════════
 function cloneData(o){ return JSON.parse(JSON.stringify(o)); }
 function cacheCurrentWeek(){ weeklyCache[wIdx]={sched:cloneData(sched),schedWk:cloneData(schedWk)}; }
+function emptyWeekSched(){
+  const out={F11:{},F8:{}};
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>{
+    out[fmt][dia]={TENIS:[],RIO:[],PORTERAS:[]};
+  }));
+  return out;
+}
+function emptyWeekSchedWk(){
+  return {"SÃ¡bado":{casa:[],visitante:[]},"Domingo":{casa:[],visitante:[]}};
+}
 function loadCachedWeek(i){
-  if(!weeklyCache[i]) return;
+  if(!weeklyCache[i]){
+    weeklyCache[i]=i===1
+      ? {sched:cloneData(initialSched),schedWk:cloneData(initialSchedWk)}
+      : {sched:emptyWeekSched(),schedWk:emptyWeekSchedWk()};
+  }
   sched=cloneData(weeklyCache[i].sched);
   schedWk=cloneData(weeklyCache[i].schedWk);
 }
