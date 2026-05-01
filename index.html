@@ -675,7 +675,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <div class="mr"><div class="ml">Rival</div><input class="mi" id="e-rival" placeholder="ej. Torrent CF"></div>
       </div>
     </div>
-    <div class="mftr"><button class="mbtn-s" onclick="closeM(&#39;m-edit&#39;)">Cancelar</button><button class="mbtn-p" onclick="saveEdit()">Guardar</button></div>
+    <div class="mftr">
+  <button class="mbtn-s" onclick="closeM('m-resumen')">Cerrar</button>
+  <button class="mbtn-s" onclick="copyResumen()">📋 Copiar</button>
+  <button class="mbtn-p" onclick="generarImagenPartidos()">🖼️ Generar imagen</button>
+</div>
   </div>
 </div>
 
@@ -1706,6 +1710,146 @@ function copyResumen(){
   navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado'));
 }
 
+function getResumenPartidosData(){
+  const casa=[], fuera=[];
+
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    getFichas(fmt,dia,pista).filter(f=>f.tipo==='partido').forEach(f=>{
+      const item={
+        equipo:EQ_NAMES[f.s]||f.s,
+        rival:f.rival||'–',
+        dia,
+        fecha:'',
+        jornada:'',
+        hora:f.i,
+        campo:f.c||'Ciudad Deportiva Levante UD',
+        loc:f.loc||'casa'
+      };
+      if(item.loc==='fuera') fuera.push(item); else casa.push(item);
+    });
+  })));
+
+  WK_DAYS.forEach(dayName=>['casa','visitante'].forEach(col=>{
+    (((schedWk||{})[dayName]||{})[col]||[]).filter(f=>f.tipo==='partido').forEach(f=>{
+      const item={
+        equipo:EQ_NAMES[f.s]||f.s,
+        rival:f.rival||'–',
+        dia:dayName,
+        fecha:'',
+        jornada:'',
+        hora:f.i,
+        campo:f.c||'',
+        loc:col==='visitante'?'fuera':'casa'
+      };
+      if(item.loc==='fuera') fuera.push(item); else casa.push(item);
+    });
+  }));
+
+  return {casa,fuera};
+}
+
+function generarImagenPartidos(){
+  const {casa,fuera}=getResumenPartidosData();
+
+  const canvas=document.createElement('canvas');
+  canvas.width=1080;
+  canvas.height=1350;
+  const ctx=canvas.getContext('2d');
+
+  ctx.fillStyle='#f7f7f2';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle='rgba(255,255,255,0.82)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle='#111';
+  ctx.textAlign='center';
+  ctx.font='bold 52px Arial';
+  ctx.fillText('PARTIDOS CANTERA',540,95);
+  ctx.font='bold 46px Arial';
+  ctx.fillText('FEMENINA',540,155);
+
+  ctx.strokeStyle='#111';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(60,190);
+  ctx.lineTo(1020,190);
+  ctx.stroke();
+
+  let y=250;
+  y=drawSectionPartidos(ctx,'🏠','PARTIDOS EN CASA',casa,y);
+  y+=40;
+  y=drawSectionPartidos(ctx,'✈️','PARTIDOS FUERA',fuera,y);
+
+  ctx.fillStyle='#6B7280';
+  ctx.font='20px Arial';
+  ctx.textAlign='center';
+  ctx.fillText('* Horarios sujetos a cambios',540,1315);
+
+  const link=document.createElement('a');
+  link.download='partidos-cantera-femenina.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+
+function drawSectionPartidos(ctx,icon,title,items,startY){
+  let y=startY;
+
+  ctx.textAlign='left';
+  ctx.fillStyle='#111';
+  ctx.font='bold 30px Arial';
+  ctx.fillText(`${icon} ${title}`,60,y);
+
+  y+=55;
+
+  if(!items.length){
+    ctx.font='24px Arial';
+    ctx.fillText('Sin partidos',60,y);
+    return y+55;
+  }
+
+  items.forEach(m=>{
+    ctx.fillStyle='#111';
+    ctx.textAlign='left';
+
+    ctx.font='bold 28px Arial';
+    ctx.fillText(m.equipo,60,y);
+
+    ctx.font='24px Arial';
+    ctx.fillText('vs',280,y);
+
+    ctx.font='26px Arial';
+    ctx.fillText(m.rival,325,y);
+
+    ctx.textAlign='right';
+    ctx.font='24px Arial';
+    ctx.fillText(m.fecha || '',775,y);
+    ctx.fillText(m.jornada || '',875,y);
+
+    ctx.font='bold 28px Arial';
+    ctx.fillText(m.hora || '',1015,y);
+
+    y+=32;
+
+    ctx.textAlign='center';
+    ctx.font='20px Arial';
+    ctx.fillStyle='#222';
+    ctx.fillText(m.campo || '',540,y);
+
+    y+=24;
+
+    ctx.strokeStyle='#999';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(60,y);
+    ctx.lineTo(1020,y);
+    ctx.stroke();
+
+    y+=45;
+  });
+
+  return y;
+}
 // ════════════════════════════════════════════
 // HISTORIAL
 // ════════════════════════════════════════════
