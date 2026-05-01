@@ -1709,8 +1709,22 @@ function openResumen(){
   }
 
   document.getElementById('res-week').textContent=WEEKS[wIdx];
-  document.getElementById('res-body').innerHTML=matchHTML(casa,'Partidos en Casa','🏠')+matchHTML(fuera,'Partidos Fuera','✈️');
-  openM('m-resumen');
+document.getElementById('res-body').innerHTML=matchHTML(casa,'Partidos en Casa','🏠')+matchHTML(fuera,'Partidos Fuera','✈️');
+
+const modal = document.getElementById('m-resumen');
+
+const oldFooter = modal.querySelector('.mftr');
+if (oldFooter) oldFooter.remove();
+
+modal.insertAdjacentHTML('beforeend', `
+  <div class="mftr">
+    <button class="mbtn-s" onclick="closeM('m-resumen')">Cerrar</button>
+    <button class="mbtn-s" onclick="copyResumen()">📋 Copiar</button>
+    <button class="mbtn-p" onclick="generarImagenPartidos()">🖼️ Generar imagen</button>
+  </div>
+`);
+
+openM('m-resumen');
 }
 
 function copyResumen(){
