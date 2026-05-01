@@ -1104,7 +1104,7 @@ function renderWeek(){
   DIAS.forEach((d,di)=>{
     const c=mkd('day-hcell');
     c.style.cssText=`width:${COL_W*3}px;min-width:${COL_W*3}px;height:${DAY_H}px;`;
-    c.innerHTML=`
+   c.innerHTML=`
   <span>${d}</span>
   <button class="btn btn-outline btn-xs" onclick="addWeekFicha('${d}')">+ Añadir</button>
   <div class="day-pistas">
