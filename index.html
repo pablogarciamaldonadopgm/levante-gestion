@@ -1104,7 +1104,14 @@ function renderWeek(){
   DIAS.forEach((d,di)=>{
     const c=mkd('day-hcell');
     c.style.cssText=`width:${COL_W*3}px;min-width:${COL_W*3}px;height:${DAY_H}px;`;
-    c.innerHTML=`<span>${d}</span><div class="day-pistas"><span class="pt pt-t">Tenis</span><span class="pt pt-r">Río</span><span class="pt pt-p">Porteras</span></div>`;
+    c.innerHTML=`
+  <span>${d}</span>
+  <button class="btn btn-outline btn-xs" onclick="addWeekFicha('${d}')">+ Añadir</button>
+  <div class="day-pistas">
+    <span class="pt pt-t">Tenis</span>
+    <span class="pt pt-r">Río</span>
+    <span class="pt pt-p">Porteras</span>
+  </div>`;
     hrow.appendChild(c);
   });
   da.appendChild(hrow);
@@ -1374,6 +1381,21 @@ function addWkFicha(dayName){
   openM('m-wk-add');
 }
 
+function addWeekFicha(dia){
+  document.getElementById('wk-modal-day').textContent = dia;
+  document.getElementById('wk-sel-eq').value='';
+  document.getElementById('wk-sel-col').value='casa';
+  document.getElementById('wk-rival').value='';
+  document.getElementById('wk-start').value='17:00';
+  document.getElementById('wk-end').value='18:30';
+  document.getElementById('wk-tipo').value='entrenamiento';
+
+  window._weekTargetDay = dia;
+  window._wkTargetDay = null;
+
+  openM('m-wk-add');
+}
+
 function saveWkFicha(){
   const dayName = window._wkTargetDay;
   const S = document.getElementById('wk-sel-eq').value.toUpperCase();
@@ -1383,6 +1405,28 @@ function saveWkFicha(){
   const i     = document.getElementById('wk-start').value||'10:00';
   const f     = document.getElementById('wk-end').value||'12:00';
   const tipo  = document.getElementById('wk-tipo').value;
+  if(window._weekTargetDay){
+  const dia = window._weekTargetDay;
+  const fmt = ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
+  const pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
+
+  ensureFichas(fmt,dia,pista).push({
+    id:uid(),
+    s:S,
+    i,
+    f,
+    c:rival ? `Partido vs ${rival}` : '',
+    tipo,
+    loc:col,
+    rival
+  });
+
+  window._weekTargetDay = null;
+  closeM('m-wk-add');
+  fbSaveSchedule();
+  renderWeek();
+  return;
+}
   if(!schedWk[dayName][col]) schedWk[dayName][col]=[];
   schedWk[dayName][col].push({id:uid(),s:S,i,f,c:'',tipo,loc:col,rival});
   closeM('m-wk-add');
