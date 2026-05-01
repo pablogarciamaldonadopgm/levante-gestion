@@ -38,7 +38,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
    SIDEBAR
 ═══════════════════════════════════════════════════ */
 .sb-logo{padding:14px 12px 10px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:9px;}
-.sb-icon{width:34px;height:34px;background:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:2px;}
+.sb-icon{width:42px;height:42px;background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible;padding:0;}
 .sb-icon img{width:100%;height:100%;object-fit:contain;display:block;}
 .sb-name{color:#fff;font-size:13px;font-weight:600;line-height:1.2;}
 .sb-sub{color:rgba(255,255,255,.4);font-size:10px;}
@@ -759,7 +759,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <div class="mb">
       <div class="mr">
         <div class="ml">Equipo</div>
-        <select class="msel" id="wk-sel-eq">
+        <select class="msel" id="wk-sel-eq" onchange="updateAddModalFields()">
           <option value="">-- Selecciona equipo --</option>
           <optgroup label="F11">
             <option value="FB">Femenino B</option><option value="FC">Femenino C</option><option value="FD">Femenino D</option>
@@ -883,8 +883,6 @@ const EQ_COLORS = {
     FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
     IC:{ bg:"#C4B5FD", tx:"#2E1065", dot:"#6D28D9" },
     ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
-    AC:{ bg:"#6EE7B7", tx:"#064E3B", dot:"#10B981" },
-    AD:{ bg:"#A7F3D0", tx:"#065F46", dot:"#059669" },
   },
   F8:{
     AC:{ bg:"#FEF08A", tx:"#713F12", dot:"#EAB308" },
@@ -898,7 +896,7 @@ const EQ_COLORS = {
 };
 
 const ALL_EQ = {
-  F11:["FB","FC","FD","IC","ID","AC","AD"],
+  F11:["FB","FC","FD","IC","ID"],
   F8: ["AC","AD","BC","BD"],
   PORT:["PORT"]
 };
@@ -909,6 +907,7 @@ const EQ_NAMES = {
 };
 
 function getEqColor(fmt, s){
+  if(s==='PORT' || fmt==='PORT') return EQ_COLORS.PORT.PORT;
   return (EQ_COLORS[fmt]||{})[s] || {bg:"#E5E7EB",tx:"#374151",dot:"#9CA3AF"};
 }
 
@@ -1080,7 +1079,8 @@ function renderTeamSelects(){
   sel.innerHTML=`
     <option value="">-- Selecciona equipo --</option>
     <optgroup label="F11">${f11.map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')}</optgroup>
-    <optgroup label="F8">${f8.map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')}</optgroup>`;
+    <optgroup label="F8">${f8.map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')}</optgroup>
+    <optgroup label="Porteras"><option value="PORT">${EQ_NAMES.PORT}</option></optgroup>`;
 }
 
 // ════════════════════════════════════════════
@@ -1263,8 +1263,8 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
   tags='';
   if(f.spanTR) tags+=`<span class="f-tag">Tenis + R&iacute;o</span>`;
   if(f.tipo==='partido') tags+=`<span class="f-tag f-tag-match">Partido</span>`;
-  if(f.loc==='casa') tags+=`<span class="f-tag f-tag-home">Casa</span>`;
-  if(f.loc==='fuera') tags+=`<span class="f-tag f-tag-away">Fuera</span>`;
+  if(f.s!=='PORT' && f.loc==='casa') tags+=`<span class="f-tag f-tag-home">Casa</span>`;
+  if(f.s!=='PORT' && f.loc==='fuera') tags+=`<span class="f-tag f-tag-away">Fuera</span>`;
   d.innerHTML=`
     <div class="f-sig">${EQ_NAMES[f.s]||f.s}</div>
     <div class="f-hr">${f.i}–${f.f}</div>
@@ -1442,9 +1442,23 @@ function updateAddModalFields(){
   const sel=document.getElementById('wk-sel-col');
   const label=document.getElementById('wk-col-label');
   const rivalRow=document.getElementById('wk-rival-row');
+  const selectedTeam=document.getElementById('wk-sel-eq').value;
 
   if(isWeek && tipo==='entrenamiento'){
     label.textContent='Pista';
+    sel.innerHTML=selectedTeam==='PORT'
+      ? `<option value="PORTERAS">Porteras</option>`
+      : `<option value="TENIS">Tenis</option>
+         <option value="RIO">R&iacute;o</option>
+         <option value="TENIS_RIO">Tenis + R&iacute;o</option>`;
+    rivalRow.style.display='none';
+    return;
+  }
+  if(isWeek && tipo==='partido' && selectedTeam==='PORT'){
+    document.getElementById('wk-tipo').value='entrenamiento';
+    updateAddModalFields();
+    return;
+  }
     sel.innerHTML=`
       <option value="TENIS">Tenis</option>
       <option value="RIO">RÃ­o</option>
@@ -1476,7 +1490,7 @@ function saveWkFicha(){
   const tipo  = document.getElementById('wk-tipo').value;
   if(window._weekTargetDay){
   const dia = window._weekTargetDay;
-  const fmt = ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
+  const fmt = S==='PORT' ? 'PORT' : ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'PORT';
   let pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
   let spanTR = false;
   let loc = '';
