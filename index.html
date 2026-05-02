@@ -1486,7 +1486,7 @@ function updateAddModalFields(){
       const opts = fmt => `
         <option value="${fmt}|TENIS">${fmt} Tenis</option>
         <option value="${fmt}|RIO">${fmt} R&iacute;o</option>
-        <option value="${fmt}|TENIS_RIO">${fmt} Tenis + R&iacute;o</option>`;
+        ${fmt==='F11' ? `<option value="${fmt}|TENIS_RIO">${fmt} Tenis + R&iacute;o</option>` : ''}`;
       sel.innerHTML=opts(ownFmt)+opts(otherFmt);
     }
     rivalRow.style.display='none';
