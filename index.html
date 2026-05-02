@@ -911,6 +911,14 @@ const ALL_EQ = {
   PORT:["PORT"]
 };
 
+const FICHAS_POR_EQUIPO = {
+  FB:4, FC:4, FD:3,
+  IC:3, ID:3,
+  AC:3, AD:3,
+  BC:2, BD:2,
+  PORT:1
+};
+
 const EQ_NAMES = {
   FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
@@ -1664,7 +1672,31 @@ function rmFicha(fmt,dia,pista,id){
   renderWeek();
 }
 
+function countAssignedTeam(s){
+  let total = 0;
+  ['F11','F8'].forEach(fmt=>{
+    DIAS.forEach(dia=>{
+      PISTAS.forEach(pista=>{
+        total += getFichas(fmt,dia,pista).filter(f=>f.s===s).length;
+      });
+    });
+  });
+  return total;
+}
+
 function buildBanks(){
+  bank.F11 = [];
+  bank.F8 = [];
+  bank.PORT = [];
+
+  TEAM_ORDER.forEach(s=>{
+    const fmt = s==='PORT' ? 'PORT' : ALL_EQ.F11.includes(s) ? 'F11' : 'F8';
+    const objetivo = FICHAS_POR_EQUIPO[s] || 0;
+    const asignadas = countAssignedTeam(s);
+    const pendientes = Math.max(objetivo - asignadas, 0);
+    for(let i=0;i<pendientes;i++) bank[fmt].push(s);
+  });
+
   ['F11','F8','PORT'].forEach(fmt=>{
     const elId = fmt==='PORT'?'bank-port':'bank-'+fmt.toLowerCase();
     const el=document.getElementById(elId); if(!el)return;
