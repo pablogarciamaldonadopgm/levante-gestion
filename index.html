@@ -919,6 +919,8 @@ const FICHAS_POR_EQUIPO = {
   PORT:1
 };
 
+const F8_TEAMS_BLOCKED_IN_F11 = ["AC","AD"];
+
 const EQ_NAMES = {
   FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
@@ -959,8 +961,8 @@ let sched = {
                RIO:  [{id:uid(),s:"ID",i:"18:20",f:"19:40",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"FD",i:"19:40",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
                PORTERAS:[]},
     Martes:   {TENIS:[],RIO:[],PORTERAS:[]},
-    Miércoles:{TENIS:[{id:uid(),s:"IC",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AC",i:"19:30",f:"21:00",c:"Partido vs Torrent CF",tipo:"partido",loc:"casa",rival:"Torrent CF"}],
-               RIO:  [{id:uid(),s:"ID",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""},{id:uid(),s:"AD",i:"19:30",f:"21:00",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+    Miércoles:{TENIS:[{id:uid(),s:"IC",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""}],
+               RIO:  [{id:uid(),s:"ID",i:"18:00",f:"19:30",c:"",tipo:"entrenamiento",loc:"",rival:""}],
                PORTERAS:[{id:uid(),s:"PORT",i:"18:00",f:"19:30",c:"Específico porteras F11",tipo:"entrenamiento",loc:"",rival:""}]},
     Jueves:   {TENIS:[{id:uid(),s:"FC",i:"16:00",f:"17:30",c:"FEM C+D",tipo:"entrenamiento",loc:"",rival:""}],
                RIO:  [{id:uid(),s:"FD",i:"16:00",f:"17:30",c:"FEM C+D",tipo:"entrenamiento",loc:"",rival:""}],
@@ -1110,6 +1112,7 @@ function renderTeamSelects(){
 // CALENDAR — WEEKDAY
 // ════════════════════════════════════════════
 function renderCalendar(){
+  removeF8TeamsFromF11();
   updateWeekLabel();
   if(calTab==='week') renderWeek();
   else renderWeekend();
@@ -2135,6 +2138,18 @@ function getFichas(fmt,dia,pista){
   return (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
 }
 
+function removeF8TeamsFromF11(){
+  if(!sched || !sched.F11) return;
+  DIAS.forEach(dia=>{
+    PISTAS.forEach(pista=>{
+      const arr = getFichas('F11',dia,pista);
+      if(arr.length){
+        sched.F11[dia][pista] = arr.filter(f=>!F8_TEAMS_BLOCKED_IN_F11.includes(f.s));
+      }
+    });
+  });
+}
+
 function ensureFichas(fmt,dia,pista){
   if(!sched[fmt]) sched[fmt]={};
   if(!sched[fmt][dia]) sched[fmt][dia]={};
@@ -2200,6 +2215,7 @@ function loadCachedWeek(i){
   }
   sched=cloneData(weeklyCache[i].sched);
   schedWk=cloneData(weeklyCache[i].schedWk);
+  removeF8TeamsFromF11();
 }
 function cw(d){
   cacheCurrentWeek();
