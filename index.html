@@ -921,16 +921,21 @@ const FICHAS_POR_EQUIPO = {
   PORT:1
 };
 
-const F8_TEAMS_BLOCKED_IN_F11 = ["AC","AD"];
-
 const EQ_NAMES = {
   FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
 };
 
+function nativeFmt(s){
+  if(s==='PORT') return 'PORT';
+  if(ALL_EQ.F11.includes(s)) return 'F11';
+  if(ALL_EQ.F8.includes(s)) return 'F8';
+  return 'F11';
+}
+
 function getEqColor(fmt, s){
   if(s==='PORT' || fmt==='PORT') return EQ_COLORS.PORT.PORT;
-  return (EQ_COLORS[fmt]||{})[s] || {bg:"#E5E7EB",tx:"#374151",dot:"#9CA3AF"};
+  return (EQ_COLORS[fmt]||{})[s] || (EQ_COLORS[nativeFmt(s)]||{})[s] || {bg:"#E5E7EB",tx:"#374151",dot:"#9CA3AF"};
 }
 
 const ENTRENADORES = [
@@ -1114,7 +1119,6 @@ function renderTeamSelects(){
 // CALENDAR — WEEKDAY
 // ════════════════════════════════════════════
 function renderCalendar(){
-  removeF8TeamsFromF11();
   updateWeekLabel();
   if(calTab==='week') renderWeek();
   else renderWeekend();
@@ -1304,7 +1308,7 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
     </div>`;
   d.draggable=true;
   d.addEventListener('dblclick',e=>{e.stopPropagation();openEdit(fmt,dia,pista,f.id);});
-  d.addEventListener('dragstart',()=>{drag={fmt,id:f.id,dia,pista,fromBank:false};setTimeout(()=>d.style.opacity='.3',0);});
+  d.addEventListener('dragstart',()=>{drag={fmt,id:f.id,s:f.s,dia,pista,fromBank:false};setTimeout(()=>d.style.opacity='.3',0);});
   d.addEventListener('dragend',()=>d.style.opacity='1');
   return d;
 }
@@ -1336,7 +1340,7 @@ function makeMergedFicha(fmt,group,dia,pista,F){
     mini.addEventListener('mouseleave',()=>mini.querySelector('.mini-acts').style.display='none');
     mini.addEventListener('dragstart',e=>{
       e.stopPropagation();
-      drag={fmt,id:f.id,dia,pista,fromBank:false};
+      drag={fmt,id:f.id,s:f.s,dia,pista,fromBank:false};
       setTimeout(()=>mini.style.opacity='.3',0);
     });
     mini.addEventListener('dragend',()=>mini.style.opacity='1');
@@ -1474,11 +1478,17 @@ function updateAddModalFields(){
 
   if(isWeek && tipo==='entrenamiento'){
     label.textContent='Pista';
-    sel.innerHTML=selectedTeam==='PORT'
-      ? `<option value="PORTERAS">Porteras</option>`
-      : `<option value="TENIS">Tenis</option>
-         <option value="RIO">R&iacute;o</option>
-         <option value="TENIS_RIO">Tenis + R&iacute;o</option>`;
+    if(selectedTeam==='PORT'){
+      sel.innerHTML=`<option value="F11|PORTERAS">Porteras</option>`;
+    } else {
+      const ownFmt = nativeFmt(selectedTeam);
+      const otherFmt = ownFmt==='F11' ? 'F8' : 'F11';
+      const opts = fmt => `
+        <option value="${fmt}|TENIS">${fmt} Tenis</option>
+        <option value="${fmt}|RIO">${fmt} R&iacute;o</option>
+        <option value="${fmt}|TENIS_RIO">${fmt} Tenis + R&iacute;o</option>`;
+      sel.innerHTML=opts(ownFmt)+opts(otherFmt);
+    }
     rivalRow.style.display='none';
     return;
   }
@@ -1518,16 +1528,20 @@ function saveWkFicha(){
   const tipo  = document.getElementById('wk-tipo').value;
   if(window._weekTargetDay){
   const dia = window._weekTargetDay;
-  const fmt = S==='PORT' ? 'F11' : ALL_EQ.F11.includes(S) ? 'F11' : ALL_EQ.F8.includes(S) ? 'F8' : 'F11';
-  let pista = fmt === 'PORT' ? 'PORTERAS' : 'TENIS';
+  let fmt = nativeFmt(S);
+  if(fmt==='PORT') fmt='F11';
+  let pista = S === 'PORT' ? 'PORTERAS' : 'TENIS';
   let spanTR = false;
   let loc = '';
   let comment = '';
 
   if(tipo==='entrenamiento'){
-    pista = col==='TENIS_RIO' ? 'TENIS' : col;
-    spanTR = col==='TENIS_RIO';
-    if(fmt==='PORT') pista='PORTERAS';
+    const parts = col.includes('|') ? col.split('|') : [fmt,col];
+    fmt = parts[0] || fmt;
+    const selectedPista = parts[1] || 'TENIS';
+    pista = selectedPista==='TENIS_RIO' ? 'TENIS' : selectedPista;
+    spanTR = selectedPista==='TENIS_RIO';
+    if(S==='PORT') pista='PORTERAS';
   } else {
     loc = col;
     comment = rival ? `Partido vs ${rival}` : '';
@@ -1601,7 +1615,9 @@ function buildBankWk(){
 function dropOnCol(e,fmt,dia,pista,F,colEl){
   e.preventDefault();
   document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));
-  if(!drag||drag.fmt!==fmt) return;
+  if(!drag || drag.wk) return;
+  if(drag.s==='PORT' && pista!=='PORTERAS') return;
+  if(drag.s!=='PORT' && pista==='PORTERAS') return;
 
   const rect=(colEl||e.currentTarget.parentElement).getBoundingClientRect();
   const minOff=Math.round((e.clientY-rect.top)/PX/15)*15;
@@ -1615,7 +1631,7 @@ function dropOnCol(e,fmt,dia,pista,F,colEl){
   let dur=80;
 
   if(!drag.fromBank){
-    const arr=getFichas(fmt,drag.dia,drag.pista);
+    const arr=getFichas(drag.fmt,drag.dia,drag.pista);
     const idx=arr.findIndex(x=>x.id===drag.id);
 
     if(idx>-1){
@@ -1624,13 +1640,14 @@ function dropOnCol(e,fmt,dia,pista,F,colEl){
       arr.splice(idx,1);
     }
   } else {
-    const bi=bank[fmt].indexOf(drag.s);
+    const sourceFmt = nativeFmt(drag.s);
+    const bi=bank[sourceFmt].indexOf(drag.s);
 
     if(bi>-1){
-      bank[fmt].splice(bi,1);
+      bank[sourceFmt].splice(bi,1);
       f={id:uid(),s:drag.s,i:iStr,f:toStr(startMin+80),c:'',tipo:'entrenamiento',loc:'',rival:''};
       dur=80;
-    } else if(fmt==='PORT'){
+    } else if(sourceFmt==='PORT'){
       const pi=bank.PORT.indexOf(drag.s);
       if(pi>-1){
         bank.PORT.splice(pi,1);
@@ -1657,12 +1674,13 @@ function dropOnCol(e,fmt,dia,pista,F,colEl){
 function dropBank(e,fmt){
   e.preventDefault();
   document.getElementById('bank-'+fmt.toLowerCase()).classList.remove('over');
-  if(!drag||drag.fromBank||drag.fmt!==fmt) return;
-  const arr=getFichas(fmt,drag.dia,drag.pista);
+  if(!drag||drag.fromBank||drag.wk) return;
+  const arr=getFichas(drag.fmt,drag.dia,drag.pista);
   const idx=arr.findIndex(x=>x.id===drag.id);
   if(idx>-1){
     const f=arr.splice(idx,1)[0];
-    bank[fmt].push(f.s);
+    const sourceFmt = nativeFmt(f.s);
+    if(sourceFmt===fmt) bank[fmt].push(f.s);
   }
   drag=null;
   fbSaveSchedule();
@@ -1672,7 +1690,7 @@ function dropBank(e,fmt){
 function rmFicha(fmt,dia,pista,id){
   const arr=getFichas(fmt,dia,pista);
   const idx=arr.findIndex(f=>f.id===id);
-  if(idx>-1){ const f=arr.splice(idx,1)[0]; bank[f.s==='PORT'?'PORT':fmt].push(f.s); }
+  if(idx>-1){ const f=arr.splice(idx,1)[0]; bank[nativeFmt(f.s)].push(f.s); }
   fbSaveSchedule();
   renderWeek();
 }
@@ -2144,18 +2162,6 @@ function getFichas(fmt,dia,pista){
   return (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
 }
 
-function removeF8TeamsFromF11(){
-  if(!sched || !sched.F11) return;
-  DIAS.forEach(dia=>{
-    PISTAS.forEach(pista=>{
-      const arr = getFichas('F11',dia,pista);
-      if(arr.length){
-        sched.F11[dia][pista] = arr.filter(f=>!F8_TEAMS_BLOCKED_IN_F11.includes(f.s));
-      }
-    });
-  });
-}
-
 function ensureFichas(fmt,dia,pista){
   if(!sched[fmt]) sched[fmt]={};
   if(!sched[fmt][dia]) sched[fmt][dia]={};
@@ -2221,7 +2227,6 @@ function loadCachedWeek(i){
   }
   sched=cloneData(weeklyCache[i].sched);
   schedWk=cloneData(weeklyCache[i].schedWk);
-  removeF8TeamsFromF11();
 }
 function cw(d){
   cacheCurrentWeek();
