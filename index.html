@@ -228,6 +228,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .chips{display:flex;flex-wrap:wrap;gap:4px;min-height:24px;}
 .chips.over{background:#EFF6FF;border-radius:4px;}
 .chip{border-radius:4px;padding:2px 8px;font-size:10px;font-weight:500;cursor:grab;user-select:none;}
+.chip-count{position:relative;padding-top:10px;margin-top:5px;min-width:74px;text-align:center;}
+.chip-count .chip-badge{position:absolute;top:-6px;left:50%;transform:translateX(-50%);min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:#111827;color:#fff;border:2px solid #fff;font-size:10px;font-weight:800;line-height:15px;box-shadow:0 1px 3px rgba(15,23,42,.25);}
 .chip:active{opacity:.6;}
 
 /* ═══════════════════════════════════════════════════
@@ -1705,12 +1707,16 @@ function buildBanks(){
     const el=document.getElementById(elId); if(!el)return;
     el.innerHTML='';
     if(!bank[fmt].length){ el.innerHTML=`<span style="font-size:10px;color:var(--text4);">Todos asignados ✓</span>`; return; }
-    bank[fmt].forEach(s=>{
+    const grouped = {};
+    bank[fmt].forEach(s=>grouped[s]=(grouped[s]||0)+1);
+    TEAM_ORDER.filter(s=>grouped[s]).forEach(s=>{
       const realFmt = s==='PORT'?'PORT':fmt;
       const c=getEqColor(realFmt,s);
-      const chip=mkd('chip');
+      const chip=mkd('chip chip-count');
       chip.style.cssText=`background:${c.bg};color:${c.tx};`;
-      chip.textContent=EQ_NAMES[s]||s; chip.draggable=true;
+      chip.innerHTML=`<span class="chip-badge">${grouped[s]}</span>${EQ_NAMES[s]||s}`;
+      chip.title=`${grouped[s]} entrenamientos sin asignar`;
+      chip.draggable=true;
       chip.addEventListener('dragstart',()=>{drag={fmt,s,fromBank:true};setTimeout(()=>chip.style.opacity='.4',0);});
       chip.addEventListener('dragend',()=>chip.style.opacity='1');
       el.appendChild(chip);
