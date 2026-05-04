@@ -1992,6 +1992,49 @@ function copyResumen(){
   navigator.clipboard.writeText(txt).then(()=>showToast('✅ Copiado'));
 }
 
+function dayIndexForMatch(dia){
+  const i=DIAS.indexOf(dia);
+  if(i>-1) return i;
+  const wk=WK_DAYS.indexOf(dia);
+  return wk>-1 ? wk+5 : 99;
+}
+
+function fechaParaDia(dia){
+  const week=WEEKS[wIdx]||'';
+  const start=(week.split(/[—–-]/)[0]||'').trim();
+  const m=start.match(/^(\d{1,2})\s+([a-záéíóúñ]{3,})/i);
+  if(!m) return '';
+
+  const monthNames=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const monthLens=[31,28,31,30,31,30,31,31,30,31,30,31];
+  let day=Number(m[1]);
+  let month=monthNames.indexOf(m[2].toLowerCase().slice(0,3));
+  if(month<0) return '';
+
+  day += dayIndexForMatch(dia);
+  while(day>monthLens[month]){
+    day-=monthLens[month];
+    month=(month+1)%12;
+  }
+  return `${day} ${monthNames[month]}`;
+}
+
+function groupPartidosByDay(items){
+  const sorted=[...items].sort((a,b)=>
+    dayIndexForMatch(a.dia)-dayIndexForMatch(b.dia) || (a.hora||'').localeCompare(b.hora||'')
+  );
+  return sorted.reduce((acc,item)=>{
+    const key=`${item.dia}|${item.fecha||fechaParaDia(item.dia)}`;
+    let group=acc.find(g=>g.key===key);
+    if(!group){
+      group={key,dia:item.dia,fecha:item.fecha||fechaParaDia(item.dia),items:[]};
+      acc.push(group);
+    }
+    group.items.push(item);
+    return acc;
+  },[]);
+}
+
 function getResumenPartidosData(){
   const casa=[], fuera=[];
 
@@ -2001,7 +2044,7 @@ function getResumenPartidosData(){
         equipo:EQ_NAMES[f.s]||f.s,
         rival:f.rival||'–',
         dia,
-        fecha:'',
+        fecha:fechaParaDia(dia),
         jornada:'',
         hora:f.i,
         campo:f.c||'Ciudad Deportiva Levante UD',
@@ -2017,7 +2060,7 @@ function getResumenPartidosData(){
         equipo:EQ_NAMES[f.s]||f.s,
         rival:f.rival||'–',
         dia:dayName,
-        fecha:'',
+        fecha:fechaParaDia(dayName),
         jornada:'',
         hora:f.i,
         campo:f.c||'',
@@ -2090,7 +2133,15 @@ function drawSectionPartidos(ctx,icon,title,items,startY){
     return y+55;
   }
 
-  items.forEach(m=>{
+  groupPartidosByDay(items).forEach(group=>{
+    ctx.fillStyle='#1B2E4B';
+    ctx.textAlign='left';
+    ctx.font='bold 28px Arial';
+    ctx.fillText(`${group.dia}${group.fecha ? ' · '+group.fecha : ''}`,60,y);
+
+    y+=40;
+
+    group.items.forEach(m=>{
     ctx.fillStyle='#111';
     ctx.textAlign='left';
 
@@ -2104,10 +2155,6 @@ function drawSectionPartidos(ctx,icon,title,items,startY){
     ctx.fillText(m.rival,325,y);
 
     ctx.textAlign='right';
-    ctx.font='24px Arial';
-    ctx.fillText(m.fecha || '',775,y);
-    ctx.fillText(m.jornada || '',875,y);
-
     ctx.font='bold 28px Arial';
     ctx.fillText(m.hora || '',1015,y);
 
@@ -2128,6 +2175,7 @@ function drawSectionPartidos(ctx,icon,title,items,startY){
     ctx.stroke();
 
     y+=45;
+  });
   });
 
   return y;
