@@ -307,6 +307,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pos-tags{display:flex;gap:4px;flex-wrap:wrap;}
 .pos-tag{display:inline-flex;border-radius:999px;background:#EEF2FF;color:#3730A3;padding:2px 7px;font-size:10px;font-weight:700;}
 .status-select{border:1px solid var(--border-strong);border-radius:6px;padding:4px 7px;font-size:11px;background:#fff;color:var(--text2);}
+.pos-secondary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.pos-secondary-item{display:flex;align-items:center;gap:5px;border:1px solid var(--border);border-radius:6px;padding:6px 7px;font-size:11px;color:var(--text2);background:#fff;}
+.pos-secondary-item input{width:13px;height:13px;}
 
 /* Scouting */
 .scout-layout{display:grid;grid-template-columns:minmax(320px,1.1fr) minmax(360px,.9fr);gap:12px;align-items:start;}
@@ -854,7 +857,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <div><div class="ml">Nombre</div><input class="mi" id="jug-edit-name"></div>
         <div><div class="ml">Año nacimiento</div><input class="mi" id="jug-edit-ano"></div>
       </div>
-      <div class="mr"><div class="ml">Posiciones</div><input class="mi" id="jug-edit-pos" placeholder="MC, MCO, ED"></div>
+      <div class="mrow2">
+        <div><div class="ml">Posicion principal</div><select class="msel" id="jug-edit-main-pos" onchange="renderSecondaryPosChecks()"></select></div>
+        <div><div class="ml">Resumen posiciones</div><input class="mi" id="jug-edit-pos" readonly></div>
+      </div>
+      <div class="mr"><div class="ml">Posiciones secundarias</div><div class="pos-secondary-grid" id="jug-edit-secondary-pos"></div></div>
       <div class="mrow2">
         <div><div class="ml">Inicio baja</div><input class="mi" id="jug-edit-inicio" placeholder="YYYY-MM-DD"></div>
         <div><div class="ml">Alta prevista</div><input class="mi" id="jug-edit-alta" placeholder="YYYY-MM-DD"></div>
@@ -1271,6 +1278,7 @@ const initialSchedWk = JSON.parse(JSON.stringify(schedWk));
 const bank = {F11:[],F8:[],PORT:[]};
 let bankWk = [];
 let lineupAssignments = {};
+const PLAYER_POSITIONS = ["POR","LD","DFC","LI","DEF","CAD","CAI","MD","MC","MCO","MI","ED","EI","ALA","DC"];
 let drag = null;
 let editTarget = null;
 let editTipo = 'entrenamiento';
@@ -2607,11 +2615,11 @@ function setJugadoraStatus(id,status){
 
 function editJugadora(id){
   const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
+  ensurePlayerPositionSelects(j.pos||'');
   document.getElementById('jug-edit-id').value=j.id;
   document.getElementById('jug-modal-title').textContent=`Editar ${j.n}`;
   document.getElementById('jug-edit-name').value=j.n;
   document.getElementById('jug-edit-ano').value=j.ano||'';
-  document.getElementById('jug-edit-pos').value=j.pos||'';
   document.getElementById('jug-edit-inicio').value=j.inicio||'';
   document.getElementById('jug-edit-alta').value=j.alta||'';
   document.getElementById('jug-edit-motivo').value=j.motivo||'';
@@ -2619,12 +2627,50 @@ function editJugadora(id){
   openM('m-jugadora');
 }
 
+function splitPlayerPositions(pos){
+  return (pos||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+}
+
+function ensurePlayerPositionSelects(pos){
+  const positions=splitPlayerPositions(pos);
+  const main=positions[0]||'MC';
+  const mainSel=document.getElementById('jug-edit-main-pos');
+  if(mainSel){
+    mainSel.innerHTML=PLAYER_POSITIONS.map(p=>`<option value="${p}" ${p===main?'selected':''}>${p}</option>`).join('');
+  }
+  renderSecondaryPosChecks(positions.slice(1));
+}
+
+function renderSecondaryPosChecks(selected){
+  const picked=new Set(selected || getSelectedSecondaryPositions());
+  const main=document.getElementById('jug-edit-main-pos')?.value||'MC';
+  const box=document.getElementById('jug-edit-secondary-pos');
+  if(!box) return;
+  box.innerHTML=PLAYER_POSITIONS.filter(p=>p!==main).map(p=>`
+    <label class="pos-secondary-item">
+      <input type="checkbox" value="${p}" ${picked.has(p)?'checked':''} onchange="updateJugadoraPosSummary()">
+      ${p}
+    </label>`).join('');
+  updateJugadoraPosSummary();
+}
+
+function getSelectedSecondaryPositions(){
+  return [...document.querySelectorAll('#jug-edit-secondary-pos input:checked')].map(i=>i.value);
+}
+
+function updateJugadoraPosSummary(){
+  const main=document.getElementById('jug-edit-main-pos')?.value||'MC';
+  const secondary=getSelectedSecondaryPositions().filter(p=>p!==main);
+  document.getElementById('jug-edit-pos').value=[main,...secondary].join(', ');
+}
+
 function saveJugadoraEdit(){
   const id=document.getElementById('jug-edit-id').value;
   const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
   j.n=document.getElementById('jug-edit-name').value.trim()||j.n;
   j.ano=Number(document.getElementById('jug-edit-ano').value)||j.ano;
-  j.pos=document.getElementById('jug-edit-pos').value.split(',').map(x=>x.trim().toUpperCase()).filter(Boolean).join(', ');
+  updateJugadoraPosSummary();
+  j.pos=document.getElementById('jug-edit-pos').value;
   j.inicio=document.getElementById('jug-edit-inicio').value.trim();
   j.alta=document.getElementById('jug-edit-alta').value.trim();
   j.motivo=document.getElementById('jug-edit-motivo').value.trim();
