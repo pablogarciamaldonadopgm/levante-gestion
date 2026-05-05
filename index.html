@@ -318,6 +318,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .scout-card{border:1px solid var(--border);border-radius:6px;background:#fff;padding:10px;display:grid;grid-template-columns:1fr auto;gap:8px;box-shadow:var(--shadow);}
 .scout-title{font-weight:800;color:var(--text);font-size:12px;}
 .scout-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.scout-mainline{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+.scout-pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;background:#F3F4F6;color:var(--text2);}
+.scout-prob{min-width:76px;justify-content:center;}
+.scout-prob.high{background:#DCFCE7;color:#166534;}
+.scout-prob.mid{background:#FEF3C7;color:#92400E;}
+.scout-prob.low{background:#FEE2E2;color:#991B1B;}
 .scout-attrs{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
 .scout-attr{background:#F3F4F6;border-radius:999px;padding:2px 7px;font-size:10px;color:var(--text2);}
 .phase-select{border:1px solid var(--border-strong);border-radius:6px;padding:4px 7px;font-size:10px;background:#fff;}
@@ -1214,14 +1220,14 @@ const JUGADORAS = [
 ];
 
 const SCOUTING = [
-  {id:uid(),n:"Claudia Mena",ano:2011,pos:"DC",pierna:"Derecha",fase:"CONTACTO",ritmo:82,tecnica:78,fisico:74,comportamiento:86,soft:"Competitiva, escucha bien correcciones.",comentarios:"Buen ataque de área. Ver contra defensas más fuertes.",x:72,y:22},
-  {id:uid(),n:"Ariadna Salas",ano:2012,pos:"MC",pierna:"Izquierda",fase:"PRUEBA",ritmo:76,tecnica:84,fisico:70,comportamiento:90,soft:"Muy colaborativa, buena comunicación.",comentarios:"Perfil asociativo. Interesante para F8/F11.",x:50,y:52},
-  {id:uid(),n:"Daniela Querol",ano:2010,pos:"DFC",pierna:"Derecha",fase:"DINÁMICA",ritmo:68,tecnica:72,fisico:86,comportamiento:80,soft:"Seria y concentrada.",comentarios:"Gana duelos. Revisar velocidad a campo abierto.",x:30,y:68},
-  {id:uid(),n:"Nora Hidalgo",ano:2013,pos:"POR",pierna:"Derecha",fase:"CONTACTO",ritmo:65,tecnica:75,fisico:72,comportamiento:88,soft:"Valiente, personalidad alta.",comentarios:"Buena base para portería. Ver blocaje alto.",x:11,y:50},
-  {id:uid(),n:"Irene Pardo",ano:2011,pos:"ED",pierna:"Derecha",fase:"PRUEBA",ritmo:88,tecnica:80,fisico:73,comportamiento:76,soft:"Atrevida, debe mejorar continuidad.",comentarios:"Desequilibrio claro por banda.",x:72,y:78},
-  {id:uid(),n:"Laia Crespo",ano:2012,pos:"LI",pierna:"Izquierda",fase:"FIRMADA",ritmo:79,tecnica:77,fisico:78,comportamiento:92,soft:"Muy fiable y responsable.",comentarios:"Encaja bien como lateral profunda.",x:32,y:22},
-  {id:uid(),n:"Vera Sanchis",ano:2010,pos:"MCO",pierna:"Ambas",fase:"DINÁMICA",ritmo:74,tecnica:88,fisico:69,comportamiento:84,soft:"Creativa, buen trato con compañeras.",comentarios:"Diferencial entre líneas.",x:58,y:48},
-  {id:uid(),n:"Paula Rius",ano:2013,pos:"ALA",pierna:"Izquierda",fase:"CONTACTO",ritmo:85,tecnica:73,fisico:71,comportamiento:82,soft:"Energía alta, positiva.",comentarios:"Interesante para F8 por amplitud.",x:64,y:16}
+  {id:uid(),n:"Claudia Mena",ano:2011,equipoDestino:"Infantil C",probFirma:62,pos:"DC",pierna:"Derecha",fase:"CONTACTO",ritmo:82,tecnica:78,fisico:74,comportamiento:86,soft:"Competitiva, escucha bien correcciones.",comentarios:"Buen ataque de área. Ver contra defensas más fuertes.",x:72,y:22},
+  {id:uid(),n:"Ariadna Salas",ano:2012,equipoDestino:"Alevín C",probFirma:74,pos:"MC",pierna:"Izquierda",fase:"PRUEBA",ritmo:76,tecnica:84,fisico:70,comportamiento:90,soft:"Muy colaborativa, buena comunicación.",comentarios:"Perfil asociativo. Interesante para F8/F11.",x:50,y:52},
+  {id:uid(),n:"Daniela Querol",ano:2010,equipoDestino:"Femenino D",probFirma:48,pos:"DFC",pierna:"Derecha",fase:"DINÁMICA",ritmo:68,tecnica:72,fisico:86,comportamiento:80,soft:"Seria y concentrada.",comentarios:"Gana duelos. Revisar velocidad a campo abierto.",x:30,y:68},
+  {id:uid(),n:"Nora Hidalgo",ano:2013,equipoDestino:"Benjamín C",probFirma:55,pos:"POR",pierna:"Derecha",fase:"CONTACTO",ritmo:65,tecnica:75,fisico:72,comportamiento:88,soft:"Valiente, personalidad alta.",comentarios:"Buena base para portería. Ver blocaje alto.",x:11,y:50},
+  {id:uid(),n:"Irene Pardo",ano:2011,equipoDestino:"Infantil D",probFirma:81,pos:"ED",pierna:"Derecha",fase:"PRUEBA",ritmo:88,tecnica:80,fisico:73,comportamiento:76,soft:"Atrevida, debe mejorar continuidad.",comentarios:"Desequilibrio claro por banda.",x:72,y:78},
+  {id:uid(),n:"Laia Crespo",ano:2012,equipoDestino:"Alevín D",probFirma:100,pos:"LI",pierna:"Izquierda",fase:"FIRMADA",ritmo:79,tecnica:77,fisico:78,comportamiento:92,soft:"Muy fiable y responsable.",comentarios:"Encaja bien como lateral profunda.",x:32,y:22},
+  {id:uid(),n:"Vera Sanchis",ano:2010,equipoDestino:"Femenino D",probFirma:68,pos:"MCO",pierna:"Ambas",fase:"DINÁMICA",ritmo:74,tecnica:88,fisico:69,comportamiento:84,soft:"Creativa, buen trato con compañeras.",comentarios:"Diferencial entre líneas.",x:58,y:48},
+  {id:uid(),n:"Paula Rius",ano:2013,equipoDestino:"Benjamín D",probFirma:39,pos:"ALA",pierna:"Izquierda",fase:"CONTACTO",ritmo:85,tecnica:73,fisico:71,comportamiento:82,soft:"Energía alta, positiva.",comentarios:"Interesante para F8 por amplitud.",x:64,y:16}
 ];
 const SCOUT_PHASES = ["CONTACTO","PRUEBA","DINÁMICA","FIRMADA"];
 const LINEUP_SYSTEMS = {
@@ -2739,7 +2745,7 @@ function renderScouting(){
     <div class="scout-card">
       <div>
         <div class="scout-title">${s.n}</div>
-        <div class="scout-meta">${s.ano} · ${s.pos} · Pierna ${s.pierna}</div>
+        <div class="scout-mainline"><span class="scout-pill">Año ${s.ano}</span><span class="scout-pill">${s.pos}</span><span class="scout-pill">Equipo ${s.equipoDestino||'Pendiente'}</span><span class="scout-pill scout-prob ${probClass(s.probFirma)}">${Number(s.probFirma||0)}% firma</span></div><div class="scout-meta">Pierna ${s.pierna}</div>
         <div class="scout-attrs">
           <span class="scout-attr">Ritmo ${s.ritmo}</span>
           <span class="scout-attr">Técnica ${s.tecnica}</span>
@@ -2764,6 +2770,13 @@ function setScoutPhase(id,phase){
   renderScouting();
 }
 
+function probClass(value){
+  const n=Number(value)||0;
+  if(n>=70) return 'high';
+  if(n>=45) return 'mid';
+  return 'low';
+}
+
 function renderScoutKanban(){
   const el=document.getElementById('scout-kanban');
   el.innerHTML=SCOUT_PHASES.map(phase=>`
@@ -2774,9 +2787,12 @@ function renderScoutKanban(){
 }
 
 function addScout(){
-  const nombre=prompt('Nombre ficticio de jugadora','Nueva Captación');
+  const nombre=prompt('Nombre ficticio de jugadora','Nueva Captacion');
   if(!nombre) return;
-  SCOUTING.push({id:uid(),n:nombre,ano:2012,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil añadido manualmente.',x:50,y:50});
+  const ano=Number(prompt('Ano de nacimiento','2012'))||2012;
+  const equipoDestino=prompt('Posible equipo de incorporacion','Alevin C')||'Pendiente';
+  const probFirma=Math.max(0,Math.min(100,Number(prompt('Probabilidad de firma (%)','50'))||50));
+  SCOUTING.push({id:uid(),n:nombre,ano,equipoDestino,probFirma,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil anadido manualmente.',x:50,y:50});
   document.getElementById('scout-filter-year').dataset.ready='';
   renderScouting();
 }
