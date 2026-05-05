@@ -304,6 +304,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .recovery-fill.warn{background:#EAB308;}
 .recovery-fill.bad{background:#DC2626;}
 .player-notes{max-width:260px;color:var(--text3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pos-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.pos-tag{display:inline-flex;border-radius:999px;background:#EEF2FF;color:#3730A3;padding:2px 7px;font-size:10px;font-weight:700;}
+.status-select{border:1px solid var(--border-strong);border-radius:6px;padding:4px 7px;font-size:11px;background:#fff;color:var(--text2);}
+
+/* Scouting */
+.scout-layout{display:grid;grid-template-columns:minmax(320px,1.1fr) minmax(360px,.9fr);gap:12px;align-items:start;}
+.scout-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.scout-list{display:grid;gap:8px;}
+.scout-card{border:1px solid var(--border);border-radius:6px;background:#fff;padding:10px;display:grid;grid-template-columns:1fr auto;gap:8px;box-shadow:var(--shadow);}
+.scout-title{font-weight:800;color:var(--text);font-size:12px;}
+.scout-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.scout-attrs{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.scout-attr{background:#F3F4F6;border-radius:999px;padding:2px 7px;font-size:10px;color:var(--text2);}
+.phase-select{border:1px solid var(--border-strong);border-radius:6px;padding:4px 7px;font-size:10px;background:#fff;}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.kanban-col{background:#F9FAFB;border:1px solid var(--border);border-radius:6px;min-height:120px;padding:8px;}
+.kanban-h{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;margin-bottom:7px;}
+.kanban-item{background:#fff;border:1px solid var(--border);border-radius:5px;padding:6px;margin-bottom:6px;font-size:10px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.pitch-box{background:#16875E;border:3px solid #fff;border-radius:8px;position:relative;height:460px;overflow:hidden;box-shadow:var(--shadow);}
+.pitch-box:before{content:"";position:absolute;inset:16px;border:2px solid rgba(255,255,255,.8);border-radius:3px;}
+.pitch-box:after{content:"";position:absolute;left:50%;top:16px;bottom:16px;border-left:2px solid rgba(255,255,255,.75);}
+.pitch-circle{position:absolute;left:50%;top:50%;width:96px;height:96px;border:2px solid rgba(255,255,255,.75);border-radius:50%;transform:translate(-50%,-50%);}
+.pitch-player{position:absolute;transform:translate(-50%,-50%);background:#fff;border-radius:6px;padding:5px 7px;min-width:82px;text-align:center;font-size:10px;font-weight:700;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:2;}
+.pitch-player span{display:block;font-size:9px;color:var(--text3);font-weight:500;margin-top:1px;}
 </style>
 </head>
 <body>
@@ -327,6 +351,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-sec">Gestión</div>
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
       <div class="nav-item" onclick="nav(&#39;jugadoras&#39;,this)"><div class="nav-dot"></div>Jugadoras<span class="nav-badge">54</span></div>
+      <div class="nav-item" onclick="nav(&#39;scouting&#39;,this)"><div class="nav-dot"></div>Scouting<span class="nav-badge">8</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
@@ -659,6 +684,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         </div>
       </div>
 
+      <!-- SCOUTING -->
+      <div class="view" id="v-scouting">
+        <div class="scout-layout">
+          <div>
+            <div class="card">
+              <div class="card-hd"><span class="card-title">Perfiles de scouting</span><button class="btn btn-outline btn-sm" onclick="addScout()">+ Perfil</button></div>
+              <div class="scout-controls">
+                <select class="msel" id="scout-filter-year" onchange="renderScouting()" style="max-width:150px;"></select>
+                <select class="msel" id="scout-filter-pos" onchange="renderScouting()" style="max-width:150px;"></select>
+              </div>
+              <div class="scout-list" id="scout-list"></div>
+            </div>
+            <div class="card" style="margin-top:12px;">
+              <div class="card-hd"><span class="card-title">Proceso de captación</span></div>
+              <div class="kanban" id="scout-kanban"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Mapa de posiciones</span></div>
+            <div class="pitch-box" id="scout-pitch"><div class="pitch-circle"></div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ENTRENADORES -->
       <div class="view" id="v-entrenadores">
         <div class="card">
@@ -742,6 +791,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <button class="mbtn-s" onclick="copyResumen()">📋 Copiar</button>
   <button class="mbtn-p" onclick="generarImagenPartidos()">🖼️ Generar imagen</button>
 </div>
+  </div>
+</div>
+
+<!-- Edit jugadora -->
+<div class="modal-bg" id="m-jugadora">
+  <div class="modal">
+    <div class="mh"><span class="mt" id="jug-modal-title">Editar jugadora</span><button class="mx" onclick="closeM('m-jugadora')">×</button></div>
+    <div class="mb">
+      <input type="hidden" id="jug-edit-id">
+      <div class="mrow2">
+        <div><div class="ml">Nombre</div><input class="mi" id="jug-edit-name"></div>
+        <div><div class="ml">Año nacimiento</div><input class="mi" id="jug-edit-ano"></div>
+      </div>
+      <div class="mr"><div class="ml">Posiciones</div><input class="mi" id="jug-edit-pos" placeholder="MC, MCO, ED"></div>
+      <div class="mrow2">
+        <div><div class="ml">Inicio baja</div><input class="mi" id="jug-edit-inicio" placeholder="YYYY-MM-DD"></div>
+        <div><div class="ml">Alta prevista</div><input class="mi" id="jug-edit-alta" placeholder="YYYY-MM-DD"></div>
+      </div>
+      <div class="mr"><div class="ml">Motivo si no disponible</div><input class="mi" id="jug-edit-motivo"></div>
+      <div class="mr"><div class="ml">Datos internos / notas privadas</div><textarea class="mta" id="jug-edit-notes"></textarea></div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-jugadora')">Cancelar</button><button class="mbtn-p" onclick="saveJugadoraEdit()">Guardar</button></div>
   </div>
 </div>
 
@@ -1065,6 +1136,18 @@ const JUGADORAS = [
   {id:uid(),n:"Aina Velasco",eq:"BD",pos:"DEF",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Progresar en salida de balón."}
 ];
 
+const SCOUTING = [
+  {id:uid(),n:"Claudia Mena",ano:2011,pos:"DC",pierna:"Derecha",fase:"CONTACTO",ritmo:82,tecnica:78,fisico:74,comportamiento:86,soft:"Competitiva, escucha bien correcciones.",comentarios:"Buen ataque de área. Ver contra defensas más fuertes.",x:72,y:22},
+  {id:uid(),n:"Ariadna Salas",ano:2012,pos:"MC",pierna:"Izquierda",fase:"PRUEBA",ritmo:76,tecnica:84,fisico:70,comportamiento:90,soft:"Muy colaborativa, buena comunicación.",comentarios:"Perfil asociativo. Interesante para F8/F11.",x:50,y:52},
+  {id:uid(),n:"Daniela Querol",ano:2010,pos:"DFC",pierna:"Derecha",fase:"DINÁMICA",ritmo:68,tecnica:72,fisico:86,comportamiento:80,soft:"Seria y concentrada.",comentarios:"Gana duelos. Revisar velocidad a campo abierto.",x:30,y:68},
+  {id:uid(),n:"Nora Hidalgo",ano:2013,pos:"POR",pierna:"Derecha",fase:"CONTACTO",ritmo:65,tecnica:75,fisico:72,comportamiento:88,soft:"Valiente, personalidad alta.",comentarios:"Buena base para portería. Ver blocaje alto.",x:11,y:50},
+  {id:uid(),n:"Irene Pardo",ano:2011,pos:"ED",pierna:"Derecha",fase:"PRUEBA",ritmo:88,tecnica:80,fisico:73,comportamiento:76,soft:"Atrevida, debe mejorar continuidad.",comentarios:"Desequilibrio claro por banda.",x:72,y:78},
+  {id:uid(),n:"Laia Crespo",ano:2012,pos:"LI",pierna:"Izquierda",fase:"FIRMADA",ritmo:79,tecnica:77,fisico:78,comportamiento:92,soft:"Muy fiable y responsable.",comentarios:"Encaja bien como lateral profunda.",x:32,y:22},
+  {id:uid(),n:"Vera Sanchis",ano:2010,pos:"MCO",pierna:"Ambas",fase:"DINÁMICA",ritmo:74,tecnica:88,fisico:69,comportamiento:84,soft:"Creativa, buen trato con compañeras.",comentarios:"Diferencial entre líneas.",x:58,y:48},
+  {id:uid(),n:"Paula Rius",ano:2013,pos:"ALA",pierna:"Izquierda",fase:"CONTACTO",ritmo:85,tecnica:73,fisico:71,comportamiento:82,soft:"Energía alta, positiva.",comentarios:"Interesante para F8 por amplitud.",x:64,y:16}
+];
+const SCOUT_PHASES = ["CONTACTO","PRUEBA","DINÁMICA","FIRMADA"];
+
 // sched[fmt][dia][pista] = [{id, s, i, f, c, tipo, loc, rival, mergedWith}]
 let sched = {
   F11:{
@@ -1150,6 +1233,7 @@ const PAGE_META = {
   calendario:  {t:"Calendario",     s:"Gestiona los horarios de entrenamiento"},
   equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
   jugadoras:   {t:"Jugadoras",      s:"Disponibilidad, salud y datos internos por equipo"},
+  scouting:    {t:"Scouting",       s:"Captación, valoración y seguimiento de perfiles"},
   entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
   mensajes:    {t:"Mensajes",       s:"Comunicaciones con familias"},
   historial:   {t:"Historial",      s:"Registro de acciones"},
@@ -1168,6 +1252,7 @@ function nav(page, el){
   if(page==='calendario')  { renderLegend(); renderCalendar(); }
   if(page==='historial')   renderHistFull();
   if(page==='jugadoras')   renderJugadoras();
+  if(page==='scouting')    renderScouting();
   if(page==='entrenadores')renderEntrenadores();
   if(page==='dashboard')   renderDash();
 }
@@ -2404,8 +2489,14 @@ function renderJugadoras(){
       <tr>
         <td><div class="player-name">${j.n}</div><div class="player-meta">${j.ano} · ${j.pos}</div></td>
         <td>${EQ_NAMES[j.eq]||j.eq}</td>
-        <td><span class="pill ${nativeFmt(j.eq)==='F11'?'pill-b':'pill-y'}">${j.pos}</span></td>
-        <td><span class="availability ${available?'ok':'ko'}">${available?'Disponible':'No disponible'}</span>${j.motivo?`<div class="player-meta">${j.motivo}</div>`:''}</td>
+        <td><div class="pos-tags">${(j.pos||'').split(',').map(p=>`<span class="pos-tag">${p.trim()}</span>`).join('')}</div></td>
+        <td>
+          <select class="status-select" onchange="setJugadoraStatus('${j.id}',this.value)">
+            <option value="disponible" ${available?'selected':''}>Disponible</option>
+            <option value="no_disponible" ${!available?'selected':''}>No disponible</option>
+          </select>
+          ${j.motivo?`<div class="player-meta">${j.motivo}</div>`:''}
+        </td>
         <td class="recovery-cell">
           <div class="player-meta">${available?'Lista para entrenar':`${j.inicio||'Sin inicio'} → ${j.alta||'Sin fecha alta'}`}</div>
           <div class="recovery-bar"><div class="recovery-fill ${rec.cls}" style="width:${rec.pct}%"></div></div>
@@ -2417,19 +2508,44 @@ function renderJugadoras(){
   }).join('') || `<tr><td colspan="7" style="color:var(--text4);">No hay jugadoras con ese filtro</td></tr>`;
 }
 
-function editJugadora(id){
+function setJugadoraStatus(id,status){
   const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
-  const estado=prompt('Estado: disponible o no_disponible',j.estado);
-  if(!estado) return;
-  j.estado=estado.trim()==='no_disponible'?'no_disponible':'disponible';
-  if(j.estado==='no_disponible'){
-    j.motivo=prompt('Motivo de no disponibilidad',j.motivo||'')||'';
-    j.inicio=prompt('Fecha inicio baja (YYYY-MM-DD)',j.inicio||new Date().toISOString().slice(0,10))||'';
-    j.alta=prompt('Fecha prevista alta (YYYY-MM-DD)',j.alta||'')||'';
+  j.estado=status;
+  if(status==='no_disponible'){
+    if(!j.motivo) j.motivo='Pendiente valorar';
+    if(!j.inicio) j.inicio=new Date().toISOString().slice(0,10);
+    if(!j.alta) j.alta=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
   } else {
     j.motivo=''; j.inicio=''; j.alta='';
   }
-  j.notas=prompt('Datos internos / notas privadas',j.notas||'')||'';
+  renderJugadoras();
+}
+
+function editJugadora(id){
+  const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
+  document.getElementById('jug-edit-id').value=j.id;
+  document.getElementById('jug-modal-title').textContent=`Editar ${j.n}`;
+  document.getElementById('jug-edit-name').value=j.n;
+  document.getElementById('jug-edit-ano').value=j.ano||'';
+  document.getElementById('jug-edit-pos').value=j.pos||'';
+  document.getElementById('jug-edit-inicio').value=j.inicio||'';
+  document.getElementById('jug-edit-alta').value=j.alta||'';
+  document.getElementById('jug-edit-motivo').value=j.motivo||'';
+  document.getElementById('jug-edit-notes').value=j.notas||'';
+  openM('m-jugadora');
+}
+
+function saveJugadoraEdit(){
+  const id=document.getElementById('jug-edit-id').value;
+  const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
+  j.n=document.getElementById('jug-edit-name').value.trim()||j.n;
+  j.ano=Number(document.getElementById('jug-edit-ano').value)||j.ano;
+  j.pos=document.getElementById('jug-edit-pos').value.split(',').map(x=>x.trim().toUpperCase()).filter(Boolean).join(', ');
+  j.inicio=document.getElementById('jug-edit-inicio').value.trim();
+  j.alta=document.getElementById('jug-edit-alta').value.trim();
+  j.motivo=document.getElementById('jug-edit-motivo').value.trim();
+  j.notas=document.getElementById('jug-edit-notes').value.trim();
+  closeM('m-jugadora');
   renderJugadoras();
 }
 
@@ -2440,6 +2556,90 @@ function addFakeJugadora(){
   if(!nombre) return;
   JUGADORAS.push({id:uid(),n:nombre,eq,pos:'MC',ano:2012,estado:'disponible',motivo:'',inicio:'',alta:'',notas:''});
   renderJugadoras();
+}
+
+// SCOUTING
+function ensureScoutingFilters(){
+  const year=document.getElementById('scout-filter-year');
+  const pos=document.getElementById('scout-filter-pos');
+  if(!year || year.dataset.ready) return;
+  const years=[...new Set(SCOUTING.map(s=>s.ano))].sort();
+  const positions=[...new Set(SCOUTING.map(s=>s.pos))].sort();
+  year.innerHTML=`<option value="todos">Todos los años</option>`+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  pos.innerHTML=`<option value="todas">Todas las posiciones</option>`+positions.map(p=>`<option value="${p}">${p}</option>`).join('');
+  year.dataset.ready='1';
+}
+
+function filteredScouting(){
+  const year=document.getElementById('scout-filter-year')?.value||'todos';
+  const pos=document.getElementById('scout-filter-pos')?.value||'todas';
+  return SCOUTING.filter(s=>
+    (year==='todos'||String(s.ano)===year) &&
+    (pos==='todas'||s.pos===pos)
+  );
+}
+
+function renderScouting(){
+  ensureScoutingFilters();
+  const list=filteredScouting();
+  document.getElementById('scout-list').innerHTML=list.map(s=>`
+    <div class="scout-card">
+      <div>
+        <div class="scout-title">${s.n}</div>
+        <div class="scout-meta">${s.ano} · ${s.pos} · Pierna ${s.pierna}</div>
+        <div class="scout-attrs">
+          <span class="scout-attr">Ritmo ${s.ritmo}</span>
+          <span class="scout-attr">Técnica ${s.tecnica}</span>
+          <span class="scout-attr">Físico ${s.fisico}</span>
+          <span class="scout-attr">Comport. ${s.comportamiento}</span>
+        </div>
+        <div class="scout-meta" style="margin-top:7px;">${s.soft}</div>
+        <div class="scout-meta">${s.comentarios}</div>
+      </div>
+      <div>
+        <select class="phase-select" onchange="setScoutPhase('${s.id}',this.value)">
+          ${SCOUT_PHASES.map(p=>`<option value="${p}" ${s.fase===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+    </div>`).join('') || `<div class="scout-meta">No hay perfiles con ese filtro</div>`;
+  renderScoutKanban();
+  renderScoutPitch(list);
+}
+
+function setScoutPhase(id,phase){
+  const s=SCOUTING.find(x=>x.id===id); if(!s)return;
+  s.fase=phase;
+  renderScouting();
+}
+
+function renderScoutKanban(){
+  const el=document.getElementById('scout-kanban');
+  el.innerHTML=SCOUT_PHASES.map(phase=>`
+    <div class="kanban-col">
+      <div class="kanban-h">${phase}</div>
+      ${SCOUTING.filter(s=>s.fase===phase).map(s=>`<div class="kanban-item"><b>${s.n}</b><br>${s.ano} · ${s.pos}</div>`).join('') || '<div class="scout-meta">Vacío</div>'}
+    </div>`).join('');
+}
+
+function renderScoutPitch(items){
+  const pitch=document.getElementById('scout-pitch');
+  pitch.innerHTML='<div class="pitch-circle"></div>';
+  items.forEach(s=>{
+    const p=document.createElement('div');
+    p.className='pitch-player';
+    p.style.left=s.x+'%';
+    p.style.top=s.y+'%';
+    p.innerHTML=`${s.n.split(' ')[0]}<span>${s.pos}</span>`;
+    pitch.appendChild(p);
+  });
+}
+
+function addScout(){
+  const nombre=prompt('Nombre ficticio de jugadora','Nueva Captación');
+  if(!nombre) return;
+  SCOUTING.push({id:uid(),n:nombre,ano:2012,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil añadido manualmente.',x:50,y:50});
+  document.getElementById('scout-filter-year').dataset.ready='';
+  renderScouting();
 }
 
 // ════════════════════════════════════════════
