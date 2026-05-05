@@ -286,6 +286,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .eq-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 .eq-chip{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;}
 .eq-dot{width:8px;height:8px;border-radius:50%;}
+
+/* Jugadoras */
+.players-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.player-summary{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:10px;margin-bottom:12px;}
+.mini-stat{background:#fff;border:1px solid var(--border);border-radius:6px;padding:10px 12px;box-shadow:var(--shadow);}
+.mini-stat b{display:block;font-size:18px;color:var(--text);}
+.mini-stat span{font-size:10px;color:var(--text3);}
+.player-name{font-weight:700;color:var(--text);}
+.player-meta{font-size:10px;color:var(--text3);margin-top:2px;}
+.availability{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:700;}
+.availability.ok{background:#DCFCE7;color:#166534;}
+.availability.ko{background:#FEE2E2;color:#991B1B;}
+.recovery-cell{min-width:170px;}
+.recovery-bar{height:7px;background:#E5E7EB;border-radius:999px;overflow:hidden;margin-top:5px;}
+.recovery-fill{height:100%;background:#059669;border-radius:999px;}
+.recovery-fill.warn{background:#EAB308;}
+.recovery-fill.bad{background:#DC2626;}
+.player-notes{max-width:260px;color:var(--text3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 </style>
 </head>
 <body>
@@ -308,6 +326,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
+      <div class="nav-item" onclick="nav(&#39;jugadoras&#39;,this)"><div class="nav-dot"></div>Jugadoras<span class="nav-badge">54</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
@@ -340,7 +359,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
         <div class="stats-row">
           <div class="stat-card"><div class="stat-val">9</div><div class="stat-lbl">Equipos activos</div></div>
           <div class="stat-card"><div class="stat-val">20</div><div class="stat-lbl">Entrenadores</div></div>
-          <div class="stat-card"><div class="stat-val">142</div><div class="stat-lbl">Jugadores</div></div>
+          <div class="stat-card"><div class="stat-val">54</div><div class="stat-lbl">Jugadoras</div></div>
           <div class="stat-card"><div class="stat-val" id="dash-partidos">3</div><div class="stat-lbl">Partidos esta semana</div></div>
         </div>
         <div class="card">
@@ -609,6 +628,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
               <tr><td><b>Benjamín C</b></td><td><span class="pill pill-y">F8</span></td><td>BC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Benjamín D</b></td><td><span class="pill pill-y">F8</span></td><td>BD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
             </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- JUGADORAS -->
+      <div class="view" id="v-jugadoras">
+        <div class="player-summary">
+          <div class="mini-stat"><b id="jug-stat-total">0</b><span>Jugadoras registradas</span></div>
+          <div class="mini-stat"><b id="jug-stat-ok">0</b><span>Disponibles</span></div>
+          <div class="mini-stat"><b id="jug-stat-ko">0</b><span>No disponibles</span></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">Jugadoras por equipo</span>
+            <button class="btn btn-outline btn-sm" onclick="addFakeJugadora()">+ Nueva</button>
+          </div>
+          <div class="players-toolbar">
+            <select class="msel" id="jug-filter-team" onchange="renderJugadoras()" style="max-width:190px;"></select>
+            <select class="msel" id="jug-filter-status" onchange="renderJugadoras()" style="max-width:160px;">
+              <option value="todas">Todas</option>
+              <option value="disponible">Disponibles</option>
+              <option value="no_disponible">No disponibles</option>
+            </select>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Jugadora</th><th>Equipo</th><th>Posición</th><th>Estado</th><th>Recuperación</th><th>Datos internos</th><th></th></tr></thead>
+            <tbody id="jug-tbl"></tbody>
           </table>
         </div>
       </div>
@@ -962,6 +1008,63 @@ const ENTRENADORES = [
   {n:"MARÍA BORRAS BELTRAN", eq:"Benjamín D", fmt:"F8", email:""},
 ];
 
+const JUGADORAS = [
+  {id:uid(),n:"Clara Vidal",eq:"FB",pos:"DFC",ano:2008,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Perfil potente en duelos y buena salida corta."},
+  {id:uid(),n:"Nora Ferrer",eq:"FB",pos:"MC",ano:2008,estado:"no_disponible",motivo:"Molestia isquios",inicio:"2026-05-01",alta:"2026-05-18",notas:"Controlar carga en aceleraciones largas."},
+  {id:uid(),n:"Irene Soler",eq:"FB",pos:"ED",ano:2007,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena profundidad y centros tensos."},
+  {id:uid(),n:"Marta Gil",eq:"FB",pos:"POR",ano:2008,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Trabajo específico de blocaje."},
+  {id:uid(),n:"Laia Torres",eq:"FB",pos:"DC",ano:2007,estado:"no_disponible",motivo:"Esguince leve",inicio:"2026-04-28",alta:"2026-05-12",notas:"Reintroducir cambios de dirección."},
+  {id:uid(),n:"Paula Martí",eq:"FB",pos:"LI",ano:2008,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Alta continuidad defensiva."},
+  {id:uid(),n:"Aitana Costa",eq:"FC",pos:"MC",ano:2009,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Ordena bien la presión tras pérdida."},
+  {id:uid(),n:"Vera Pastor",eq:"FC",pos:"EI",ano:2009,estado:"no_disponible",motivo:"Sobrecarga gemelo",inicio:"2026-05-03",alta:"2026-05-15",notas:"Evitar volumen de golpeo."},
+  {id:uid(),n:"Lucía Marco",eq:"FC",pos:"DFC",ano:2009,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen perfil para línea de cuatro."},
+  {id:uid(),n:"Sara Beltrán",eq:"FC",pos:"DC",ano:2009,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Ataca bien primer palo."},
+  {id:uid(),n:"Noa Estellés",eq:"FC",pos:"LD",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Pendiente mejorar orientación corporal."},
+  {id:uid(),n:"Julia Campos",eq:"FC",pos:"MCO",ano:2009,estado:"no_disponible",motivo:"Proceso gripal",inicio:"2026-05-04",alta:"2026-05-09",notas:"Revisar sensaciones antes de competir."},
+  {id:uid(),n:"Emma Roca",eq:"FD",pos:"POR",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen juego con pies."},
+  {id:uid(),n:"Alba Soria",eq:"FD",pos:"DFC",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Lidera bien la línea."},
+  {id:uid(),n:"Carla Pons",eq:"FD",pos:"MC",ano:2010,estado:"no_disponible",motivo:"Rodilla",inicio:"2026-04-20",alta:"2026-05-25",notas:"Trabajo individual de readaptación."},
+  {id:uid(),n:"Inés Rubio",eq:"FD",pos:"ED",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen uno contra uno."},
+  {id:uid(),n:"Marina Cano",eq:"FD",pos:"LI",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Progresar en envíos largos."},
+  {id:uid(),n:"Daniela Puig",eq:"FD",pos:"DC",ano:2010,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Finaliza rápido en área."},
+  {id:uid(),n:"Elena Prats",eq:"IC",pos:"MC",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Muy fiable en apoyos."},
+  {id:uid(),n:"Cloe Miralles",eq:"IC",pos:"DFC",ano:2011,estado:"no_disponible",motivo:"Tobillo",inicio:"2026-04-29",alta:"2026-05-20",notas:"No forzar giros cerrados."},
+  {id:uid(),n:"Ariadna Serra",eq:"IC",pos:"EI",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Gran cambio de ritmo."},
+  {id:uid(),n:"Vega Molina",eq:"IC",pos:"LD",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Trabajar centro tras conducción."},
+  {id:uid(),n:"Nuria Blasco",eq:"IC",pos:"DC",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena lectura de espacios."},
+  {id:uid(),n:"Ona Martínez",eq:"IC",pos:"POR",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Coordinación con línea defensiva."},
+  {id:uid(),n:"Abril Navarro",eq:"ID",pos:"MC",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Perfil asociativo."},
+  {id:uid(),n:"Lola Ibáñez",eq:"ID",pos:"DFC",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Contundente en duelos."},
+  {id:uid(),n:"Mireia Andreu",eq:"ID",pos:"ED",ano:2011,estado:"no_disponible",motivo:"Cuádriceps",inicio:"2026-05-02",alta:"2026-05-16",notas:"Revisar sprint antes de alta."},
+  {id:uid(),n:"Celia Grau",eq:"ID",pos:"LI",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buenas conducciones interiores."},
+  {id:uid(),n:"Valeria Nieto",eq:"ID",pos:"DC",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Ataca bien espalda de central."},
+  {id:uid(),n:"Maya Oliva",eq:"ID",pos:"POR",ano:2011,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Mejorar saque medio."},
+  {id:uid(),n:"Nerea Calvo",eq:"AC",pos:"POR",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Valiente en salidas."},
+  {id:uid(),n:"Aina Orts",eq:"AC",pos:"DEF",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Muy atenta a coberturas."},
+  {id:uid(),n:"Lara Crespo",eq:"AC",pos:"MC",ano:2012,estado:"no_disponible",motivo:"Muñeca",inicio:"2026-05-01",alta:"2026-05-22",notas:"Puede hacer trabajo sin contacto."},
+  {id:uid(),n:"Sofía Ribes",eq:"AC",pos:"ALA",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Cambio de ritmo diferencial."},
+  {id:uid(),n:"Candela Roig",eq:"AC",pos:"DC",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena agresividad ofensiva."},
+  {id:uid(),n:"Mar Pérez",eq:"AC",pos:"MC",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Juega fácil y rápido."},
+  {id:uid(),n:"Triana Bosch",eq:"AD",pos:"POR",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen blocaje frontal."},
+  {id:uid(),n:"Rocío Pla",eq:"AD",pos:"DEF",ano:2012,estado:"no_disponible",motivo:"Talón",inicio:"2026-04-26",alta:"2026-05-10",notas:"Carga progresiva."},
+  {id:uid(),n:"Elsa Morant",eq:"AD",pos:"MC",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Ordenada tácticamente."},
+  {id:uid(),n:"Violeta Sáez",eq:"AD",pos:"ALA",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena conducción exterior."},
+  {id:uid(),n:"Jimena Abril",eq:"AD",pos:"DC",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Instinto para remate."},
+  {id:uid(),n:"Naiara Esteve",eq:"AD",pos:"DEF",ano:2012,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Mejorar primer control."},
+  {id:uid(),n:"Olivia Mas",eq:"BC",pos:"POR",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen aprendizaje técnico."},
+  {id:uid(),n:"Greta Ferri",eq:"BC",pos:"DEF",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Concentrada en defensa."},
+  {id:uid(),n:"Aroa Pastor",eq:"BC",pos:"MC",ano:2013,estado:"no_disponible",motivo:"Contusión",inicio:"2026-05-04",alta:"2026-05-11",notas:"Pendiente evolución semanal."},
+  {id:uid(),n:"Mila Fuentes",eq:"BC",pos:"ALA",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Atrevida en regate."},
+  {id:uid(),n:"Leire Gil",eq:"BC",pos:"DC",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena actitud competitiva."},
+  {id:uid(),n:"Alma Cervera",eq:"BC",pos:"MC",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buen pase corto."},
+  {id:uid(),n:"Nadia Rubio",eq:"BD",pos:"POR",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Serena bajo presión."},
+  {id:uid(),n:"Lia Segura",eq:"BD",pos:"DEF",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Muy disciplinada."},
+  {id:uid(),n:"Vera Llopis",eq:"BD",pos:"MC",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Buena orientación corporal."},
+  {id:uid(),n:"Carmen Ríos",eq:"BD",pos:"ALA",ano:2013,estado:"no_disponible",motivo:"Molestias aductor",inicio:"2026-04-30",alta:"2026-05-14",notas:"Evitar golpeo fuerte."},
+  {id:uid(),n:"Iris Moreno",eq:"BD",pos:"DC",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Siempre activa en presión."},
+  {id:uid(),n:"Aina Velasco",eq:"BD",pos:"DEF",ano:2013,estado:"disponible",motivo:"",inicio:"",alta:"",notas:"Progresar en salida de balón."}
+];
+
 // sched[fmt][dia][pista] = [{id, s, i, f, c, tipo, loc, rival, mergedWith}]
 let sched = {
   F11:{
@@ -1046,6 +1149,7 @@ const PAGE_META = {
   dashboard:   {t:"Dashboard",      s:"Resumen general del club"},
   calendario:  {t:"Calendario",     s:"Gestiona los horarios de entrenamiento"},
   equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
+  jugadoras:   {t:"Jugadoras",      s:"Disponibilidad, salud y datos internos por equipo"},
   entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
   mensajes:    {t:"Mensajes",       s:"Comunicaciones con familias"},
   historial:   {t:"Historial",      s:"Registro de acciones"},
@@ -1063,6 +1167,7 @@ function nav(page, el){
   renderTopActions(page);
   if(page==='calendario')  { renderLegend(); renderCalendar(); }
   if(page==='historial')   renderHistFull();
+  if(page==='jugadoras')   renderJugadoras();
   if(page==='entrenadores')renderEntrenadores();
   if(page==='dashboard')   renderDash();
 }
@@ -2241,6 +2346,100 @@ function updateDashPartidos(){
 
   const el=document.getElementById('dash-partidos');
   if(el) el.textContent=count;
+}
+
+// JUGADORAS TABLE
+function daysBetween(a,b){
+  const A=new Date(a+'T00:00:00');
+  const B=new Date(b+'T00:00:00');
+  if(Number.isNaN(A.getTime())||Number.isNaN(B.getTime())) return 0;
+  return Math.ceil((B-A)/86400000);
+}
+
+function recoveryProgress(j){
+  if(j.estado==='disponible') return {pct:100,label:'Disponible',cls:''};
+  if(!j.inicio||!j.alta) return {pct:0,label:'Sin plazo',cls:'bad'};
+  const today=new Date().toISOString().slice(0,10);
+  const total=Math.max(daysBetween(j.inicio,j.alta),1);
+  const done=Math.max(daysBetween(j.inicio,today),0);
+  const pct=Math.max(0,Math.min(100,Math.round((done/total)*100)));
+  const left=Math.max(daysBetween(today,j.alta),0);
+  return {pct,label:left?`${left} días restantes`:'Alta prevista',cls:pct<35?'bad':pct<75?'warn':''};
+}
+
+function ensureJugadoraFilters(){
+  const sel=document.getElementById('jug-filter-team');
+  if(!sel || sel.dataset.ready) return;
+  sel.innerHTML=`<option value="todos">Todos los equipos</option>`+
+    TEAM_ORDER.filter(s=>s!=='PORT').map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('');
+  sel.dataset.ready='1';
+}
+
+function filteredJugadoras(){
+  const team=document.getElementById('jug-filter-team')?.value||'todos';
+  const status=document.getElementById('jug-filter-status')?.value||'todas';
+  return JUGADORAS.filter(j=>
+    (team==='todos'||j.eq===team) &&
+    (status==='todas'||j.estado===status)
+  );
+}
+
+function renderJugadoras(){
+  ensureJugadoraFilters();
+  const total=JUGADORAS.length;
+  const ok=JUGADORAS.filter(j=>j.estado==='disponible').length;
+  const ko=total-ok;
+  document.getElementById('jug-stat-total').textContent=total;
+  document.getElementById('jug-stat-ok').textContent=ok;
+  document.getElementById('jug-stat-ko').textContent=ko;
+
+  const rows=filteredJugadoras().sort((a,b)=>
+    TEAM_ORDER.indexOf(a.eq)-TEAM_ORDER.indexOf(b.eq) || a.n.localeCompare(b.n)
+  );
+  const tbl=document.getElementById('jug-tbl');
+  tbl.innerHTML=rows.map(j=>{
+    const rec=recoveryProgress(j);
+    const available=j.estado==='disponible';
+    return `
+      <tr>
+        <td><div class="player-name">${j.n}</div><div class="player-meta">${j.ano} · ${j.pos}</div></td>
+        <td>${EQ_NAMES[j.eq]||j.eq}</td>
+        <td><span class="pill ${nativeFmt(j.eq)==='F11'?'pill-b':'pill-y'}">${j.pos}</span></td>
+        <td><span class="availability ${available?'ok':'ko'}">${available?'Disponible':'No disponible'}</span>${j.motivo?`<div class="player-meta">${j.motivo}</div>`:''}</td>
+        <td class="recovery-cell">
+          <div class="player-meta">${available?'Lista para entrenar':`${j.inicio||'Sin inicio'} → ${j.alta||'Sin fecha alta'}`}</div>
+          <div class="recovery-bar"><div class="recovery-fill ${rec.cls}" style="width:${rec.pct}%"></div></div>
+          <div class="player-meta">${rec.label} · ${rec.pct}%</div>
+        </td>
+        <td><div class="player-notes" title="${j.notas||''}">${j.notas||''}</div></td>
+        <td style="text-align:right;"><button class="btn btn-outline btn-sm" onclick="editJugadora('${j.id}')">Editar</button></td>
+      </tr>`;
+  }).join('') || `<tr><td colspan="7" style="color:var(--text4);">No hay jugadoras con ese filtro</td></tr>`;
+}
+
+function editJugadora(id){
+  const j=JUGADORAS.find(x=>x.id===id); if(!j)return;
+  const estado=prompt('Estado: disponible o no_disponible',j.estado);
+  if(!estado) return;
+  j.estado=estado.trim()==='no_disponible'?'no_disponible':'disponible';
+  if(j.estado==='no_disponible'){
+    j.motivo=prompt('Motivo de no disponibilidad',j.motivo||'')||'';
+    j.inicio=prompt('Fecha inicio baja (YYYY-MM-DD)',j.inicio||new Date().toISOString().slice(0,10))||'';
+    j.alta=prompt('Fecha prevista alta (YYYY-MM-DD)',j.alta||'')||'';
+  } else {
+    j.motivo=''; j.inicio=''; j.alta='';
+  }
+  j.notas=prompt('Datos internos / notas privadas',j.notas||'')||'';
+  renderJugadoras();
+}
+
+function addFakeJugadora(){
+  const eq=(prompt('Equipo (FB, FC, FD, IC, ID, AC, AD, BC, BD)','FB')||'').toUpperCase();
+  if(!EQ_NAMES[eq] || eq==='PORT') return showToast('Equipo no válido');
+  const nombre=prompt('Nombre ficticio','Nueva Jugadora');
+  if(!nombre) return;
+  JUGADORAS.push({id:uid(),n:nombre,eq,pos:'MC',ano:2012,estado:'disponible',motivo:'',inicio:'',alta:'',notas:''});
+  renderJugadoras();
 }
 
 // ════════════════════════════════════════════
