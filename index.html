@@ -2789,6 +2789,9 @@ function buildLineup(teamCode,systemName){
   return slots.map((slot,idx)=>{
     const [pos,x,y]=slot;
     const key=`${teamCode}|${systemName}|${idx}`;
+    if(Object.prototype.hasOwnProperty.call(lineupAssignments,key) && !lineupAssignments[key]){
+      return {pos,x,y,player:null,idx};
+    }
     let player=players.find(j=>j.id===lineupAssignments[key]);
     if(player) used.add(player.id);
     if(!player) player=players.find(j=>!used.has(j.id)&&playerMatchesSlot(j,pos));
@@ -2836,7 +2839,7 @@ function renderPlantillas(){
 
 function assignLineupSlotSelect(team,system,idx,playerId){
   const key=`${team}|${system}|${idx}`;
-  if(!playerId) delete lineupAssignments[key]; else lineupAssignments[key]=playerId;
+  lineupAssignments[key]=playerId || '';
   renderPlantillas();
 }
 
