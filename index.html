@@ -1278,6 +1278,7 @@ const initialSchedWk = JSON.parse(JSON.stringify(schedWk));
 const bank = {F11:[],F8:[],PORT:[]};
 let bankWk = [];
 let lineupAssignments = {};
+let lineupBenchedPlayers = {};
 const PLAYER_POSITIONS = ["POR","LD","DFC","LI","DEF","CAD","CAI","MD","MC","MCO","MI","ED","EI","ALA","DC"];
 let drag = null;
 let editTarget = null;
@@ -2830,7 +2831,8 @@ function playerMatchesSlot(player,slot){
 function buildLineup(teamCode,systemName){
   const fmt=nativeFmt(teamCode);
   const slots=LINEUP_SYSTEMS[fmt][systemName]||[];
-  const players=JUGADORAS.filter(j=>j.eq===teamCode);
+  const benched=lineupBenchedPlayers[`${teamCode}|${systemName}`]||new Set();
+  const players=JUGADORAS.filter(j=>j.eq===teamCode && !benched.has(j.id));
   const used=new Set();
   return slots.map((slot,idx)=>{
     const [pos,x,y]=slot;
@@ -2885,7 +2887,15 @@ function renderPlantillas(){
 
 function assignLineupSlotSelect(team,system,idx,playerId){
   const key=`${team}|${system}|${idx}`;
-  lineupAssignments[key]=playerId || '';
+  const groupKey=`${team}|${system}`;
+  if(!lineupBenchedPlayers[groupKey]) lineupBenchedPlayers[groupKey]=new Set();
+  if(!playerId){
+    if(lineupAssignments[key]) lineupBenchedPlayers[groupKey].add(lineupAssignments[key]);
+    lineupAssignments[key]='';
+  } else {
+    lineupBenchedPlayers[groupKey].delete(playerId);
+    lineupAssignments[key]=playerId;
+  }
   renderPlantillas();
 }
 
