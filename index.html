@@ -328,17 +328,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pitch-circle{position:absolute;left:50%;top:50%;width:96px;height:96px;border:2px solid rgba(255,255,255,.75);border-radius:50%;transform:translate(-50%,-50%);}
 .pitch-player{position:absolute;transform:translate(-50%,-50%);background:#fff;border-radius:6px;padding:5px 7px;min-width:82px;text-align:center;font-size:10px;font-weight:700;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:2;}
 .pitch-player span{display:block;font-size:9px;color:var(--text3);font-weight:500;margin-top:1px;}
-.lineup-layout{display:grid;grid-template-columns:minmax(420px,1fr) 280px;gap:12px;align-items:start;}
+.team-row{cursor:pointer;}
+.team-row:hover{background:#F8FAFC;}
+.team-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.team-detail-title{font-size:18px;font-weight:800;color:var(--text);}
+.lineup-layout{display:grid;grid-template-columns:1fr;gap:12px;align-items:start;}
 .lineup-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
 .lineup-slot{position:absolute;transform:translate(-50%,-50%);z-index:2;text-align:center;}
 .lineup-pos{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:22px;border-radius:999px;background:#1B2E4B;color:#fff;font-size:10px;font-weight:800;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.16);}
-.lineup-player{background:#fff;border-radius:6px;padding:6px 8px;min-width:92px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:10px;font-weight:700;color:var(--text);cursor:pointer;}
+.lineup-player{background:#fff;border-radius:6px;padding:6px 8px;min-width:116px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:10px;font-weight:700;color:var(--text);}
 .lineup-player:hover{outline:2px solid #2563EB;}
+.lineup-player.out-position{background:#FEE2E2;color:#991B1B;outline:2px solid #EF4444;}
 .lineup-player span{display:block;font-size:9px;color:var(--text3);font-weight:500;margin-top:1px;}
+.lineup-select{width:100%;border:1px solid var(--border-strong);border-radius:5px;padding:4px 5px;font-size:10px;background:#fff;color:var(--text);}
+.lineup-warning{display:block;margin-top:3px;color:#B91C1C;font-size:9px;font-weight:800;}
 .lineup-panel{display:grid;gap:8px;}
 .lineup-group{border:1px solid var(--border);border-radius:6px;background:#fff;padding:9px;}
 .lineup-group h4{font-size:11px;color:var(--text);margin-bottom:6px;}
 .lineup-chip{display:inline-flex;background:#F3F4F6;border-radius:999px;padding:3px 7px;font-size:10px;color:var(--text2);margin:2px;}
+.medical-note{max-width:260px;color:var(--text2);font-size:11px;line-height:1.35;}
 </style>
 </head>
 <body>
@@ -361,8 +369,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
-      <div class="nav-item" onclick="nav(&#39;jugadoras&#39;,this)"><div class="nav-dot"></div>Jugadoras<span class="nav-badge">54</span></div>
       <div class="nav-item" onclick="nav(&#39;scouting&#39;,this)"><div class="nav-dot"></div>Scouting<span class="nav-badge">8</span></div>
+      <div class="nav-item" onclick="nav(&#39;medicos&#39;,this)"><div class="nav-dot"></div>Servicios médicos<span class="nav-badge" id="med-badge">0</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
@@ -649,16 +657,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 
       <!-- EQUIPOS -->
       <div class="view" id="v-equipos">
-        <div class="card">
+        <div class="card" id="equipos-list">
           <div class="card-hd"><span class="card-title">Equipos registrados</span><button class="btn btn-outline btn-sm">+ Nuevo equipo</button></div>
           <table class="tbl">
             <thead><tr><th>Equipo</th><th>Formato</th><th>Sigla</th><th>Entrenadores</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td><b>Femenino B</b></td><td><span class="pill pill-b">F11</span></td><td>FB</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Femenino D</b></td><td><span class="pill pill-b">F11</span></td><td>FD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Infantil C</b></td><td><span class="pill pill-b">F11</span></td><td>IC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
-              <tr><td><b>Infantil D</b></td><td><span class="pill pill-b">F11</span></td><td>ID</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+            <tbody onclick="const r=event.target.closest('tr'); if(r) openEquipoDetalle(r.children[2].textContent.trim());">
+              <tr class="team-row" onclick="openEquipoDetalle('FB')"><td><b>Femenino B</b></td><td><span class="pill pill-b">F11</span></td><td>FB</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr class="team-row" onclick="openEquipoDetalle('FC')"><td><b>Femenino C</b></td><td><span class="pill pill-b">F11</span></td><td>FC</td><td>3</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr class="team-row" onclick="openEquipoDetalle('FD')"><td><b>Femenino D</b></td><td><span class="pill pill-b">F11</span></td><td>FD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr class="team-row" onclick="openEquipoDetalle('IC')"><td><b>Infantil C</b></td><td><span class="pill pill-b">F11</span></td><td>IC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
+              <tr class="team-row" onclick="openEquipoDetalle('ID')"><td><b>Infantil D</b></td><td><span class="pill pill-b">F11</span></td><td>ID</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Alevín C</b></td><td><span class="pill pill-y">F8</span></td><td>AC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Alevín D</b></td><td><span class="pill pill-y">F8</span></td><td>AD</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
               <tr><td><b>Benjamín C</b></td><td><span class="pill pill-y">F8</span></td><td>BC</td><td>2</td><td><span class="pill pill-g">Activo</span></td></tr>
@@ -666,10 +674,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
             </tbody>
           </table>
         </div>
-        <div class="card" style="margin-top:12px;">
-          <div class="card-hd"><span class="card-title">Plantilla y sistema</span><button class="btn btn-outline btn-sm" onclick="addLineupPlayer()">+ Añadir jugadora</button></div>
+        <div class="card" id="equipo-detail" style="display:none;">
+          <div class="card-hd"><span class="card-title">Plantilla y sistema</span><button class="btn btn-outline btn-sm" onclick="addLineupPlayer()">+ Anadir jugadora</button></div>
+          <div class="team-detail-head">
+            <button class="btn btn-outline btn-sm" onclick="closeEquipoDetalle()">Volver a equipos</button>
+            <div class="team-detail-title" id="equipo-detail-title">Plantilla</div>
+          </div>
           <div class="lineup-controls">
-            <select class="msel" id="lineup-team" onchange="onLineupTeamChange()" style="max-width:190px;"></select>
+            <select class="msel" id="lineup-team" onchange="onLineupTeamChange()" style="display:none;"></select>
             <select class="msel" id="lineup-system" onchange="renderPlantillas()" style="max-width:170px;"></select>
           </div>
           <div class="lineup-layout">
@@ -702,6 +714,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <table class="tbl">
             <thead><tr><th>Jugadora</th><th>Equipo</th><th>Posición</th><th>Estado</th><th>Recuperación</th><th>Datos internos</th><th></th></tr></thead>
             <tbody id="jug-tbl"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SERVICIOS MEDICOS -->
+      <div class="view" id="v-medicos">
+        <div class="player-summary">
+          <div class="mini-stat"><b id="med-stat-total">0</b><span>Lesionadas</span></div>
+          <div class="mini-stat"><b id="med-stat-soon">0</b><span>Alta en 7 dias</span></div>
+          <div class="mini-stat"><b id="med-stat-long">0</b><span>Seguimiento largo</span></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Servicios medicos</span></div>
+          <table class="tbl">
+            <thead><tr><th>Jugadora</th><th>Equipo</th><th>Motivo</th><th>Alta prevista</th><th>Recuperacion</th><th>Detalles</th><th></th></tr></thead>
+            <tbody id="med-tbl"></tbody>
           </table>
         </div>
       </div>
@@ -1285,8 +1313,8 @@ const PAGE_META = {
   dashboard:   {t:"Dashboard",      s:"Resumen general del club"},
   calendario:  {t:"Calendario",     s:"Gestiona los horarios de entrenamiento"},
   equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
-  jugadoras:   {t:"Jugadoras",      s:"Disponibilidad, salud y datos internos por equipo"},
   scouting:    {t:"Scouting",       s:"Captación, valoración y seguimiento de perfiles"},
+  medicos:     {t:"Servicios médicos", s:"Seguimiento de lesionadas y recuperaciones"},
   entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
   mensajes:    {t:"Mensajes",       s:"Comunicaciones con familias"},
   historial:   {t:"Historial",      s:"Registro de acciones"},
@@ -1303,10 +1331,10 @@ function nav(page, el){
   document.getElementById('psub').textContent   = m.s||'';
   renderTopActions(page);
   if(page==='calendario')  { renderLegend(); renderCalendar(); }
-  if(page==='equipos')     renderPlantillas();
+  if(page==='equipos')     closeEquipoDetalle();
   if(page==='historial')   renderHistFull();
-  if(page==='jugadoras')   renderJugadoras();
   if(page==='scouting')    renderScouting();
+  if(page==='medicos')     renderMedicos();
   if(page==='entrenadores')renderEntrenadores();
   if(page==='dashboard')   renderDash();
 }
@@ -2572,7 +2600,9 @@ function setJugadoraStatus(id,status){
   } else {
     j.motivo=''; j.inicio=''; j.alta='';
   }
-  renderJugadoras();
+  if(document.getElementById('jug-tbl')) renderJugadoras();
+  if(currentPage==='equipos' && document.getElementById('equipo-detail')?.style.display!=='none') renderPlantillas();
+  renderMedicos();
 }
 
 function editJugadora(id){
@@ -2600,7 +2630,9 @@ function saveJugadoraEdit(){
   j.motivo=document.getElementById('jug-edit-motivo').value.trim();
   j.notas=document.getElementById('jug-edit-notes').value.trim();
   closeM('m-jugadora');
-  renderJugadoras();
+  if(document.getElementById('jug-tbl')) renderJugadoras();
+  if(currentPage==='equipos' && document.getElementById('equipo-detail')?.style.display!=='none') renderPlantillas();
+  renderMedicos();
 }
 
 function addFakeJugadora(){
@@ -2697,6 +2729,27 @@ function addScout(){
 }
 
 // PLANTILLAS
+function openEquipoDetalle(teamCode){
+  const list=document.getElementById('equipos-list');
+  const detail=document.getElementById('equipo-detail');
+  if(list) list.style.display='none';
+  if(detail) detail.style.display='block';
+  ensureLineupControls();
+  const team=document.getElementById('lineup-team');
+  if(team) team.value=teamCode;
+  fillLineupSystems();
+  const title=document.getElementById('equipo-detail-title');
+  if(title) title.textContent=`${EQ_NAMES[teamCode]||teamCode} · Plantilla y sistema`;
+  renderPlantillas();
+}
+
+function closeEquipoDetalle(){
+  const list=document.getElementById('equipos-list');
+  const detail=document.getElementById('equipo-detail');
+  if(list) list.style.display='block';
+  if(detail) detail.style.display='none';
+}
+
 function ensureLineupControls(){
   const team=document.getElementById('lineup-team');
   if(!team || team.dataset.ready) return;
@@ -2714,10 +2767,7 @@ function fillLineupSystems(){
   system.innerHTML=Object.keys(LINEUP_SYSTEMS[fmt]||{}).map(s=>`<option value="${s}">${s}</option>`).join('');
 }
 
-function onLineupTeamChange(){
-  fillLineupSystems();
-  renderPlantillas();
-}
+function onLineupTeamChange(){ fillLineupSystems(); renderPlantillas(); }
 
 function playerMatchesSlot(player,slot){
   const positions=(player.pos||'').split(',').map(p=>p.trim().toUpperCase());
@@ -2743,9 +2793,23 @@ function buildLineup(teamCode,systemName){
     if(player) used.add(player.id);
     if(!player) player=players.find(j=>!used.has(j.id)&&playerMatchesSlot(j,pos));
     if(!player) player=players.find(j=>!used.has(j.id));
-    if(player) used.add(player.id);
+    if(player){ used.add(player.id); lineupAssignments[key]=player.id; }
     return {pos,x,y,player,idx};
   });
+}
+
+function assignedLineupIds(team,system,exceptIdx){
+  const blocked=new Set();
+  Object.entries(lineupAssignments).forEach(([key,id])=>{
+    const [kTeam,kSystem,kIdx]=key.split('|');
+    if(kTeam===team && kSystem===system && Number(kIdx)!==exceptIdx && id) blocked.add(id);
+  });
+  return blocked;
+}
+
+function lineupOptions(team,system,idx,currentId){
+  const blocked=assignedLineupIds(team,system,idx);
+  return JUGADORAS.filter(j=>j.eq===team && (j.id===currentId || !blocked.has(j.id))).map(j=>`<option value="${j.id}" ${j.id===currentId?'selected':''}>${j.n} (${j.pos||'Sin posicion'})</option>`).join('');
 }
 
 function renderPlantillas(){
@@ -2754,45 +2818,25 @@ function renderPlantillas(){
   const system=document.getElementById('lineup-system')?.value||Object.keys(LINEUP_SYSTEMS[nativeFmt(team)]||{})[0];
   const lineup=buildLineup(team,system);
   const pitch=document.getElementById('lineup-pitch');
+  if(!pitch) return;
   pitch.innerHTML='<div class="pitch-circle"></div>';
   lineup.forEach(slot=>{
     const el=document.createElement('div');
     el.className='lineup-slot';
     el.style.left=slot.x+'%';
     el.style.top=slot.y+'%';
-    el.innerHTML=`<div class="lineup-pos">${slot.pos}</div><div class="lineup-player" onclick="assignLineupSlot('${team}','${system}',${slot.idx})">${slot.player?slot.player.n:'Sin asignar'}<span>${slot.player?(slot.player.pos||''):'Pulsa para asignar'}</span></div>`;
+    const currentId=slot.player?.id||'';
+    const out=slot.player && !playerMatchesSlot(slot.player,slot.pos);
+    el.innerHTML=`<div class="lineup-pos">${slot.pos}</div><div class="lineup-player ${out?'out-position':''}"><select class="lineup-select" onchange="assignLineupSlotSelect('${team}','${system}',${slot.idx},this.value)"><option value="">Sin asignar</option>${lineupOptions(team,system,slot.idx,currentId)}</select><span>${slot.player?(slot.player.pos||''):'Selecciona jugadora'}</span>${out?'<span class="lineup-warning">Fuera de posicion</span>':''}</div>`;
     pitch.appendChild(el);
   });
-
   const players=JUGADORAS.filter(j=>j.eq===team);
-  const grouped={};
-  players.forEach(j=>{
-    (j.pos||'Sin posición').split(',').map(p=>p.trim()).filter(Boolean).forEach(p=>{
-      if(!grouped[p]) grouped[p]=[];
-      grouped[p].push(j);
-    });
-  });
-  document.getElementById('lineup-panel').innerHTML=`
-    <div class="lineup-group"><h4>${EQ_NAMES[team]||team}</h4><div class="player-meta">${players.length} jugadoras · Sistema ${system}</div><button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addLineupPlayer()">+ Añadir jugadora</button></div>
-    ${Object.keys(grouped).sort().map(pos=>`
-      <div class="lineup-group">
-        <h4>${pos}</h4>
-        ${grouped[pos].map(j=>`<span class="lineup-chip">${j.n}</span>`).join('')}
-      </div>`).join('')}`;
+  document.getElementById('lineup-panel').innerHTML=`<div class="lineup-group"><h4>${EQ_NAMES[team]||team}</h4><div class="player-meta">${players.length} jugadoras - Sistema ${system}</div><button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addLineupPlayer()">+ Anadir jugadora</button></div><div class="lineup-group"><h4>Lista de jugadoras</h4><table class="tbl"><thead><tr><th>Jugadora</th><th>Posiciones</th><th>Estado</th><th>Recuperacion</th><th></th></tr></thead><tbody>${players.map(j=>`<tr><td><b>${j.n}</b><div class="player-meta">${j.ano||''}</div></td><td>${j.pos||'Sin posicion'}</td><td><select class="status-select" onchange="setJugadoraStatus('${j.id}',this.value)"><option value="disponible" ${j.estado==='disponible'?'selected':''}>Disponible</option><option value="no_disponible" ${j.estado==='no_disponible'?'selected':''}>No disponible</option></select></td><td>${j.estado==='no_disponible'?recoveryProgress(j):'<span class="player-meta">Disponible</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="editJugadora('${j.id}')">Editar</button></td></tr>`).join('')}</tbody></table></div>`;
 }
 
-function assignLineupSlot(team,system,idx){
-  const players=JUGADORAS.filter(j=>j.eq===team);
-  if(!players.length){showToast('No hay jugadoras en este equipo');return;}
-  const current=lineupAssignments[`${team}|${system}|${idx}`]||'';
-  const opts=players.map((j,i)=>`${i+1}. ${j.n} (${j.pos})`).join('\n');
-  const ans=prompt(`Elige jugadora para esta posición:\n${opts}\n\nEscribe el número. 0 para dejar sin asignar.`, current ? String(players.findIndex(j=>j.id===current)+1) : '');
-  if(ans===null) return;
-  const n=Number(ans);
+function assignLineupSlotSelect(team,system,idx,playerId){
   const key=`${team}|${system}|${idx}`;
-  if(n===0){ delete lineupAssignments[key]; renderPlantillas(); return; }
-  if(!n || !players[n-1]){showToast('Selección no válida');return;}
-  lineupAssignments[key]=players[n-1].id;
+  if(!playerId) delete lineupAssignments[key]; else lineupAssignments[key]=playerId;
   renderPlantillas();
 }
 
@@ -2801,11 +2845,32 @@ function addLineupPlayer(){
   const nombre=prompt(`Nueva jugadora para ${EQ_NAMES[team]||team}`,'Nueva Jugadora');
   if(!nombre) return;
   const pos=(prompt('Posiciones separadas por coma','MC')||'MC').split(',').map(p=>p.trim().toUpperCase()).filter(Boolean).join(', ');
-  const ano=Number(prompt('Año de nacimiento','2012'))||2012;
-  JUGADORAS.push({id:uid(),n:nombre,eq:team,pos,ano,estado:'disponible',motivo:'',inicio:'',alta:'',notas:''});
+  const ano=Number(prompt('Ano de nacimiento','2012'))||2012;
+  JUGADORAS.push({id:uid(),n:nombre,eq:team,pos,ano,estado:'disponible',motivo:'',inicio:'',alta:'',notas:'',detallesMedicos:''});
   renderPlantillas();
 }
 
+function renderMedicos(){
+  const injured=JUGADORAS.filter(j=>j.estado==='no_disponible');
+  const today=new Date(); today.setHours(0,0,0,0);
+  const soon=injured.filter(j=>j.alta && ((new Date(j.alta)-today)/86400000)<=7).length;
+  const long=injured.length-soon;
+  document.getElementById('med-stat-total').textContent=injured.length;
+  document.getElementById('med-stat-soon').textContent=soon;
+  document.getElementById('med-stat-long').textContent=long;
+  const badge=document.getElementById('med-badge'); if(badge) badge.textContent=injured.length;
+  const tbl=document.getElementById('med-tbl'); if(!tbl) return;
+  tbl.innerHTML=injured.map(j=>`<tr><td><b>${j.n}</b><div class="player-meta">${j.pos||''}</div></td><td>${EQ_NAMES[j.eq]||j.eq}</td><td>${j.motivo||'Pendiente definir'}</td><td>${j.alta||'-'}</td><td>${recoveryProgress(j)}</td><td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}</td><td><button class="btn btn-outline btn-sm" onclick="editMedical('${j.id}')">Editar</button></td></tr>`).join('') || '<tr><td colspan="7" style="color:var(--text3);">No hay jugadoras lesionadas ahora mismo.</td></tr>';
+}
+
+function editMedical(id){
+  const j=JUGADORAS.find(x=>x.id===id); if(!j) return;
+  const motivo=prompt('Motivo / lesion',j.motivo||''); if(motivo===null) return;
+  const alta=prompt('Alta prevista (YYYY-MM-DD)',j.alta||''); if(alta===null) return;
+  const detalles=prompt('Detalles de recuperacion',j.detallesMedicos||j.notas||''); if(detalles===null) return;
+  j.estado='no_disponible'; j.motivo=motivo; j.alta=alta; j.detallesMedicos=detalles;
+  renderMedicos();
+}
 // ════════════════════════════════════════════
 // ENTRENADORES TABLE
 // ════════════════════════════════════════════
@@ -2872,6 +2937,7 @@ renderLegend();
 renderCalendar();
 cacheCurrentWeek();
 renderDash();
+renderMedicos();
 renderTopActions('calendario');
 </script>
 
