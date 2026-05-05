@@ -328,6 +328,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pitch-circle{position:absolute;left:50%;top:50%;width:96px;height:96px;border:2px solid rgba(255,255,255,.75);border-radius:50%;transform:translate(-50%,-50%);}
 .pitch-player{position:absolute;transform:translate(-50%,-50%);background:#fff;border-radius:6px;padding:5px 7px;min-width:82px;text-align:center;font-size:10px;font-weight:700;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:2;}
 .pitch-player span{display:block;font-size:9px;color:var(--text3);font-weight:500;margin-top:1px;}
+.lineup-layout{display:grid;grid-template-columns:minmax(420px,1fr) 280px;gap:12px;align-items:start;}
+.lineup-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.lineup-slot{position:absolute;transform:translate(-50%,-50%);z-index:2;text-align:center;}
+.lineup-pos{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:22px;border-radius:999px;background:#1B2E4B;color:#fff;font-size:10px;font-weight:800;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.16);}
+.lineup-player{background:#fff;border-radius:6px;padding:6px 8px;min-width:92px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:10px;font-weight:700;color:var(--text);}
+.lineup-player span{display:block;font-size:9px;color:var(--text3);font-weight:500;margin-top:1px;}
+.lineup-panel{display:grid;gap:8px;}
+.lineup-group{border:1px solid var(--border);border-radius:6px;background:#fff;padding:9px;}
+.lineup-group h4{font-size:11px;color:var(--text);margin-bottom:6px;}
+.lineup-chip{display:inline-flex;background:#F3F4F6;border-radius:999px;padding:3px 7px;font-size:10px;color:var(--text2);margin:2px;}
 </style>
 </head>
 <body>
@@ -352,6 +362,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
       <div class="nav-item" onclick="nav(&#39;jugadoras&#39;,this)"><div class="nav-dot"></div>Jugadoras<span class="nav-badge">54</span></div>
       <div class="nav-item" onclick="nav(&#39;scouting&#39;,this)"><div class="nav-dot"></div>Scouting<span class="nav-badge">8</span></div>
+      <div class="nav-item" onclick="nav(&#39;plantillas&#39;,this)"><div class="nav-dot"></div>Plantillas<span class="nav-badge">9</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
       <div class="nav-sec">Comunicación</div>
       <div class="nav-item" onclick="nav(&#39;mensajes&#39;,this)"><div class="nav-dot"></div>Mensajes</div>
@@ -704,6 +715,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
           <div class="card">
             <div class="card-hd"><span class="card-title">Mapa de posiciones</span></div>
             <div class="pitch-box" id="scout-pitch"><div class="pitch-circle"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANTILLAS -->
+      <div class="view" id="v-plantillas">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Plantillas por sistema</span></div>
+          <div class="lineup-controls">
+            <select class="msel" id="lineup-team" onchange="onLineupTeamChange()" style="max-width:190px;"></select>
+            <select class="msel" id="lineup-system" onchange="renderPlantillas()" style="max-width:170px;"></select>
+          </div>
+          <div class="lineup-layout">
+            <div class="pitch-box" id="lineup-pitch"><div class="pitch-circle"></div></div>
+            <div class="lineup-panel" id="lineup-panel"></div>
           </div>
         </div>
       </div>
@@ -1147,6 +1173,33 @@ const SCOUTING = [
   {id:uid(),n:"Paula Rius",ano:2013,pos:"ALA",pierna:"Izquierda",fase:"CONTACTO",ritmo:85,tecnica:73,fisico:71,comportamiento:82,soft:"Energía alta, positiva.",comentarios:"Interesante para F8 por amplitud.",x:64,y:16}
 ];
 const SCOUT_PHASES = ["CONTACTO","PRUEBA","DINÁMICA","FIRMADA"];
+const LINEUP_SYSTEMS = {
+  F11:{
+    "1-4-3-3":[
+      ["POR",8,50],["LD",24,82],["DFC",24,62],["DFC",24,38],["LI",24,18],
+      ["MC",47,68],["MC",47,50],["MC",47,32],["ED",72,82],["DC",78,50],["EI",72,18]
+    ],
+    "1-4-4-2":[
+      ["POR",8,50],["LD",24,82],["DFC",24,62],["DFC",24,38],["LI",24,18],
+      ["MD",50,82],["MC",48,60],["MC",48,40],["MI",50,18],["DC",76,60],["DC",76,40]
+    ],
+    "1-3-5-2":[
+      ["POR",8,50],["DFC",25,68],["DFC",23,50],["DFC",25,32],
+      ["CAD",48,84],["MC",48,66],["MC",48,50],["MC",48,34],["CAI",48,16],["DC",76,60],["DC",76,40]
+    ]
+  },
+  F8:{
+    "1-2-3-2":[
+      ["POR",8,50],["DEF",28,63],["DEF",28,37],["ALA",52,78],["MC",52,50],["ALA",52,22],["DC",78,60],["DC",78,40]
+    ],
+    "1-2-1-3-1":[
+      ["POR",8,50],["DEF",27,63],["DEF",27,37],["MC",43,50],["ALA",60,78],["MCO",63,50],["ALA",60,22],["DC",80,50]
+    ],
+    "1-3-3-1":[
+      ["POR",8,50],["DEF",28,74],["DEF",26,50],["DEF",28,26],["ALA",55,78],["MC",55,50],["ALA",55,22],["DC",80,50]
+    ]
+  }
+};
 
 // sched[fmt][dia][pista] = [{id, s, i, f, c, tipo, loc, rival, mergedWith}]
 let sched = {
@@ -1234,6 +1287,7 @@ const PAGE_META = {
   equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
   jugadoras:   {t:"Jugadoras",      s:"Disponibilidad, salud y datos internos por equipo"},
   scouting:    {t:"Scouting",       s:"Captación, valoración y seguimiento de perfiles"},
+  plantillas:  {t:"Plantillas",     s:"Sistemas y distribución visual por posiciones"},
   entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
   mensajes:    {t:"Mensajes",       s:"Comunicaciones con familias"},
   historial:   {t:"Historial",      s:"Registro de acciones"},
@@ -1253,6 +1307,7 @@ function nav(page, el){
   if(page==='historial')   renderHistFull();
   if(page==='jugadoras')   renderJugadoras();
   if(page==='scouting')    renderScouting();
+  if(page==='plantillas')  renderPlantillas();
   if(page==='entrenadores')renderEntrenadores();
   if(page==='dashboard')   renderDash();
 }
@@ -2640,6 +2695,88 @@ function addScout(){
   SCOUTING.push({id:uid(),n:nombre,ano:2012,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil añadido manualmente.',x:50,y:50});
   document.getElementById('scout-filter-year').dataset.ready='';
   renderScouting();
+}
+
+// PLANTILLAS
+function ensureLineupControls(){
+  const team=document.getElementById('lineup-team');
+  if(!team || team.dataset.ready) return;
+  team.innerHTML=TEAM_ORDER.filter(s=>s!=='PORT').map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('');
+  team.value='FB';
+  team.dataset.ready='1';
+  fillLineupSystems();
+}
+
+function fillLineupSystems(){
+  const team=document.getElementById('lineup-team');
+  const system=document.getElementById('lineup-system');
+  if(!team||!system) return;
+  const fmt=nativeFmt(team.value);
+  system.innerHTML=Object.keys(LINEUP_SYSTEMS[fmt]||{}).map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+
+function onLineupTeamChange(){
+  fillLineupSystems();
+  renderPlantillas();
+}
+
+function playerMatchesSlot(player,slot){
+  const positions=(player.pos||'').split(',').map(p=>p.trim().toUpperCase());
+  if(positions.includes(slot)) return true;
+  if(slot==='DFC' && positions.includes('DEF')) return true;
+  if(['LD','LI','CAD','CAI'].includes(slot) && positions.includes('DEF')) return true;
+  if(['MD','MI','ALA','ED','EI'].includes(slot) && positions.includes('ALA')) return true;
+  if(['MC','MCO'].includes(slot) && positions.includes('MC')) return true;
+  if(slot==='DC' && positions.includes('DC')) return true;
+  if(slot==='POR' && positions.includes('POR')) return true;
+  return false;
+}
+
+function buildLineup(teamCode,systemName){
+  const fmt=nativeFmt(teamCode);
+  const slots=LINEUP_SYSTEMS[fmt][systemName]||[];
+  const players=JUGADORAS.filter(j=>j.eq===teamCode);
+  const used=new Set();
+  return slots.map(slot=>{
+    const [pos,x,y]=slot;
+    let player=players.find(j=>!used.has(j.id)&&playerMatchesSlot(j,pos));
+    if(!player) player=players.find(j=>!used.has(j.id));
+    if(player) used.add(player.id);
+    return {pos,x,y,player};
+  });
+}
+
+function renderPlantillas(){
+  ensureLineupControls();
+  const team=document.getElementById('lineup-team')?.value||'FB';
+  const system=document.getElementById('lineup-system')?.value||Object.keys(LINEUP_SYSTEMS[nativeFmt(team)]||{})[0];
+  const lineup=buildLineup(team,system);
+  const pitch=document.getElementById('lineup-pitch');
+  pitch.innerHTML='<div class="pitch-circle"></div>';
+  lineup.forEach(slot=>{
+    const el=document.createElement('div');
+    el.className='lineup-slot';
+    el.style.left=slot.x+'%';
+    el.style.top=slot.y+'%';
+    el.innerHTML=`<div class="lineup-pos">${slot.pos}</div><div class="lineup-player">${slot.player?slot.player.n:'Sin asignar'}<span>${slot.player?(slot.player.pos||''):'-'}</span></div>`;
+    pitch.appendChild(el);
+  });
+
+  const players=JUGADORAS.filter(j=>j.eq===team);
+  const grouped={};
+  players.forEach(j=>{
+    (j.pos||'Sin posición').split(',').map(p=>p.trim()).filter(Boolean).forEach(p=>{
+      if(!grouped[p]) grouped[p]=[];
+      grouped[p].push(j);
+    });
+  });
+  document.getElementById('lineup-panel').innerHTML=`
+    <div class="lineup-group"><h4>${EQ_NAMES[team]||team}</h4><div class="player-meta">${players.length} jugadoras · Sistema ${system}</div></div>
+    ${Object.keys(grouped).sort().map(pos=>`
+      <div class="lineup-group">
+        <h4>${pos}</h4>
+        ${grouped[pos].map(j=>`<span class="lineup-chip">${j.n}</span>`).join('')}
+      </div>`).join('')}`;
 }
 
 // ════════════════════════════════════════════
