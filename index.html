@@ -312,7 +312,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .pos-secondary-item input{width:13px;height:13px;}
 
 /* Scouting */
-.scout-layout{display:grid;grid-template-columns:minmax(320px,1.1fr) minmax(360px,.9fr);gap:12px;align-items:start;}
+.scout-layout{display:grid;grid-template-columns:1fr;gap:12px;align-items:start;}
 .scout-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
 .scout-list{display:grid;gap:8px;}
 .scout-card{border:1px solid var(--border);border-radius:6px;background:#fff;padding:10px;display:grid;grid-template-columns:1fr auto;gap:8px;box-shadow:var(--shadow);}
@@ -764,10 +764,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
               <div class="card-hd"><span class="card-title">Proceso de captación</span></div>
               <div class="kanban" id="scout-kanban"></div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-hd"><span class="card-title">Mapa de posiciones</span></div>
-            <div class="pitch-box" id="scout-pitch"><div class="pitch-circle"></div></div>
           </div>
         </div>
       </div>
@@ -2760,7 +2756,6 @@ function renderScouting(){
       </div>
     </div>`).join('') || `<div class="scout-meta">No hay perfiles con ese filtro</div>`;
   renderScoutKanban();
-  renderScoutPitch(list);
 }
 
 function setScoutPhase(id,phase){
@@ -2776,19 +2771,6 @@ function renderScoutKanban(){
       <div class="kanban-h">${phase}</div>
       ${SCOUTING.filter(s=>s.fase===phase).map(s=>`<div class="kanban-item"><b>${s.n}</b><br>${s.ano} · ${s.pos}</div>`).join('') || '<div class="scout-meta">Vacío</div>'}
     </div>`).join('');
-}
-
-function renderScoutPitch(items){
-  const pitch=document.getElementById('scout-pitch');
-  pitch.innerHTML='<div class="pitch-circle"></div>';
-  items.forEach(s=>{
-    const p=document.createElement('div');
-    p.className='pitch-player';
-    p.style.left=s.x+'%';
-    p.style.top=s.y+'%';
-    p.innerHTML=`${s.n.split(' ')[0]}<span>${s.pos}</span>`;
-    pitch.appendChild(p);
-  });
 }
 
 function addScout(){
