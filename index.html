@@ -2783,6 +2783,13 @@ function filteredScouting(){
   );
 }
 
+function resetScoutingFilters(){
+  const year=document.getElementById('scout-filter-year');
+  const pos=document.getElementById('scout-filter-pos');
+  if(year) year.dataset.ready='';
+  if(pos) pos.dataset.ready='';
+}
+
 function renderScouting(){
   ensureScoutingFilters();
   const list=filteredScouting();
@@ -2878,6 +2885,7 @@ function saveScoutEdit(){
   s.soft=document.getElementById('scout-edit-soft').value.trim();
   s.comentarios=document.getElementById('scout-edit-comments').value.trim();
   closeM('m-scout');
+  resetScoutingFilters();
   renderScouting();
 }
 
@@ -2891,17 +2899,18 @@ function probClass(value){
 
 function renderScoutKanban(){
   const el=document.getElementById('scout-kanban');
+  const visible=filteredScouting();
   el.innerHTML=SCOUT_PHASES.map(phase=>`
     <div class="kanban-col">
       <div class="kanban-h">${phase}</div>
-      ${SCOUTING.filter(s=>s.fase===phase).map(s=>`<div class="kanban-item"><b>${s.n}</b><br>${s.ano} · ${s.pos}</div>`).join('') || '<div class="scout-meta">Vacío</div>'}
+      ${visible.filter(s=>s.fase===phase).map(s=>`<div class="kanban-item"><b>${s.n}</b><br>${s.ano} · ${s.pos}</div>`).join('') || '<div class="scout-meta">Vacío</div>'}
     </div>`).join('');
 }
 
 function addScout(){
   const id=uid();
   SCOUTING.push({id,n:'Nueva captacion',ano:2012,equipoDestino:'Pendiente',probFirma:50,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil anadido manualmente.',x:50,y:50});
-  document.getElementById('scout-filter-year').dataset.ready='';
+  resetScoutingFilters();
   renderScouting();
   editScout(id);
 }
