@@ -2850,13 +2850,18 @@ function renderFfcvCard(teamCode,data,loading=false){
   if(!el) return;
   const d=data || FFCV_MANUAL_DATA[teamCode] || {};
   const goleadoras=(d.goleadoras||[]).filter(Boolean);
+  const statusText=loading ? 'Cargando datos...' :
+    d.estadoConexion==='conectado' ? `Conectado FFCV${d.jornada?` · Jornada ${d.jornada}`:''}` :
+    d.estadoConexion==='error' ? 'Error al consultar FFCV' :
+    d.estadoConexion==='equipo_no_encontrado' ? 'Equipo no encontrado en FFCV' :
+    'Datos preparados para conexion';
   el.innerHTML=`
     <div class="ffcv-card">
       <div class="ffcv-head">
         <div>
           <div class="ffcv-title">Datos FFCV</div>
           <div class="ffcv-sub">${d.temporada||'-'} · ${d.modalidad||'-'} · ${d.competicion||'Sin competicion'}</div>
-          <div class="ffcv-sub">${d.grupo||'Sin grupo'} · ${loading?'Cargando datos...':(d.estadoConexion==='manual'?'Datos preparados para conexion':'Actualizado')}</div>
+          <div class="ffcv-sub">${d.grupo||'Sin grupo'} · ${statusText}</div>
         </div>
         <button class="btn btn-outline btn-sm" onclick="cargarDatosFFCV('${teamCode}',true)">Actualizar</button>
       </div>
@@ -2869,7 +2874,7 @@ function renderFfcvCard(teamCode,data,loading=false){
       </div>
       <div class="ffcv-sub" style="margin-bottom:6px;">Goles por jugadora</div>
       <div class="ffcv-scorers">
-        ${goleadoras.length?goleadoras.map(g=>`<span class="lineup-chip">${g.nombre}: ${g.goles}</span>`).join(''):'<span class="ffcv-empty">Sin goleadoras cargadas todavia.</span>'}
+        ${goleadoras.length?goleadoras.map(g=>`<span class="lineup-chip">${g.nombre}: ${g.goles}</span>`).join(''):'<span class="ffcv-empty">Pendiente conectar rankings/goleadoras de FFCV.</span>'}
       </div>
     </div>`;
 }
