@@ -86,6 +86,7 @@ function emptyPayload(equipo, cfg) {
     golesFavor: null,
     golesContra: null,
     puntos: null,
+    plantilla: [],
     goleadoras: []
   };
 }
@@ -114,6 +115,45 @@ async function fetchClasificacion(cfg) {
   }
 
   return response.json();
+}
+
+async function fetchPlantilla(cfg) {
+  if (!cfg.codEquipo) return [];
+
+  const url = new URL("https://ffcv.es/competiciones/api/equipos/plantilla_home.php");
+  url.searchParams.set("cod_equipo", cfg.codEquipo);
+
+  const response = await fetch(url, {
+    headers: {
+      accept: "*/*",
+      referer: `https://ffcv.es/competiciones/equipos/equipo.php?codigo_equipo=${cfg.codEquipo}`,
+      "user-agent": "Mozilla/5.0"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`FFCV plantilla respondio ${response.status}`);
+  }
+
+  const data = await response.json();
+  const players = Array.isArray(data.jugadores_equipo) ? data.jugadores_equipo : [];
+
+  return players.map(player => ({
+    codJugador: player.codjugador || "",
+    nombre: player.nombre || "",
+    dorsal: player.dorsal || "",
+    posicionFfcv: player.posicion || "",
+    posicion: mapPosition(player.posicion)
+  })).filter(player => player.nombre);
+}
+
+function mapPosition(position) {
+  const raw = String(position || "").toLowerCase();
+  if (raw.includes("portero")) return "POR";
+  if (raw.includes("defensa")) return "DEF";
+  if (raw.includes("centro") || raw.includes("medio")) return "MC";
+  if (raw.includes("delanter")) return "DC";
+  return "MC";
 }
 
 function mapClasificacion(equipo, cfg, data) {
@@ -150,6 +190,7 @@ function mapClasificacion(equipo, cfg, data) {
     puntos: toNumber(row.puntos),
     coeficiente: row.coeficiente || null,
     racha: Array.isArray(row.racha_partidos) ? row.racha_partidos.map(r => r.tipo).filter(Boolean) : [],
+    plantilla: [],
     goleadoras: []
   };
 }
@@ -168,7 +209,9 @@ export default async function handler(req, res) {
 
   try {
     const data = await fetchClasificacion(cfg);
-    return res.status(200).json(mapClasificacion(equipo, cfg, data));
+    const payload = mapClasificacion(equipo, cfg, data);
+    payload.plantilla = await fetchPlantilla(cfg);
+    return res.status(200).json(payload);
   } catch (error) {
     return res.status(200).json({
       ...emptyPayload(equipo, cfg),

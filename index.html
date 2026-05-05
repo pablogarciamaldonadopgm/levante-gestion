@@ -2879,6 +2879,39 @@ function renderFfcvCard(teamCode,data,loading=false){
     </div>`;
 }
 
+function syncFfcvPlantilla(teamCode,plantilla){
+  if(!Array.isArray(plantilla) || !plantilla.length) return false;
+  const previous=new Map(JUGADORAS.filter(j=>j.eq===teamCode).map(j=>[j.codFfcv||j.n,j]));
+  const mapped=plantilla.map((p,idx)=>{
+    const key=p.codJugador || p.nombre;
+    const old=previous.get(key) || previous.get(p.nombre) || {};
+    return {
+      id: old.id || `ffcv-${teamCode}-${p.codJugador||idx}`,
+      codFfcv: p.codJugador || '',
+      n: p.nombre,
+      eq: teamCode,
+      pos: p.posicion || 'MC',
+      ano: old.ano || '',
+      estado: old.estado || 'disponible',
+      motivo: old.motivo || '',
+      inicio: old.inicio || '',
+      alta: old.alta || '',
+      notas: old.notas || '',
+      detallesMedicos: old.detallesMedicos || '',
+      dorsal: p.dorsal || '',
+      posicionFfcv: p.posicionFfcv || ''
+    };
+  });
+  JUGADORAS.splice(0,JUGADORAS.length,...JUGADORAS.filter(j=>j.eq!==teamCode),...mapped);
+  Object.keys(lineupAssignments).forEach(key=>{
+    if(key.startsWith(`${teamCode}|`)) delete lineupAssignments[key];
+  });
+  Object.keys(lineupBenchedPlayers).forEach(key=>{
+    if(key.startsWith(`${teamCode}|`)) delete lineupBenchedPlayers[key];
+  });
+  return true;
+}
+
 async function cargarDatosFFCV(teamCode,force=false){
   if(!force && ffcvCache[teamCode]){
     renderFfcvCard(teamCode,ffcvCache[teamCode]);
@@ -2890,6 +2923,9 @@ async function cargarDatosFFCV(teamCode,force=false){
     if(!res.ok) throw new Error('FFCV API no disponible');
     const data=await res.json();
     ffcvCache[teamCode]=data;
+    if(syncFfcvPlantilla(teamCode,data.plantilla) && document.getElementById('lineup-team')?.value===teamCode){
+      renderPlantillas();
+    }
     renderFfcvCard(teamCode,data);
   }catch(err){
     const fallback={...(FFCV_MANUAL_DATA[teamCode]||{}),estadoConexion:'manual'};
@@ -2964,7 +3000,7 @@ function renderPlantillas(){
     pitch.appendChild(el);
   });
   const players=JUGADORAS.filter(j=>j.eq===team);
-  document.getElementById('lineup-panel').innerHTML=`<div class="lineup-group"><h4>${EQ_NAMES[team]||team}</h4><div class="player-meta">${players.length} jugadoras - Sistema ${system}</div><button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addLineupPlayer()">+ Anadir jugadora</button></div><div class="lineup-group"><h4>Lista de jugadoras</h4><table class="tbl"><thead><tr><th>Jugadora</th><th>Posiciones</th><th>Estado</th><th>Recuperacion</th><th></th></tr></thead><tbody>${players.map(j=>`<tr><td><b>${j.n}</b><div class="player-meta">${j.ano||''}</div></td><td>${j.pos||'Sin posicion'}</td><td><select class="status-select" onchange="setJugadoraStatus('${j.id}',this.value)"><option value="disponible" ${j.estado==='disponible'?'selected':''}>Disponible</option><option value="no_disponible" ${j.estado==='no_disponible'?'selected':''}>No disponible</option></select></td><td>${j.estado==='no_disponible'?recoveryProgress(j):'<span class="player-meta">Disponible</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="editJugadora('${j.id}')">Editar</button></td></tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('lineup-panel').innerHTML=`<div class="lineup-group"><h4>${EQ_NAMES[team]||team}</h4><div class="player-meta">${players.length} jugadoras - Sistema ${system}</div><button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addLineupPlayer()">+ Anadir jugadora</button></div><div class="lineup-group"><h4>Lista de jugadoras</h4><table class="tbl"><thead><tr><th>Jugadora</th><th>Dorsal</th><th>Posiciones</th><th>Estado</th><th>Recuperacion</th><th></th></tr></thead><tbody>${players.map(j=>`<tr><td><b>${j.n}</b><div class="player-meta">${j.codFfcv?'FFCV '+j.codFfcv:(j.ano||'')}</div></td><td>${j.dorsal||'-'}</td><td>${j.pos||'Sin posicion'}${j.posicionFfcv?`<div class="player-meta">${j.posicionFfcv}</div>`:''}</td><td><select class="status-select" onchange="setJugadoraStatus('${j.id}',this.value)"><option value="disponible" ${j.estado==='disponible'?'selected':''}>Disponible</option><option value="no_disponible" ${j.estado==='no_disponible'?'selected':''}>No disponible</option></select></td><td>${j.estado==='no_disponible'?recoveryProgress(j):'<span class="player-meta">Disponible</span>'}</td><td><button class="btn btn-outline btn-sm" onclick="editJugadora('${j.id}')">Editar</button></td></tr>`).join('')}</tbody></table></div>`;
 }
 
 function assignLineupSlotSelect(team,system,idx,playerId){
