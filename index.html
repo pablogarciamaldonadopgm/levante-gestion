@@ -388,6 +388,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <div class="nav-item active" onclick="nav(&#39;calendario&#39;,this)"><div class="nav-dot"></div>Calendario</div>
       <div class="nav-sec">Gestión</div>
       <div class="nav-item" onclick="nav(&#39;equipos&#39;,this)"><div class="nav-dot"></div>Equipos<span class="nav-badge">9</span></div>
+      <div class="nav-item" onclick="nav(&#39;jugadoras&#39;,this)"><div class="nav-dot"></div>Jugadoras<span class="nav-badge">54</span></div>
       <div class="nav-item" onclick="nav(&#39;scouting&#39;,this)"><div class="nav-dot"></div>Scouting<span class="nav-badge">8</span></div>
       <div class="nav-item" onclick="nav(&#39;medicos&#39;,this)"><div class="nav-dot"></div>Servicios médicos<span class="nav-badge" id="med-badge">0</span></div>
       <div class="nav-item" onclick="nav(&#39;entrenadores&#39;,this)"><div class="nav-dot"></div>Entrenadores<span class="nav-badge">20</span></div>
@@ -886,6 +887,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   </div>
 </div>
 
+<!-- Edit scouting -->
+<div class="modal-bg" id="m-scout">
+  <div class="modal modal-wide">
+    <div class="mh"><span class="mt">Editar scouting</span><button class="mx" onclick="closeM('m-scout')">x</button></div>
+    <div class="mb">
+      <input type="hidden" id="scout-edit-id">
+      <div class="mrow2">
+        <div><div class="ml">Nombre</div><input class="mi" id="scout-edit-name"></div>
+        <div><div class="ml">Ano nacimiento</div><input class="mi" id="scout-edit-ano" type="number" min="2000" max="2035"></div>
+      </div>
+      <div class="mrow2">
+        <div><div class="ml">Posicion</div><select class="msel" id="scout-edit-pos"></select></div>
+        <div><div class="ml">Pierna habil</div><select class="msel" id="scout-edit-pierna">
+          <option>Derecha</option><option>Izquierda</option><option>Ambas</option>
+        </select></div>
+      </div>
+      <div class="mrow2">
+        <div><div class="ml">Equipo incorporacion</div><select class="msel" id="scout-edit-team"></select></div>
+        <div><div class="ml">Probabilidad firma (%)</div><input class="mi" id="scout-edit-prob" type="number" min="0" max="100"></div>
+      </div>
+      <div class="mrow2">
+        <div><div class="ml">Fase</div><select class="msel" id="scout-edit-fase"></select></div>
+        <div><div class="ml">Ritmo</div><input class="mi" id="scout-edit-ritmo" type="number" min="0" max="100"></div>
+      </div>
+      <div class="mrow2">
+        <div><div class="ml">Tecnica</div><input class="mi" id="scout-edit-tecnica" type="number" min="0" max="100"></div>
+        <div><div class="ml">Fisico</div><input class="mi" id="scout-edit-fisico" type="number" min="0" max="100"></div>
+      </div>
+      <div class="mr"><div class="ml">Comportamiento</div><input class="mi" id="scout-edit-comportamiento" type="number" min="0" max="100"></div>
+      <div class="mr"><div class="ml">Comportamiento / soft skills</div><textarea class="mta" id="scout-edit-soft"></textarea></div>
+      <div class="mr"><div class="ml">Comentarios</div><textarea class="mta" id="scout-edit-comments"></textarea></div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-scout')">Cancelar</button><button class="mbtn-p" onclick="saveScoutEdit()">Guardar</button></div>
+  </div>
+</div>
+
 <!-- Email modal -->
 <div class="modal-bg" id="m-email">
   <div class="modal modal-wide">
@@ -1125,7 +1162,13 @@ const FFCV_MANUAL_DATA = {
   BC:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Segona FFCV Benjami 2n. any Valencia",grupo:"Lliga Regular Grup 9",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
   BD:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]}
 };
-let ffcvCache = {};
+function loadFfcvCache(){
+  try{return JSON.parse(localStorage.getItem('ffcvCache')||'{}')||{};}catch(e){return {};}
+}
+function saveFfcvCache(){
+  try{localStorage.setItem('ffcvCache',JSON.stringify(ffcvCache));}catch(e){}
+}
+let ffcvCache = loadFfcvCache();
 
 function nativeFmt(s){
   if(s==='PORT') return 'PORT';
@@ -1348,6 +1391,7 @@ const PAGE_META = {
   dashboard:   {t:"Dashboard",      s:"Resumen general del club"},
   calendario:  {t:"Calendario",     s:"Gestiona los horarios de entrenamiento"},
   equipos:     {t:"Equipos",        s:"Gestión de equipos y categorías"},
+  jugadoras:   {t:"Jugadoras",      s:"Disponibilidad, salud y datos internos por equipo"},
   scouting:    {t:"Scouting",       s:"Captación, valoración y seguimiento de perfiles"},
   medicos:     {t:"Servicios médicos", s:"Seguimiento de lesionadas y recuperaciones"},
   entrenadores:{t:"Entrenadores",   s:"Equipo técnico"},
@@ -1367,6 +1411,7 @@ function nav(page, el){
   renderTopActions(page);
   if(page==='calendario')  { renderLegend(); renderCalendar(); }
   if(page==='equipos')     closeEquipoDetalle();
+  if(page==='jugadoras')   renderJugadoras();
   if(page==='historial')   renderHistFull();
   if(page==='scouting')    renderScouting();
   if(page==='medicos')     renderMedicos();
@@ -2773,26 +2818,69 @@ function setScoutPhase(id,phase){
 
 function editScout(id){
   const s=SCOUTING.find(x=>x.id===id); if(!s)return;
-  const nombre=prompt('Nombre',s.n); if(nombre===null) return;
-  const ano=prompt('Año de nacimiento',s.ano||''); if(ano===null) return;
-  const pos=prompt('Posicion',s.pos||'MC'); if(pos===null) return;
-  const pierna=prompt('Pierna habil',s.pierna||'Derecha'); if(pierna===null) return;
-  const equipoDestino=prompt('Posible equipo de incorporacion',s.equipoDestino||'Pendiente'); if(equipoDestino===null) return;
-  const probFirma=prompt('Probabilidad de firma (%)',s.probFirma||50); if(probFirma===null) return;
-  const fase=prompt(`Fase (${SCOUT_PHASES.join(', ')})`,s.fase||'CONTACTO'); if(fase===null) return;
-  const soft=prompt('Comportamiento / soft skills',s.soft||''); if(soft===null) return;
-  const comentarios=prompt('Comentarios',s.comentarios||''); if(comentarios===null) return;
-  s.n=nombre.trim()||s.n;
-  s.ano=Number(ano)||s.ano;
-  s.pos=(pos.trim()||s.pos).toUpperCase();
-  s.pierna=pierna.trim()||s.pierna;
-  s.equipoDestino=equipoDestino.trim()||'Pendiente';
-  s.probFirma=Math.max(0,Math.min(100,Number(probFirma)||0));
-  s.fase=SCOUT_PHASES.includes((fase||'').toUpperCase()) ? fase.toUpperCase() : s.fase;
-  s.soft=soft.trim();
-  s.comentarios=comentarios.trim();
+  ensureScoutEditOptions();
+  document.getElementById('scout-edit-id').value=s.id;
+  document.getElementById('scout-edit-name').value=s.n||'';
+  document.getElementById('scout-edit-ano').value=s.ano||'';
+  document.getElementById('scout-edit-pos').value=s.pos||'MC';
+  document.getElementById('scout-edit-pierna').value=s.pierna||'Derecha';
+  document.getElementById('scout-edit-team').value=s.equipoDestino||'Pendiente';
+  document.getElementById('scout-edit-prob').value=Number(s.probFirma||0);
+  document.getElementById('scout-edit-fase').value=s.fase||'CONTACTO';
+  document.getElementById('scout-edit-ritmo').value=Number(s.ritmo||0);
+  document.getElementById('scout-edit-tecnica').value=Number(s.tecnica||0);
+  document.getElementById('scout-edit-fisico').value=Number(s.fisico||0);
+  document.getElementById('scout-edit-comportamiento').value=Number(s.comportamiento||0);
+  document.getElementById('scout-edit-soft').value=s.soft||'';
+  document.getElementById('scout-edit-comments').value=s.comentarios||'';
+  openM('m-scout');
+}
+
+function ensureScoutEditOptions(){
+  const pos=document.getElementById('scout-edit-pos');
+  const team=document.getElementById('scout-edit-team');
+  const fase=document.getElementById('scout-edit-fase');
+  if(pos && !pos.dataset.ready){
+    pos.innerHTML=PLAYER_POSITIONS.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
+    pos.dataset.ready='1';
+  }
+  if(team && !team.dataset.ready){
+    team.innerHTML='<option value="Pendiente">Pendiente</option>'+
+      TEAM_ORDER.filter(s=>s!=='PORT').map(s=>'<option value="'+(EQ_NAMES[s]||s)+'">'+(EQ_NAMES[s]||s)+'</option>').join('');
+    team.dataset.ready='1';
+  }
+  if(fase && !fase.dataset.ready){
+    fase.innerHTML=SCOUT_PHASES.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
+    fase.dataset.ready='1';
+  }
+}
+
+function scoutNum(id,min=0,max=100){
+  const n=Number(document.getElementById(id).value);
+  if(!Number.isFinite(n)) return min;
+  return Math.max(min,Math.min(max,n));
+}
+
+function saveScoutEdit(){
+  const id=document.getElementById('scout-edit-id').value;
+  const s=SCOUTING.find(x=>x.id===id); if(!s)return;
+  s.n=document.getElementById('scout-edit-name').value.trim()||s.n;
+  s.ano=scoutNum('scout-edit-ano',2000,2035)||s.ano;
+  s.pos=document.getElementById('scout-edit-pos').value||s.pos;
+  s.pierna=document.getElementById('scout-edit-pierna').value||s.pierna;
+  s.equipoDestino=document.getElementById('scout-edit-team').value||'Pendiente';
+  s.probFirma=scoutNum('scout-edit-prob',0,100);
+  s.fase=document.getElementById('scout-edit-fase').value||s.fase;
+  s.ritmo=scoutNum('scout-edit-ritmo',0,100);
+  s.tecnica=scoutNum('scout-edit-tecnica',0,100);
+  s.fisico=scoutNum('scout-edit-fisico',0,100);
+  s.comportamiento=scoutNum('scout-edit-comportamiento',0,100);
+  s.soft=document.getElementById('scout-edit-soft').value.trim();
+  s.comentarios=document.getElementById('scout-edit-comments').value.trim();
+  closeM('m-scout');
   renderScouting();
 }
+
 
 function probClass(value){
   const n=Number(value)||0;
@@ -2811,14 +2899,11 @@ function renderScoutKanban(){
 }
 
 function addScout(){
-  const nombre=prompt('Nombre ficticio de jugadora','Nueva Captacion');
-  if(!nombre) return;
-  const ano=Number(prompt('Ano de nacimiento','2012'))||2012;
-  const equipoDestino=prompt('Posible equipo de incorporacion','Alevin C')||'Pendiente';
-  const probFirma=Math.max(0,Math.min(100,Number(prompt('Probabilidad de firma (%)','50'))||50));
-  SCOUTING.push({id:uid(),n:nombre,ano,equipoDestino,probFirma,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil anadido manualmente.',x:50,y:50});
+  const id=uid();
+  SCOUTING.push({id,n:'Nueva captacion',ano:2012,equipoDestino:'Pendiente',probFirma:50,pos:'MC',pierna:'Derecha',fase:'CONTACTO',ritmo:70,tecnica:70,fisico:70,comportamiento:70,soft:'Pendiente valorar.',comentarios:'Perfil anadido manualmente.',x:50,y:50});
   document.getElementById('scout-filter-year').dataset.ready='';
   renderScouting();
+  editScout(id);
 }
 
 // PLANTILLAS
@@ -2904,6 +2989,9 @@ function renderFfcvCard(teamCode,data,loading=false){
 function syncFfcvPlantilla(teamCode,plantilla){
   if(!Array.isArray(plantilla) || !plantilla.length) return false;
   const previous=new Map(JUGADORAS.filter(j=>j.eq===teamCode).map(j=>[j.codFfcv||j.n,j]));
+  const currentKeys=JUGADORAS.filter(j=>j.eq===teamCode).map(j=>j.codFfcv||j.n).join('|');
+  const nextKeys=plantilla.map(p=>p.codJugador||p.nombre).join('|');
+  const rosterChanged=currentKeys!==nextKeys;
   const mapped=plantilla.map((p,idx)=>{
     const key=p.codJugador || p.nombre;
     const old=previous.get(key) || previous.get(p.nombre) || {};
@@ -2925,18 +3013,24 @@ function syncFfcvPlantilla(teamCode,plantilla){
     };
   });
   JUGADORAS.splice(0,JUGADORAS.length,...JUGADORAS.filter(j=>j.eq!==teamCode),...mapped);
-  Object.keys(lineupAssignments).forEach(key=>{
-    if(key.startsWith(`${teamCode}|`)) delete lineupAssignments[key];
-  });
-  Object.keys(lineupBenchedPlayers).forEach(key=>{
-    if(key.startsWith(`${teamCode}|`)) delete lineupBenchedPlayers[key];
-  });
+  if(rosterChanged){
+    Object.keys(lineupAssignments).forEach(key=>{
+      if(key.startsWith(`${teamCode}|`)) delete lineupAssignments[key];
+    });
+    Object.keys(lineupBenchedPlayers).forEach(key=>{
+      if(key.startsWith(`${teamCode}|`)) delete lineupBenchedPlayers[key];
+    });
+  }
   return true;
 }
 
 async function cargarDatosFFCV(teamCode,force=false){
   if(!force && ffcvCache[teamCode]){
-    renderFfcvCard(teamCode,ffcvCache[teamCode]);
+    const cached=ffcvCache[teamCode];
+    if(syncFfcvPlantilla(teamCode,cached.plantilla) && document.getElementById('lineup-team')?.value===teamCode){
+      renderPlantillas();
+    }
+    renderFfcvCard(teamCode,cached);
     return;
   }
   renderFfcvCard(teamCode,FFCV_MANUAL_DATA[teamCode],true);
@@ -2945,13 +3039,13 @@ async function cargarDatosFFCV(teamCode,force=false){
     if(!res.ok) throw new Error('FFCV API no disponible');
     const data=await res.json();
     ffcvCache[teamCode]=data;
+    saveFfcvCache();
     if(syncFfcvPlantilla(teamCode,data.plantilla) && document.getElementById('lineup-team')?.value===teamCode){
       renderPlantillas();
     }
     renderFfcvCard(teamCode,data);
   }catch(err){
-    const fallback={...(FFCV_MANUAL_DATA[teamCode]||{}),estadoConexion:'manual'};
-    ffcvCache[teamCode]=fallback;
+    const fallback=ffcvCache[teamCode] || {...(FFCV_MANUAL_DATA[teamCode]||{}),estadoConexion:'manual'};
     renderFfcvCard(teamCode,fallback);
   }
 }
