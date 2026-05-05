@@ -349,6 +349,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .lineup-group{border:1px solid var(--border);border-radius:6px;background:#fff;padding:9px;}
 .lineup-group h4{font-size:11px;color:var(--text);margin-bottom:6px;}
 .lineup-chip{display:inline-flex;background:#F3F4F6;border-radius:999px;padding:3px 7px;font-size:10px;color:var(--text2);margin:2px;}
+.ffcv-card{border:1px solid var(--border);border-radius:6px;background:#fff;padding:12px;margin-bottom:12px;}
+.ffcv-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.ffcv-title{font-size:12px;font-weight:800;color:var(--text);}
+.ffcv-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.ffcv-grid{display:grid;grid-template-columns:repeat(5,minmax(92px,1fr));gap:8px;margin-bottom:10px;}
+.ffcv-stat{border:1px solid var(--border);border-radius:6px;background:#F8FAFC;padding:8px;}
+.ffcv-stat b{display:block;font-size:18px;color:var(--text);}
+.ffcv-stat span{font-size:10px;color:var(--text3);}
+.ffcv-scorers{display:flex;flex-wrap:wrap;gap:5px;}
+.ffcv-empty{font-size:11px;color:var(--text3);}
 .medical-note{max-width:260px;color:var(--text2);font-size:11px;line-height:1.35;}
 </style>
 </head>
@@ -687,6 +697,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
             <select class="msel" id="lineup-team" onchange="onLineupTeamChange()" style="display:none;"></select>
             <select class="msel" id="lineup-system" onchange="renderPlantillas()" style="max-width:170px;"></select>
           </div>
+          <div id="ffcv-card"></div>
           <div class="lineup-layout">
             <div class="pitch-box" id="lineup-pitch"><div class="pitch-circle"></div></div>
             <div class="lineup-panel" id="lineup-panel"></div>
@@ -1100,6 +1111,19 @@ const EQ_NAMES = {
   FB:"Femenino B", FC:"Femenino C", FD:"Femenino D", IC:"Infantil C", ID:"Infantil D",
   AD:"Alevín D", AC:"Alevín C", BC:"Benjamín C", BD:"Benjamín D", PORT:"Porteras"
 };
+
+const FFCV_MANUAL_DATA = {
+  FB:{temporada:"2025-2026",modalidad:"FEMENI F11",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  FC:{temporada:"2025-2026",modalidad:"FEMENI F11",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  FD:{temporada:"2025-2026",modalidad:"FEMENI F11",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  IC:{temporada:"2025-2026",modalidad:"MASCULI F11",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  ID:{temporada:"2025-2026",modalidad:"MASCULI F11",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  AC:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  AD:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  BC:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Segona FFCV Benjami 2n. any Valencia",grupo:"Lliga Regular Grup 9",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]},
+  BD:{temporada:"2025-2026",modalidad:"MASCULI F8",competicion:"Pendiente configurar",grupo:"Pendiente configurar",posicion:null,partidos:null,victorias:null,empates:null,derrotas:null,golesFavor:null,golesContra:null,puntos:null,goleadoras:[]}
+};
+let ffcvCache = {};
 
 function nativeFmt(s){
   if(s==='PORT') return 'PORT';
@@ -2788,6 +2812,7 @@ function openEquipoDetalle(teamCode){
   const title=document.getElementById('equipo-detail-title');
   if(title) title.textContent=`${EQ_NAMES[teamCode]||teamCode} · Plantilla y sistema`;
   renderPlantillas();
+  cargarDatosFFCV(teamCode);
 }
 
 function closeEquipoDetalle(){
@@ -2815,6 +2840,58 @@ function fillLineupSystems(){
 }
 
 function onLineupTeamChange(){ fillLineupSystems(); renderPlantillas(); }
+
+function ffcvValue(v,suffix=''){
+  return v===null || v===undefined || v==='' ? '-' : `${v}${suffix}`;
+}
+
+function renderFfcvCard(teamCode,data,loading=false){
+  const el=document.getElementById('ffcv-card');
+  if(!el) return;
+  const d=data || FFCV_MANUAL_DATA[teamCode] || {};
+  const goleadoras=(d.goleadoras||[]).filter(Boolean);
+  el.innerHTML=`
+    <div class="ffcv-card">
+      <div class="ffcv-head">
+        <div>
+          <div class="ffcv-title">Datos FFCV</div>
+          <div class="ffcv-sub">${d.temporada||'-'} · ${d.modalidad||'-'} · ${d.competicion||'Sin competicion'}</div>
+          <div class="ffcv-sub">${d.grupo||'Sin grupo'} · ${loading?'Cargando datos...':(d.estadoConexion==='manual'?'Datos preparados para conexion':'Actualizado')}</div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="cargarDatosFFCV('${teamCode}',true)">Actualizar</button>
+      </div>
+      <div class="ffcv-grid">
+        <div class="ffcv-stat"><b>${ffcvValue(d.posicion,d.posicion?'º':'')}</b><span>Posicion</span></div>
+        <div class="ffcv-stat"><b>${ffcvValue(d.victorias)}</b><span>Victorias</span></div>
+        <div class="ffcv-stat"><b>${ffcvValue(d.puntos)}</b><span>Puntos</span></div>
+        <div class="ffcv-stat"><b>${ffcvValue(d.golesFavor)}</b><span>Goles favor</span></div>
+        <div class="ffcv-stat"><b>${ffcvValue(d.golesContra)}</b><span>Goles contra</span></div>
+      </div>
+      <div class="ffcv-sub" style="margin-bottom:6px;">Goles por jugadora</div>
+      <div class="ffcv-scorers">
+        ${goleadoras.length?goleadoras.map(g=>`<span class="lineup-chip">${g.nombre}: ${g.goles}</span>`).join(''):'<span class="ffcv-empty">Sin goleadoras cargadas todavia.</span>'}
+      </div>
+    </div>`;
+}
+
+async function cargarDatosFFCV(teamCode,force=false){
+  if(!force && ffcvCache[teamCode]){
+    renderFfcvCard(teamCode,ffcvCache[teamCode]);
+    return;
+  }
+  renderFfcvCard(teamCode,FFCV_MANUAL_DATA[teamCode],true);
+  try{
+    const res=await fetch(`/api/ffcv?equipo=${encodeURIComponent(teamCode)}`);
+    if(!res.ok) throw new Error('FFCV API no disponible');
+    const data=await res.json();
+    ffcvCache[teamCode]=data;
+    renderFfcvCard(teamCode,data);
+  }catch(err){
+    const fallback={...(FFCV_MANUAL_DATA[teamCode]||{}),estadoConexion:'manual'};
+    ffcvCache[teamCode]=fallback;
+    renderFfcvCard(teamCode,fallback);
+  }
+}
 
 function playerMatchesSlot(player,slot){
   const positions=(player.pos||'').split(',').map(p=>p.trim().toUpperCase());
