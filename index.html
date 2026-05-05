@@ -2756,6 +2756,7 @@ function renderScouting(){
         <div class="scout-meta">${s.comentarios}</div>
       </div>
       <div>
+        <button class="btn btn-outline btn-sm" style="margin-bottom:6px;width:100%;" onclick="editScout('${s.id}')">Editar</button>
         <select class="phase-select" onchange="setScoutPhase('${s.id}',this.value)">
           ${SCOUT_PHASES.map(p=>`<option value="${p}" ${s.fase===p?'selected':''}>${p}</option>`).join('')}
         </select>
@@ -2767,6 +2768,29 @@ function renderScouting(){
 function setScoutPhase(id,phase){
   const s=SCOUTING.find(x=>x.id===id); if(!s)return;
   s.fase=phase;
+  renderScouting();
+}
+
+function editScout(id){
+  const s=SCOUTING.find(x=>x.id===id); if(!s)return;
+  const nombre=prompt('Nombre',s.n); if(nombre===null) return;
+  const ano=prompt('Año de nacimiento',s.ano||''); if(ano===null) return;
+  const pos=prompt('Posicion',s.pos||'MC'); if(pos===null) return;
+  const pierna=prompt('Pierna habil',s.pierna||'Derecha'); if(pierna===null) return;
+  const equipoDestino=prompt('Posible equipo de incorporacion',s.equipoDestino||'Pendiente'); if(equipoDestino===null) return;
+  const probFirma=prompt('Probabilidad de firma (%)',s.probFirma||50); if(probFirma===null) return;
+  const fase=prompt(`Fase (${SCOUT_PHASES.join(', ')})`,s.fase||'CONTACTO'); if(fase===null) return;
+  const soft=prompt('Comportamiento / soft skills',s.soft||''); if(soft===null) return;
+  const comentarios=prompt('Comentarios',s.comentarios||''); if(comentarios===null) return;
+  s.n=nombre.trim()||s.n;
+  s.ano=Number(ano)||s.ano;
+  s.pos=(pos.trim()||s.pos).toUpperCase();
+  s.pierna=pierna.trim()||s.pierna;
+  s.equipoDestino=equipoDestino.trim()||'Pendiente';
+  s.probFirma=Math.max(0,Math.min(100,Number(probFirma)||0));
+  s.fase=SCOUT_PHASES.includes((fase||'').toUpperCase()) ? fase.toUpperCase() : s.fase;
+  s.soft=soft.trim();
+  s.comentarios=comentarios.trim();
   renderScouting();
 }
 
@@ -3035,7 +3059,22 @@ function renderMedicos(){
   document.getElementById('med-stat-long').textContent=long;
   const badge=document.getElementById('med-badge'); if(badge) badge.textContent=injured.length;
   const tbl=document.getElementById('med-tbl'); if(!tbl) return;
-  tbl.innerHTML=injured.map(j=>`<tr><td><b>${j.n}</b><div class="player-meta">${j.pos||''}</div></td><td>${EQ_NAMES[j.eq]||j.eq}</td><td>${j.motivo||'Pendiente definir'}</td><td>${j.alta||'-'}</td><td>${recoveryProgress(j)}</td><td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}</td><td><button class="btn btn-outline btn-sm" onclick="editMedical('${j.id}')">Editar</button></td></tr>`).join('') || '<tr><td colspan="7" style="color:var(--text3);">No hay jugadoras lesionadas ahora mismo.</td></tr>';
+  tbl.innerHTML=injured.map(j=>{
+    const rec=recoveryProgress(j);
+    return `<tr>
+      <td><b>${j.n}</b><div class="player-meta">${j.pos||''}</div></td>
+      <td>${EQ_NAMES[j.eq]||j.eq}</td>
+      <td>${j.motivo||'Pendiente definir'}</td>
+      <td>${j.alta||'-'}</td>
+      <td class="recovery-cell">
+        <div class="player-meta">${j.inicio||'Sin inicio'} -> ${j.alta||'Sin fecha alta'}</div>
+        <div class="recovery-bar"><div class="recovery-fill ${rec.cls}" style="width:${rec.pct}%"></div></div>
+        <div class="player-meta">${rec.label} - ${rec.pct}%</div>
+      </td>
+      <td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="editMedical('${j.id}')">Editar</button></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="color:var(--text3);">No hay jugadoras lesionadas ahora mismo.</td></tr>';
 }
 
 function editMedical(id){
