@@ -2139,17 +2139,43 @@ function playersByTeam(team){
   return JUGADORAS.filter(j=>j.eq===team).sort((a,b)=>a.n.localeCompare(b.n));
 }
 
+function rosterKey(j){ return 'jugadora-'+j.id; }
+function scoutKey(s){ return 'scout-'+s.id; }
+function isScoutKey(id){ return String(id||'').startsWith('scout-'); }
+function scoutByKey(id){ return SCOUTING.find(s=>scoutKey(s)===id); }
+
+function normalizeGuestId(id){
+  if(isScoutKey(id)) return id;
+  if(String(id||'').startsWith('jugadora-')) return id;
+  return 'jugadora-'+id;
+}
+
+function availableScoutingGuests(){
+  return SCOUTING.slice().sort((a,b)=>(Number(a.ano)||9999)-(Number(b.ano)||9999) || a.n.localeCompare(b.n));
+}
+
+function guestEntityByKey(key){
+  if(isScoutKey(key)){
+    const s=scoutByKey(key);
+    return s ? {key,n:s.n,eq:'SCOUTING',pos:s.pos,ano:s.ano,estado:'disponible',motivo:'',isScout:true} : null;
+  }
+  const raw=String(key||'').replace(/^jugadora-/,'');
+  const j=JUGADORAS.find(x=>x.id===raw);
+  return j ? {...j,key:rosterKey(j),isScout:false} : null;
+}
+
 function playersForFicha(f){
-  const guests=new Set((editGuestIds&&editGuestIds.length)?editGuestIds:(f.guests||[]));
+  const guests=((editGuestIds&&editGuestIds.length)?editGuestIds:(f.guests||[])).map(normalizeGuestId);
+  const base=playersByTeam(f.s).map(j=>({...j,key:rosterKey(j),isScout:false}));
+  const guestItems=guests.map(guestEntityByKey).filter(Boolean).filter(x=>x.eq!==f.s || x.isScout);
   const seen=new Set();
-  return JUGADORAS.filter(j=>{
-    const keep=j.eq===f.s || guests.has(j.id);
-    if(!keep || seen.has(j.id)) return false;
-    seen.add(j.id);
+  return [...base,...guestItems].filter(p=>{
+    if(seen.has(p.key)) return false;
+    seen.add(p.key);
     return true;
   }).sort((a,b)=>{
-    const ag=guests.has(a.id)?1:0, bg=guests.has(b.id)?1:0;
-    return ag-bg || TEAM_ORDER.indexOf(a.eq)-TEAM_ORDER.indexOf(b.eq) || a.n.localeCompare(b.n);
+    const ag=guests.includes(a.key)?1:0, bg=guests.includes(b.key)?1:0;
+    return ag-bg || TEAM_ORDER.indexOf(a.eq)-TEAM_ORDER.indexOf(b.eq) || (Number(a.ano)||9999)-(Number(b.ano)||9999) || a.n.localeCompare(b.n);
   });
 }
 
@@ -2165,12 +2191,12 @@ function buildAttendanceDraft(f,resetGuests=false){
   const existing={...(f.att||{}),...(editAttendance||{})};
   editAttendance={};
   if(resetGuests){
-    editGuestIds=[...(f.guests||[])].filter(id=>JUGADORAS.some(j=>j.id===id && j.eq!==f.s));
+    editGuestIds=[...(f.guests||[])].map(normalizeGuestId).filter(id=>guestEntityByKey(id));
   } else {
-    editGuestIds=[...(editGuestIds||[])].filter(id=>JUGADORAS.some(j=>j.id===id && j.eq!==f.s));
+    editGuestIds=[...(editGuestIds||[])].map(normalizeGuestId).filter(id=>guestEntityByKey(id));
   }
   playersForFicha(f).forEach(j=>{
-    editAttendance[j.id]={...defaultAttendanceForPlayer(j),...(existing[j.id]||{})};
+    editAttendance[j.key]={...defaultAttendanceForPlayer(j),...(existing[j.key]||existing[j.id]||{})};
   });
 }
 
@@ -2205,7 +2231,8 @@ function fillGuestTeams(team){
   const sel=document.getElementById('e-guest-team');
   if(!sel) return;
   const prev=sel.value;
-  sel.innerHTML=TEAM_ORDER.filter(s=>s!=='PORT' && s!==team).map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('');
+  sel.innerHTML=TEAM_ORDER.filter(s=>s!=='PORT' && s!==team).map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('')+
+    `<option value="SCOUTING">Scouting</option>`;
   if([...sel.options].some(o=>o.value===prev)) sel.value=prev;
   fillGuestPlayers();
 }
@@ -2215,13 +2242,18 @@ function fillGuestPlayers(){
   const sel=document.getElementById('e-guest-player');
   if(!sel) return;
   const blocked=new Set(editGuestIds||[]);
-  sel.innerHTML=JUGADORAS.filter(j=>j.eq===team && !blocked.has(j.id)).map(j=>`<option value="${j.id}">${j.n} (${j.pos||'Sin posicion'})</option>`).join('');
+  if(team==='SCOUTING'){
+    sel.innerHTML=availableScoutingGuests().filter(s=>!blocked.has(scoutKey(s))).map(s=>`<option value="${scoutKey(s)}">${s.n} · ${s.ano} (${s.pos||'Sin posicion'})</option>`).join('');
+    return;
+  }
+  sel.innerHTML=JUGADORAS.filter(j=>j.eq===team && !blocked.has(rosterKey(j))).map(j=>`<option value="${rosterKey(j)}">${j.n} · ${j.ano||'-'} (${j.pos||'Sin posicion'})</option>`).join('');
 }
 
 function addGuestPlayer(){
   const id=document.getElementById('e-guest-player')?.value;
-  if(!id || editGuestIds.includes(id)) return;
-  editGuestIds.push(id);
+  const key=normalizeGuestId(id);
+  if(!key || editGuestIds.includes(key)) return;
+  editGuestIds.push(key);
   const f=currentEditFicha();
   if(f) renderFichaAttendance({...f,guests:editGuestIds});
 }
@@ -2246,25 +2278,27 @@ function renderFichaAttendance(f,resetGuests=false){
   fillGuestTeams(f.s);
   const players=playersForFicha(f);
   body.innerHTML=players.map(j=>{
-    const a=editAttendance[j.id]||defaultAttendanceForPlayer(j);
-    const isGuest=editGuestIds.includes(j.id);
+    const key=j.key||rosterKey(j);
+    const a=editAttendance[key]||defaultAttendanceForPlayer(j);
+    const isGuest=editGuestIds.includes(key);
+    const meta=j.isScout ? `Scouting · ${j.ano||'-'} · ${j.pos||''}` : `${EQ_NAMES[j.eq]||j.eq} · ${j.ano||'-'} · ${j.pos||''}`;
     return `
       <tr>
-        <td><div class="att-player">${j.n}</div><div class="att-meta">${EQ_NAMES[j.eq]||j.eq} · ${j.pos||''}</div>${isGuest?'<span class="att-chip">Invitada</span>':''}</td>
-        <td><select class="att-select" onchange="setAttDraft('${j.id}','disp',this.value)">
+        <td><div class="att-player">${j.n}</div><div class="att-meta">${meta}</div>${isGuest?`<span class="att-chip">${j.isScout?'Scouting':'Invitada'}</span>`:''}</td>
+        <td><select class="att-select" onchange="setAttDraft('${key}','disp',this.value)">
           <option value="disponible" ${a.disp==='disponible'?'selected':''}>Disponible</option>
           <option value="duda" ${a.disp==='duda'?'selected':''}>Duda</option>
           <option value="no_disponible" ${a.disp==='no_disponible'?'selected':''}>No disponible</option>
         </select></td>
-        <td><select class="att-select" onchange="setAttDraft('${j.id}','asist',this.value)">
+        <td><select class="att-select" onchange="setAttDraft('${key}','asist',this.value)">
           <option value="pendiente" ${a.asist==='pendiente'?'selected':''}>Pendiente</option>
           <option value="asistio" ${a.asist==='asistio'?'selected':''}>Asistio</option>
           <option value="falto" ${a.asist==='falto'?'selected':''}>Falto</option>
           <option value="justificada" ${a.asist==='justificada'?'selected':''}>Justificada</option>
           <option value="lesionada" ${a.asist==='lesionada'?'selected':''}>Lesionada</option>
         </select></td>
-        <td><input class="att-input" value="${escAttr(a.motivo)}" placeholder="Motivo" oninput="setAttDraft('${j.id}','motivo',this.value)"></td>
-        <td>${isGuest?`<button class="att-remove" onclick="removeGuestPlayer('${j.id}')">Quitar</button>`:''}</td>
+        <td><input class="att-input" value="${escAttr(a.motivo)}" placeholder="Motivo" oninput="setAttDraft('${key}','motivo',this.value)"></td>
+        <td>${isGuest?`<button class="att-remove" onclick="removeGuestPlayer('${key}')">Quitar</button>`:''}</td>
       </tr>`;
   }).join('') || '<tr><td colspan="5" style="color:var(--text3);">Este equipo no tiene jugadoras registradas.</td></tr>';
   updateAttendanceSummary();
@@ -2273,9 +2307,9 @@ function renderFichaAttendance(f,resetGuests=false){
 function attendanceSummaryLabel(f){
   const players=playersForFicha(f);
   if(!players.length || !f.att) return '';
-  const values=players.map(j=>f.att[j.id]).filter(Boolean);
+  const values=players.map(j=>f.att[j.key||j.id]).filter(Boolean);
   if(!values.length) return '';
-  const available=players.filter(j=>(f.att[j.id]?.disp||defaultAttendanceForPlayer(j).disp)==='disponible').length;
+  const available=players.filter(j=>(f.att[j.key||j.id]?.disp||defaultAttendanceForPlayer(j).disp)==='disponible').length;
   const absent=values.filter(a=>['falto','justificada','lesionada'].includes(a.asist)).length;
   return absent ? `${available}/${players.length} disp · ${absent} faltas` : `${available}/${players.length} disp`;
 }
