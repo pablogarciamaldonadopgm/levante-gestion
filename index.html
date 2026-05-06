@@ -930,6 +930,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   </div>
 </div>
 
+<!-- Edit medical -->
+<div class="modal-bg" id="m-medical">
+  <div class="modal modal-wide">
+    <div class="mh"><span class="mt" id="med-modal-title">Editar lesion</span><button class="mx" onclick="closeM('m-medical')">x</button></div>
+    <div class="mb">
+      <input type="hidden" id="med-edit-id">
+      <div class="mrow2">
+        <div><div class="ml">Jugadora</div><input class="mi" id="med-edit-name" readonly></div>
+        <div><div class="ml">Equipo</div><input class="mi" id="med-edit-team" readonly></div>
+      </div>
+      <div class="mr"><div class="ml">Lesion / motivo</div><input class="mi" id="med-edit-motivo" placeholder="ej. Esguince tobillo"></div>
+      <div class="mrow2">
+        <div><div class="ml">Inicio baja</div><input class="mi" id="med-edit-inicio" placeholder="YYYY-MM-DD"></div>
+        <div><div class="ml">Alta prevista</div><input class="mi" id="med-edit-alta" placeholder="YYYY-MM-DD"></div>
+      </div>
+      <div class="mrow2">
+        <div><div class="ml">Fase recuperacion</div><select class="msel" id="med-edit-fase">
+          <option value="Diagnostico">Diagnostico</option>
+          <option value="Reposo">Reposo</option>
+          <option value="Readaptacion">Readaptacion</option>
+          <option value="Parcial">Trabajo parcial</option>
+          <option value="Alta">Alta</option>
+        </select></div>
+        <div><div class="ml">Trabajo permitido</div><select class="msel" id="med-edit-trabajo">
+          <option value="Sin entrenamiento">Sin entrenamiento</option>
+          <option value="Individual">Individual</option>
+          <option value="Parcial con grupo">Parcial con grupo</option>
+          <option value="Normal">Normal</option>
+        </select></div>
+      </div>
+      <div class="mr"><div class="ml">Detalles de recuperacion</div><textarea class="mta" id="med-edit-detalles"></textarea></div>
+      <div class="mr"><div class="ml">Notas internas</div><textarea class="mta" id="med-edit-notas"></textarea></div>
+    </div>
+    <div class="mftr"><button class="mbtn-s" onclick="closeM('m-medical')">Cancelar</button><button class="mbtn-p" onclick="saveMedicalEdit()">Guardar</button></div>
+  </div>
+</div>
+
 <!-- Edit scouting -->
 <div class="modal-bg" id="m-scout">
   <div class="modal modal-wide">
@@ -3514,7 +3551,7 @@ function renderMedicos(){
         <div class="recovery-bar"><div class="recovery-fill ${rec.cls}" style="width:${rec.pct}%"></div></div>
         <div class="player-meta">${rec.label} - ${rec.pct}%</div>
       </td>
-      <td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}</td>
+      <td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}${j.faseMedica?`<div class="player-meta">Fase: ${j.faseMedica}</div>`:''}${j.trabajoPermitido?`<div class="player-meta">Trabajo: ${j.trabajoPermitido}</div>`:''}</td>
       <td><button class="btn btn-outline btn-sm" onclick="editMedical('${j.id}')">Editar</button></td>
     </tr>`;
   }).join('');
@@ -3533,11 +3570,35 @@ function renderMedicos(){
 
 function editMedical(id){
   const j=JUGADORAS.find(x=>x.id===id); if(!j) return;
-  const motivo=prompt('Motivo / lesion',j.motivo||''); if(motivo===null) return;
-  const alta=prompt('Alta prevista (YYYY-MM-DD)',j.alta||''); if(alta===null) return;
-  const detalles=prompt('Detalles de recuperacion',j.detallesMedicos||j.notas||''); if(detalles===null) return;
-  j.estado='no_disponible'; j.motivo=motivo; j.alta=alta; j.detallesMedicos=detalles;
+  document.getElementById('med-edit-id').value=j.id;
+  document.getElementById('med-modal-title').textContent=`Servicios medicos · ${j.n}`;
+  document.getElementById('med-edit-name').value=j.n;
+  document.getElementById('med-edit-team').value=EQ_NAMES[j.eq]||j.eq;
+  document.getElementById('med-edit-motivo').value=j.motivo||'';
+  document.getElementById('med-edit-inicio').value=j.inicio||new Date().toISOString().slice(0,10);
+  document.getElementById('med-edit-alta').value=j.alta||'';
+  document.getElementById('med-edit-fase').value=j.faseMedica||'Diagnostico';
+  document.getElementById('med-edit-trabajo').value=j.trabajoPermitido||'Sin entrenamiento';
+  document.getElementById('med-edit-detalles').value=j.detallesMedicos||'';
+  document.getElementById('med-edit-notas').value=j.notasMedicas||j.notas||'';
+  openM('m-medical');
+}
+
+function saveMedicalEdit(){
+  const id=document.getElementById('med-edit-id').value;
+  const j=JUGADORAS.find(x=>x.id===id); if(!j) return;
+  j.estado='no_disponible';
+  j.motivo=document.getElementById('med-edit-motivo').value.trim()||'Pendiente valorar';
+  j.inicio=document.getElementById('med-edit-inicio').value.trim();
+  j.alta=document.getElementById('med-edit-alta').value.trim();
+  j.faseMedica=document.getElementById('med-edit-fase').value;
+  j.trabajoPermitido=document.getElementById('med-edit-trabajo').value;
+  j.detallesMedicos=document.getElementById('med-edit-detalles').value.trim();
+  j.notasMedicas=document.getElementById('med-edit-notas').value.trim();
+  closeM('m-medical');
   renderMedicos();
+  if(document.getElementById('jug-tbl')) renderJugadoras();
+  if(currentPage==='equipos' && document.getElementById('equipo-detail')?.style.display!=='none') renderPlantillas();
 }
 // ════════════════════════════════════════════
 // ENTRENADORES TABLE
