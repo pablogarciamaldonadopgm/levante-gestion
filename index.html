@@ -380,6 +380,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .ffcv-scorers{display:flex;flex-wrap:wrap;gap:5px;}
 .ffcv-empty{font-size:11px;color:var(--text3);}
 .medical-note{max-width:260px;color:var(--text2);font-size:11px;line-height:1.35;}
+.medical-source{display:inline-flex;border-radius:999px;background:#FEF3C7;color:#92400E;padding:2px 7px;font-size:9px;font-weight:800;margin-top:4px;}
 .team-week-card{border:1px solid var(--border);border-radius:6px;background:#fff;padding:12px;margin-bottom:12px;}
 .team-week-grid{display:grid;grid-template-columns:repeat(6,minmax(80px,1fr));gap:8px;margin:10px 0;}
 .team-week-stat{border:1px solid var(--border);border-radius:6px;background:#F8FAFC;padding:8px;}
@@ -2231,6 +2232,9 @@ function updateAttendanceSummary(){
 function setAttDraft(playerId,field,value){
   if(!editAttendance[playerId]) editAttendance[playerId]=defaultAttendanceForPlayer({});
   editAttendance[playerId][field]=value;
+  if(field==='asist' && value==='lesionada' && !editAttendance[playerId].motivo){
+    editAttendance[playerId].motivo='Pendiente valorar';
+  }
   updateAttendanceSummary();
 }
 
@@ -3461,17 +3465,44 @@ function addLineupPlayer(){
   renderPlantillas();
 }
 
+function detectedMedicalCases(){
+  const cases=[];
+  const seen=new Set();
+  ['F11','F8'].forEach(fmt=>DIAS.forEach(dia=>PISTAS.forEach(pista=>{
+    getFichas(fmt,dia,pista).forEach(f=>{
+      playersForFicha(f).forEach(p=>{
+        const key=p.key||p.id;
+        const att=f.att?.[key];
+        if(!att || att.asist!=='lesionada') return;
+        const id=`${key}|${fmt}|${dia}|${pista}|${f.id}`;
+        if(seen.has(id)) return;
+        seen.add(id);
+        cases.push({
+          key:id,
+          player:p,
+          equipo:f.s,
+          motivo:att.motivo||'Detectada en entrenamiento',
+          detalle:`${dia} ${f.i}-${f.f} · ${pista}${f.c?' · '+f.c:''}`,
+          source:'sesion'
+        });
+      });
+    });
+  })));
+  return cases;
+}
+
 function renderMedicos(){
   const injured=JUGADORAS.filter(j=>j.estado==='no_disponible');
+  const detected=detectedMedicalCases();
   const today=new Date(); today.setHours(0,0,0,0);
   const soon=injured.filter(j=>j.alta && ((new Date(j.alta)-today)/86400000)<=7).length;
   const long=injured.length-soon;
-  document.getElementById('med-stat-total').textContent=injured.length;
+  document.getElementById('med-stat-total').textContent=injured.length+detected.length;
   document.getElementById('med-stat-soon').textContent=soon;
-  document.getElementById('med-stat-long').textContent=long;
-  const badge=document.getElementById('med-badge'); if(badge) badge.textContent=injured.length;
+  document.getElementById('med-stat-long').textContent=long+detected.length;
+  const badge=document.getElementById('med-badge'); if(badge) badge.textContent=injured.length+detected.length;
   const tbl=document.getElementById('med-tbl'); if(!tbl) return;
-  tbl.innerHTML=injured.map(j=>{
+  const fixedRows=injured.map(j=>{
     const rec=recoveryProgress(j);
     return `<tr>
       <td><b>${j.n}</b><div class="player-meta">${j.pos||''}</div></td>
@@ -3486,7 +3517,18 @@ function renderMedicos(){
       <td class="medical-note">${j.detallesMedicos||j.notas||'Sin detalles anadidos'}</td>
       <td><button class="btn btn-outline btn-sm" onclick="editMedical('${j.id}')">Editar</button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="7" style="color:var(--text3);">No hay jugadoras lesionadas ahora mismo.</td></tr>';
+  }).join('');
+  const detectedRows=detected.map(c=>`
+    <tr>
+      <td><b>${c.player.n}</b><div class="player-meta">${c.player.pos||''}</div><span class="medical-source">Detectada en sesion</span></td>
+      <td>${c.player.isScout?'Scouting':(EQ_NAMES[c.player.eq]||c.player.eq)}</td>
+      <td>${c.motivo}</td>
+      <td>Por revisar</td>
+      <td><div class="recovery-cell"><div class="player-meta">Pendiente de valoracion</div><div class="recovery-bar"><div class="recovery-fill bad" style="width:0%"></div></div><div class="player-meta">0%</div></div></td>
+      <td class="medical-note">${c.detalle}</td>
+      <td>${c.player.isScout?'<span class="player-meta">Scouting</span>':`<button class="btn btn-outline btn-sm" onclick="editMedical('${c.player.id}')">Revisar</button>`}</td>
+    </tr>`).join('');
+  tbl.innerHTML=fixedRows+detectedRows || '<tr><td colspan="7" style="color:var(--text3);">No hay jugadoras lesionadas ahora mismo.</td></tr>';
 }
 
 function editMedical(id){
