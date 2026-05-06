@@ -110,6 +110,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
 .stat-val{font-size:22px;font-weight:600;color:var(--text);}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px;}
+.dash-grid .card:last-child{grid-column:1/-1;}
+.dash-list{display:grid;gap:7px;padding:10px 12px;}
+.dash-item{border:1px solid var(--border);border-radius:6px;background:#F9FAFB;padding:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;}
+.dash-title{font-size:11px;font-weight:800;color:var(--text);}
+.dash-meta{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.35;}
+.dash-pill{display:inline-flex;border-radius:999px;background:#EEF2FF;color:#3730A3;padding:2px 7px;font-size:9px;font-weight:800;white-space:nowrap;}
+.dash-empty{font-size:11px;color:var(--text3);padding:10px 12px;}
 
 /* ═══════════════════════════════════════════════════
    CALENDAR TOOLBAR
@@ -446,26 +454,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <!-- DASHBOARD -->
       <div class="view" id="v-dashboard">
         <div class="stats-row">
-          <div class="stat-card"><div class="stat-val">9</div><div class="stat-lbl">Equipos activos</div></div>
-          <div class="stat-card"><div class="stat-val">20</div><div class="stat-lbl">Entrenadores</div></div>
-          <div class="stat-card"><div class="stat-val">54</div><div class="stat-lbl">Jugadoras</div></div>
-          <div class="stat-card"><div class="stat-val" id="dash-partidos">3</div><div class="stat-lbl">Partidos esta semana</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-trainings">0</div><div class="stat-lbl">Entrenamientos semana</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-medicos">0</div><div class="stat-lbl">Casos medicos</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-scouting">0</div><div class="stat-lbl">Scouting activo</div></div>
+          <div class="stat-card"><div class="stat-val" id="dash-partidos">0</div><div class="stat-lbl">Partidos esta semana</div></div>
         </div>
-        <div class="card">
-          <div class="card-hd"><span class="card-title">Actividad reciente</span></div>
-          <div id="hist-dash">
-    <div class="hist-item">
-      <div class="hist-ic" style="background:#D1FAE5">💾</div>
-      <div class="hist-body"><div class="ht">Horario guardado</div><div class="hs">Semana 28 abr — 4 may · hace 10 min</div></div>
-    </div>
-    <div class="hist-item">
-      <div class="hist-ic" style="background:#DBEAFE">📧</div>
-      <div class="hist-body"><div class="ht">Email enviado a 12 entrenadores</div><div class="hs">Horario semana · hace 2h</div></div>
-    </div>
-    <div class="hist-item">
-      <div class="hist-ic" style="background:#DCFCE7">💬</div>
-      <div class="hist-body"><div class="ht">WhatsApp generado — Alevín C</div><div class="hs">Partido vs Torrent CF · ayer</div></div>
-    </div></div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Partidos de la semana</span><button class="btn btn-outline btn-sm" onclick="openResumen()">Resumen</button></div>
+            <div class="dash-list" id="dash-matches"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Alertas pendientes</span></div>
+            <div class="dash-list" id="dash-alerts"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Servicios medicos</span></div>
+            <div class="dash-list" id="dash-medical-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Scouting activo</span></div>
+            <div class="dash-list" id="dash-scout-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">Actividad reciente</span></div>
+            <div id="hist-dash"></div>
+          </div>
         </div>
       </div>
 
@@ -2825,13 +2839,84 @@ function renderHistFull(){
 }
 
 function renderDash(){
+  const rows=weekFichas();
+  const partidos=rows.filter(r=>r.f.tipo==='partido');
+  const entrenes=rows.filter(r=>r.f.tipo!=='partido');
+  const detected=typeof detectedMedicalCases==='function' ? detectedMedicalCases() : [];
+  const medicalPlayers=JUGADORAS.filter(j=>j.estado==='no_disponible');
+  const activeScouting=SCOUTING.filter(s=>['PRUEBA','DINAMICA','DINÁMICA'].includes(s.fase));
+
+  dashSet('dash-trainings',entrenes.length);
+  dashSet('dash-partidos',partidos.length);
+  dashSet('dash-medicos',medicalPlayers.length+detected.length);
+  dashSet('dash-scouting',activeScouting.length);
+
+  dashList('dash-matches',partidos.slice(0,6).map(r=>{
+    const loc=(r.pista==='visitante'||r.f.loc==='fuera')?'Fuera':'Casa';
+    const rival=r.f.rival ? ` vs ${r.f.rival}` : '';
+    return dashItem(EQ_NAMES[r.f.s]||r.f.s,`${r.dia} · ${r.f.i}-${r.f.f}${rival}`,loc);
+  }),'Sin partidos esta semana');
+
+  const alerts=[];
+  rows.forEach(r=>{
+    const team=EQ_NAMES[r.f.s]||r.f.s;
+    if(!r.f.att || !Object.keys(r.f.att).length) alerts.push(dashItem(team,`${r.dia} · ${r.f.i}-${r.f.f} sin asistencia registrada`,'Asistencia'));
+    if(r.f.tipo==='partido' && !r.f.rival) alerts.push(dashItem(team,`${r.dia} · ${r.f.i}-${r.f.f} partido sin rival`,'Partido'));
+    const guests=(r.f.guests||[]).length;
+    if(guests) alerts.push(dashItem(team,`${r.dia} · ${r.f.i}-${r.f.f} con ${guests} invitadas/scouting`,'Invitadas'));
+  });
+  detected.slice(0,4).forEach(c=>alerts.push(dashItem(c.player.n,c.detalle,'Medico')));
+  dashList('dash-alerts',alerts.slice(0,8),'Sin alertas pendientes');
+
+  const medicalItems=[
+    ...medicalPlayers.slice(0,5).map(j=>dashItem(j.n,`${EQ_NAMES[j.eq]||j.eq} · ${j.motivo||'Pendiente'} · alta ${j.alta||'-'}`,'Lesion')),
+    ...detected.slice(0,5).map(c=>dashItem(c.player.n,`${c.player.isScout?'Scouting':(EQ_NAMES[c.player.eq]||c.player.eq)} · ${c.motivo}`,'Sesion'))
+  ];
+  dashList('dash-medical-list',medicalItems.slice(0,6),'Sin casos medicos activos');
+
+  dashList('dash-scout-list',activeScouting.slice(0,6).map(s=>{
+    const prob=Number(s.probFirma||0);
+    return dashItem(s.n,`${s.ano} · ${s.pos} · ${s.equipoDestino||'Pendiente'} · ${prob}%`,s.fase);
+  }),'Sin perfiles en prueba o dinamica');
+
   const el=document.getElementById('hist-dash');
   if(el) el.innerHTML=histHTML(historial.slice(0,4));
-  updateDashPartidos();
 }
 
 function getFichas(fmt,dia,pista){
   return (((sched || {})[fmt] || {})[dia] || {})[pista] || [];
+}
+
+function weekFichas(){
+  const rows=[];
+  ['F11','F8'].forEach(fmt=>{
+    DIAS.forEach(dia=>{
+      PISTAS.forEach(pista=>{
+        getFichas(fmt,dia,pista).forEach(f=>rows.push({fmt,dia,pista,f,weekend:false}));
+      });
+    });
+  });
+  WK_DAYS.forEach(dia=>{
+    ['casa','visitante'].forEach(pista=>{
+      (((schedWk || {})[dia] || {})[pista] || []).forEach(f=>rows.push({fmt:'WK',dia,pista,f,weekend:true}));
+    });
+  });
+  return rows;
+}
+
+function dashSet(id,value){
+  const el=document.getElementById(id);
+  if(el) el.textContent=value;
+}
+
+function dashList(id,items,empty){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.innerHTML=items.length ? items.join('') : `<div class="dash-empty">${empty}</div>`;
+}
+
+function dashItem(title,meta,pill=''){
+  return `<div class="dash-item"><div><div class="dash-title">${title}</div><div class="dash-meta">${meta}</div></div>${pill?`<span class="dash-pill">${pill}</span>`:''}</div>`;
 }
 
 function ensureFichas(fmt,dia,pista){
@@ -2842,26 +2927,7 @@ function ensureFichas(fmt,dia,pista){
 }
 
 function updateDashPartidos(){
-  let count=0;
-
-  ['F11','F8'].forEach(fmt=>{
-    DIAS.forEach(dia=>{
-      PISTAS.forEach(pista=>{
-        count += getFichas(fmt,dia,pista)
-          .filter(f=>f.tipo==='partido').length;
-      });
-    });
-  });
-
-  WK_DAYS.forEach(d=>{
-    ['casa','visitante'].forEach(c=>{
-      count += (((schedWk || {})[d] || {})[c] || [])
-        .filter(f=>f.tipo==='partido').length;
-    });
-  });
-
-  const el=document.getElementById('dash-partidos');
-  if(el) el.textContent=count;
+  dashSet('dash-partidos',weekFichas().filter(r=>r.f.tipo==='partido').length);
 }
 
 // JUGADORAS TABLE
