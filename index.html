@@ -321,6 +321,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .att-player{font-weight:600;color:var(--text);}
 .att-meta{font-size:9px;color:var(--text3);margin-top:1px;}
 .att-select,.att-input{width:100%;border:1px solid var(--border-strong);border-radius:5px;background:#fff;padding:4px 6px;font-size:10px;}
+.att-guest-tools{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-bottom:8px;}
+.att-chip{display:inline-flex;border-radius:999px;background:#EEF2FF;color:#3730A3;padding:1px 6px;font-size:9px;font-weight:700;margin-top:2px;}
+.att-remove{border:1px solid var(--border);background:#fff;border-radius:5px;padding:3px 6px;font-size:10px;cursor:pointer;color:var(--text3);}
 
 /* Scouting */
 .scout-layout{display:grid;grid-template-columns:1fr;gap:12px;align-items:start;}
@@ -868,8 +871,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
             <div class="att-title">Disponibilidad / asistencia</div>
             <div class="att-summary" id="e-att-summary">Sin datos</div>
           </div>
+          <div class="att-guest-tools">
+            <select class="att-select" id="e-guest-team" onchange="fillGuestPlayers()"></select>
+            <select class="att-select" id="e-guest-player"></select>
+            <button class="btn btn-outline btn-sm" onclick="addGuestPlayer()">+ Invitada</button>
+          </div>
           <table class="att-table">
-            <thead><tr><th>Jugadora</th><th>Disponibilidad</th><th>Asistencia</th><th>Motivo</th></tr></thead>
+            <thead><tr><th>Jugadora</th><th>Disponibilidad</th><th>Asistencia</th><th>Motivo</th><th></th></tr></thead>
             <tbody id="e-att-body"></tbody>
           </table>
         </div>
@@ -1377,6 +1385,7 @@ let editTarget = null;
 let editTipo = 'entrenamiento';
 let editLoc  = 'casa';
 let editAttendance = {};
+let editGuestIds = [];
 
 let historial = [
   {icon:"💾",bg:"#D1FAE5",title:"Horario guardado",sub:"Semana 28 abr — 4 may · hace 10 min",ts:Date.now()-600000},
@@ -2130,6 +2139,20 @@ function playersByTeam(team){
   return JUGADORAS.filter(j=>j.eq===team).sort((a,b)=>a.n.localeCompare(b.n));
 }
 
+function playersForFicha(f){
+  const guests=new Set((editGuestIds&&editGuestIds.length)?editGuestIds:(f.guests||[]));
+  const seen=new Set();
+  return JUGADORAS.filter(j=>{
+    const keep=j.eq===f.s || guests.has(j.id);
+    if(!keep || seen.has(j.id)) return false;
+    seen.add(j.id);
+    return true;
+  }).sort((a,b)=>{
+    const ag=guests.has(a.id)?1:0, bg=guests.has(b.id)?1:0;
+    return ag-bg || TEAM_ORDER.indexOf(a.eq)-TEAM_ORDER.indexOf(b.eq) || a.n.localeCompare(b.n);
+  });
+}
+
 function defaultAttendanceForPlayer(j){
   return {
     disp:j.estado==='no_disponible'?'no_disponible':'disponible',
@@ -2138,10 +2161,15 @@ function defaultAttendanceForPlayer(j){
   };
 }
 
-function buildAttendanceDraft(f){
-  const existing=f.att||{};
+function buildAttendanceDraft(f,resetGuests=false){
+  const existing={...(f.att||{}),...(editAttendance||{})};
   editAttendance={};
-  playersByTeam(f.s).forEach(j=>{
+  if(resetGuests){
+    editGuestIds=[...(f.guests||[])].filter(id=>JUGADORAS.some(j=>j.id===id && j.eq!==f.s));
+  } else {
+    editGuestIds=[...(editGuestIds||[])].filter(id=>JUGADORAS.some(j=>j.id===id && j.eq!==f.s));
+  }
+  playersForFicha(f).forEach(j=>{
     editAttendance[j.id]={...defaultAttendanceForPlayer(j),...(existing[j.id]||{})};
   });
 }
@@ -2173,16 +2201,56 @@ function escAttr(v){
   return String(v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
-function renderFichaAttendance(f){
+function fillGuestTeams(team){
+  const sel=document.getElementById('e-guest-team');
+  if(!sel) return;
+  const prev=sel.value;
+  sel.innerHTML=TEAM_ORDER.filter(s=>s!=='PORT' && s!==team).map(s=>`<option value="${s}">${EQ_NAMES[s]||s}</option>`).join('');
+  if([...sel.options].some(o=>o.value===prev)) sel.value=prev;
+  fillGuestPlayers();
+}
+
+function fillGuestPlayers(){
+  const team=document.getElementById('e-guest-team')?.value;
+  const sel=document.getElementById('e-guest-player');
+  if(!sel) return;
+  const blocked=new Set(editGuestIds||[]);
+  sel.innerHTML=JUGADORAS.filter(j=>j.eq===team && !blocked.has(j.id)).map(j=>`<option value="${j.id}">${j.n} (${j.pos||'Sin posicion'})</option>`).join('');
+}
+
+function addGuestPlayer(){
+  const id=document.getElementById('e-guest-player')?.value;
+  if(!id || editGuestIds.includes(id)) return;
+  editGuestIds.push(id);
+  const f=currentEditFicha();
+  if(f) renderFichaAttendance({...f,guests:editGuestIds});
+}
+
+function removeGuestPlayer(id){
+  editGuestIds=editGuestIds.filter(x=>x!==id);
+  delete editAttendance[id];
+  const f=currentEditFicha();
+  if(f) renderFichaAttendance({...f,guests:editGuestIds});
+}
+
+function currentEditFicha(){
+  if(!editTarget) return null;
+  const {fmt,dia,pista,id}=editTarget;
+  return getFichas(fmt,dia,pista).find(x=>x.id===id) || null;
+}
+
+function renderFichaAttendance(f,resetGuests=false){
   const body=document.getElementById('e-att-body');
   if(!body) return;
-  const players=playersByTeam(f.s);
-  buildAttendanceDraft(f);
+  buildAttendanceDraft(f,resetGuests);
+  fillGuestTeams(f.s);
+  const players=playersForFicha(f);
   body.innerHTML=players.map(j=>{
     const a=editAttendance[j.id]||defaultAttendanceForPlayer(j);
+    const isGuest=editGuestIds.includes(j.id);
     return `
       <tr>
-        <td><div class="att-player">${j.n}</div><div class="att-meta">${j.pos||''}</div></td>
+        <td><div class="att-player">${j.n}</div><div class="att-meta">${EQ_NAMES[j.eq]||j.eq} · ${j.pos||''}</div>${isGuest?'<span class="att-chip">Invitada</span>':''}</td>
         <td><select class="att-select" onchange="setAttDraft('${j.id}','disp',this.value)">
           <option value="disponible" ${a.disp==='disponible'?'selected':''}>Disponible</option>
           <option value="duda" ${a.disp==='duda'?'selected':''}>Duda</option>
@@ -2196,13 +2264,14 @@ function renderFichaAttendance(f){
           <option value="lesionada" ${a.asist==='lesionada'?'selected':''}>Lesionada</option>
         </select></td>
         <td><input class="att-input" value="${escAttr(a.motivo)}" placeholder="Motivo" oninput="setAttDraft('${j.id}','motivo',this.value)"></td>
+        <td>${isGuest?`<button class="att-remove" onclick="removeGuestPlayer('${j.id}')">Quitar</button>`:''}</td>
       </tr>`;
-  }).join('') || '<tr><td colspan="4" style="color:var(--text3);">Este equipo no tiene jugadoras registradas.</td></tr>';
+  }).join('') || '<tr><td colspan="5" style="color:var(--text3);">Este equipo no tiene jugadoras registradas.</td></tr>';
   updateAttendanceSummary();
 }
 
 function attendanceSummaryLabel(f){
-  const players=playersByTeam(f.s);
+  const players=playersForFicha(f);
   if(!players.length || !f.att) return '';
   const values=players.map(j=>f.att[j.id]).filter(Boolean);
   if(!values.length) return '';
@@ -2226,7 +2295,7 @@ function openEdit(fmt,dia,pista,id){
   document.getElementById('span-tr-row').style.display=(pista==='PORTERAS'||f.s==='PORT')?'none':'';
   setTipo(editTipo,false);
   setLoc(editLoc,false);
-  renderFichaAttendance(f);
+  renderFichaAttendance(f,true);
   openM('m-edit');
 }
 
@@ -2255,6 +2324,7 @@ function saveEdit(){
     f.tipo=editTipo; f.loc=editLoc;
     f.rival=document.getElementById('e-rival').value.trim();
     f.att=cloneData(editAttendance||{});
+    f.guests=[...(editGuestIds||[])];
     f.spanTR=!!document.getElementById('e-span-tr').checked && pista!=='PORTERAS' && f.s!=='PORT';
     if(f.spanTR && pista==='RIO'){
       arr.splice(arr.findIndex(x=>x.id===id),1);
