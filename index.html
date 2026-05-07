@@ -1199,9 +1199,10 @@ function fbPushHistorial(item){
 // ════════════════════════════════════════════
 const DIAS   = ["Lunes","Martes","Miércoles","Jueves","Viernes"];
 const PISTAS = ["TENIS","RIO","PORTERAS"];
-const WEEKS  = ["21 abr — 27 abr","28 abr — 4 may","5 may — 11 may","12 may — 18 may","19 may — 25 may"];
+const WEEK_ANCHOR = new Date(2026,3,21); // 21 abr 2026, mantiene los indices ya usados.
+const WEEKS  = buildWeeks(WEEK_ANCHOR,40);
 const WK_DAYS = ["Sábado","Domingo"];
-let wIdx = 1;
+let wIdx = currentWeekIndex();
 let calTab = 'week'; // 'week' | 'weekend'
 const TEAM_ORDER = ["FB","FC","FD","IC","ID","AC","AD","BC","BD","PORT"];
 let weeklyCache = {};
@@ -3682,6 +3683,29 @@ function renderEntrenadores(){
 // WEEK NAV
 // ════════════════════════════════════════════
 function cloneData(o){ return JSON.parse(JSON.stringify(o)); }
+function fmtWeekDate(d){
+  const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+function buildWeeks(anchor,count){
+  const weeks=[];
+  for(let i=0;i<count;i++){
+    const start=new Date(anchor);
+    start.setDate(anchor.getDate()+i*7);
+    const end=new Date(start);
+    end.setDate(start.getDate()+6);
+    weeks.push(`${fmtWeekDate(start)} — ${fmtWeekDate(end)}`);
+  }
+  return weeks;
+}
+function currentWeekIndex(){
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  const start=new Date(WEEK_ANCHOR);
+  start.setHours(0,0,0,0);
+  const diff=Math.floor((today-start)/86400000);
+  return Math.max(0,Math.min(WEEKS.length-1,Math.floor(diff/7)));
+}
 function cacheCurrentWeek(){ weeklyCache[wIdx]={sched:cloneData(sched),schedWk:cloneData(schedWk)}; }
 function emptyWeekSched(){
   const out={F11:{},F8:{}};
@@ -3691,7 +3715,7 @@ function emptyWeekSched(){
   return out;
 }
 function emptyWeekSchedWk(){
-  return {"SÃ¡bado":{casa:[],visitante:[]},"Domingo":{casa:[],visitante:[]}};
+  return {"Sábado":{casa:[],visitante:[]},"Domingo":{casa:[],visitante:[]}};
 }
 function loadCachedWeek(i){
   if(!weeklyCache[i]){
@@ -3728,6 +3752,7 @@ function copiarSemanaAnterior(){
 // ════════════════════════════════════════════
 initFirebase();
 renderTeamSelects();
+loadCachedWeek(wIdx);
 renderLegend();
 renderCalendar();
 cacheCurrentWeek();
