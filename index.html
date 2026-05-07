@@ -1209,20 +1209,20 @@ let weeklyCache = {};
 // Unique color per team
 const EQ_COLORS = {
   F11:{
-    FB:{ bg:"#FEE2E2", tx:"#7F1D1D", dot:"#E11D48" },
-    FC:{ bg:"#F9A8C9", tx:"#5C0F2C", dot:"#C2185B" },
-    FD:{ bg:"#FBD0E0", tx:"#6B1A33", dot:"#E91E8C" },
-    IC:{ bg:"#C4B5FD", tx:"#2E1065", dot:"#6D28D9" },
-    ID:{ bg:"#DDD6FE", tx:"#3730A3", dot:"#7C3AED" },
+    FB:{ bg:"#FFE4E6", tx:"#881337", dot:"#E11D48" },
+    FC:{ bg:"#DBEAFE", tx:"#1E3A8A", dot:"#2563EB" },
+    FD:{ bg:"#DCFCE7", tx:"#14532D", dot:"#16A34A" },
+    IC:{ bg:"#EDE9FE", tx:"#4C1D95", dot:"#7C3AED" },
+    ID:{ bg:"#FEF3C7", tx:"#78350F", dot:"#D97706" },
   },
   F8:{
-    AC:{ bg:"#FEF08A", tx:"#713F12", dot:"#EAB308" },
-    AD:{ bg:"#FDE047", tx:"#78350F", dot:"#CA8A04" },
-    BC:{ bg:"#FCA5A5", tx:"#7F1D1D", dot:"#EF4444" },
-    BD:{ bg:"#F87171", tx:"#6B0000", dot:"#DC2626" },
+    AC:{ bg:"#CCFBF1", tx:"#134E4A", dot:"#0D9488" },
+    AD:{ bg:"#FFEDD5", tx:"#7C2D12", dot:"#F97316" },
+    BC:{ bg:"#FCE7F3", tx:"#831843", dot:"#DB2777" },
+    BD:{ bg:"#E0F2FE", tx:"#0C4A6E", dot:"#0284C7" },
   },
   PORT:{
-    PORT:{ bg:"#E9D5FF", tx:"#5B21B6", dot:"#7C3AED" }
+    PORT:{ bg:"#F3E8FF", tx:"#581C87", dot:"#9333EA" }
   }
 };
 
@@ -1735,7 +1735,7 @@ function makeFicha(fmt,f,clr,dia,pista,F,isPort){
   const height=Math.max((toMin(f.f)-toMin(f.i))*PX,46);
   const d=mkd('ficha'+(isPort?' porteras-ficha':''));
   const spanStyle = f.spanTR && pista==='TENIS' ? `right:auto;width:${COL_W*2-4}px;` : '';
-  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;${spanStyle}`;
+  d.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height}px;border-left:3px solid ${clr.dot||clr.tx};${spanStyle}`;
   d.title=`Doble clic para editar\n${EQ_NAMES[f.s]||f.s} ${f.i}-${f.f}${f.c?'\n'+f.c:''}`;
   let tags=f.spanTR?`<span class="f-tag">Tenis + RÃ­o</span>`:'';
   if(f.tipo==='partido') tags+=`<span class="f-tag f-tag-match">⚽ Partido</span>`;
@@ -1865,7 +1865,7 @@ function renderWeekend(){
         const top=(toMin(f.i)-WK_START*60)*PX;
   const height2=Math.max((toMin(f.f)-toMin(f.i))*PX,46);
         const fd=mkd('ficha');
-        fd.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height2}px;`;
+        fd.style.cssText=`background:${clr.bg};color:${clr.tx};top:${top}px;height:${height2}px;border-left:3px solid ${clr.dot||clr.tx};`;
         let tags2='';
         if(f.tipo==='partido') tags2+=`<span class="f-tag f-tag-match">⚽</span>`;
         if(col==='casa')       tags2+=`<span class="f-tag f-tag-home">🏠</span>`;
